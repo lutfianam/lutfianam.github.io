@@ -1,47 +1,923 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gubuk Marhaen — Belajar Marhaenisme</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Lutfi Anam - Profile & Portfolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            accent: '#6366f1',
+                            dark: '#0b0f19',
+                            card: '#111827',
+                            border: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #14b8a6;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #14b8a6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
-<body data-halaman="beranda">
-    <header class="site-header">
-        <div class="logo-container">
-            <a href="index.html">
-                <span class="logo-badge">GM</span>
-                <h1>Gubuk Marhaen</h1>
+<body class="bg-brand-dark text-slate-200 font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Navigation Bar -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#hero" class="text-xl font-bold font-mono tracking-tight flex items-center gap-2">
+                <span class="text-brand-500">&lt;</span>
+                <span class="text-white">Lutfi.Anam</span>
+                <span class="text-brand-accent">/&gt;</span>
             </a>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="#about" class="hover:text-brand-500 transition-colors">Tentang</a>
+                <a href="#skills" class="hover:text-brand-500 transition-colors">Keahlian</a>
+                <a href="#experience" class="hover:text-brand-500 transition-colors">Pengalaman</a>
+                <a href="#portfolio" class="hover:text-brand-500 transition-colors">Portofolio</a>
+                <a href="#philosophy" class="hover:text-brand-500 transition-colors">Filosofi</a>
+                <a href="#contact" class="hover:text-brand-500 transition-colors">Kontak</a>
+            </nav>
+
+            <div class="hidden md:flex items-center gap-4">
+                <button onclick="toggleModalCV()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-brand-500 hover:bg-brand-600 text-slate-950 font-mono tracking-wide transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf">="text-sm"></i> Unduh Ringkasan CV
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-400 hover:text-white focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
         </div>
-        <div class="stempel">KTD<span>GMNI</span></div>
+
+        <!-- Mobile Menu Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-b border-slate-800 px-4 pt-2 pb-6 space-y-3">
+            <a href="#about" class="block py-2 text-slate-300 hover:text-brand-500 font-medium">Tentang</a>
+            <a href="#skills" class="block py-2 text-slate-300 hover:text-brand-500 font-medium">Keahlian</a>
+            <a href="#experience" class="block py-2 text-slate-300 hover:text-brand-500 font-medium">Pengalaman</a>
+            <a href="#portfolio" class="block py-2 text-slate-300 hover:text-brand-500 font-medium">Portofolio</a>
+            <a href="#philosophy" class="block py-2 text-slate-300 hover:text-brand-500 font-medium">Filosofi</a>
+            <a href="#contact" class="block py-2 text-slate-300 hover:text-brand-500 font-medium">Kontak</a>
+            <button onclick="toggleModalCV()" class="w-full mt-2 px-4 py-2.5 text-xs font-semibold rounded-lg bg-brand-500 text-slate-950 font-mono flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-pdf"></i> Unduh Ringkasan CV
+            </button>
+        </div>
     </header>
 
-    <nav class="tab-nav">
-        <a href="index.html" data-tab="beranda">Beranda</a>
-        <a href="daftar-modul.html" data-tab="daftar-modul">Daftar Modul</a>
-        <a href="belajar.html" data-tab="belajar">Halaman Belajar</a>
-        <a href="kuis.html" data-tab="kuis">Kuis</a>
-        <a href="hasil-kuis.html" data-tab="hasil-kuis">Hasil Kuis</a>
-    </nav>
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen pt-28 pb-16 flex items-center justify-center relative overflow-hidden">
+        <!-- Ambient Background Light -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/3 right-10 w-80 h-80 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <span class="eyebrow">Kaderisasi Tingkat Dasar · GMNI</span>
-                <h2>Belajar Marhaenisme selangkah demi selangkah</h2>
-                <p>Modul singkat untuk memahami Pengantar Marhaenisme, Marhaenisme, dan Materialisme-Dialektika-Historis, kapan saja kamu sempat.</p>
-                <a href="daftar-modul.html" class="cta-button">Mulai Belajar</a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-mono text-brand-500">
+                        <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
+                        Mahasiswa Teknologi Pendidikan & Praktisi IT Sekolah
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                        Halo, Saya <span class="gradient-text">Lutfi Anam</span>
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        Mengintegrasikan <strong class="text-slate-200">Teknologi Pendidikan</strong>, <strong class="text-slate-200">Desain Visual</strong>, dan <strong class="text-slate-200">Infrastruktur Digital</strong> untuk menciptakan sistem operasional sekolah dan pengalaman belajar interaktif yang modern.
+                    </p>
+
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="#portfolio" class="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-slate-950 font-semibold hover:opacity-90 transition-all shadow-lg shadow-brand-500/25 flex items-center gap-2">
+                            <i class="fa-solid fa-briefcase"></i> Lihat Portofolio
+                        </a>
+                        <a href="#contact" class="px-6 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Hubungi Saya
+                        </a>
+                    </div>
+
+                    <!-- Highlight Badges -->
+                    <div class="pt-8 grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-slate-800/80">
+                        <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-center lg:text-left">
+                            <p class="text-xs text-slate-400">Studi Utama</p>
+                            <p class="text-sm font-semibold text-white">Teknologi Pendidikan</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-center lg:text-left">
+                            <p class="text-xs text-slate-400">Sertifikasi & Pelatihan</p>
+                            <p class="text-sm font-semibold text-white">Program PELURU</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-center lg:text-left col-span-2 sm:col-span-1">
+                            <p class="text-xs text-slate-400">Spesialisasi</p>
+                            <p class="text-sm font-semibold text-white">ID & Digital Web Ops</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Avatar / Visual Terminal Card -->
+                <div class="lg:col-span-5 flex flex-col items-center justify-center gap-6">
+                    
+                    <!-- Slot Foto Profil -->
+                    <!-- <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-brand-500 to-brand-accent rounded-2xl blur opacity-40 group-hover:opacity-80 transition duration-500"></div>
+                        <div class="relative w-48 h-48 sm:w-56 sm:h-56 rounded-2xl overflow-hidden border-2 border-brand-500/50 bg-slate-900 shadow-2xl flex items-center justify-center">
+                            <!-- PETUNJUK: Ganti src di bawah ini dengan link/URL foto Anda -->
+                            <img src="https://placehold.co/400x400/111827/14b8a6?text=Foto+Lutfi+Anam" alt="Lutfi Anam" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/400x400/111827/14b8a6?text=Foto+Lutfi+Anam'">
+                        </div>
+                        <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-slate-900 border border-brand-500 text-[10px] font-mono text-brand-500 shadow-lg flex items-center gap-1.5 whitespace-nowrap">
+                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span> Foto Profil
+                        </div>
+                    </div> -->
+
+                    <!-- Terminal Card -->
+                    <div class="w-full max-w-md rounded-2xl glass-panel p-6 shadow-2xl border border-slate-700/50 relative">
+                        <!-- Terminal Bar -->
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-800 font-mono text-xs text-slate-400">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                            </div>
+                            <span>lutfi_profile.json</span>
+                        </div>
+                        
+                        <!-- Terminal Body Content -->
+                        <div class="py-4 space-y-3 font-mono text-xs sm:text-sm">
+                            <p><span class="text-purple-400">const</span> <span class="text-yellow-300">profile</span> = {</p>
+                            <p class="pl-4"><span class="text-cyan-400">nama</span>: <span class="text-emerald-300">'Lutfi Anam'</span>,</p>
+                            <p class="pl-4"><span class="text-cyan-400">institusi</span>: <span class="text-emerald-300">'Universitas Terbuka'</span>,</p>
+                            <p class="pl-4"><span class="text-cyan-400">bidang</span>: [<span class="text-emerald-300">'Instructional Design'</span>, <span class="text-emerald-300">'IT Ops'</span>],</p>
+                            <p class="pl-4"><span class="text-cyan-400">desainModel</span>: [<span class="text-emerald-300">'ADDIE'</span>, <span class="text-emerald-300">'Kemp'</span>, <span class="text-emerald-300">'Dick & Carey'</span>],</p>
+                            <p class="pl-4"><span class="text-cyan-400">toolsUtama</span>: [<span class="text-emerald-300">'Ibis Paint X'</span>, <span class="text-emerald-300">'Web/DNS'</span>, <span class="text-emerald-300">'Office 365'</span>],</p>
+                            <p class="pl-4"><span class="text-cyan-400">filosofi</span>: <span class="text-emerald-300">'Stoic & Meritokrasi'</span></p>
+                            <p>};</p>
+                            <div class="pt-2 text-slate-500 text-xs flex items-center gap-1">
+                                <span class="animate-pulse text-brand-500">&gt;</span> System ready for collaboration...
+                            </div>
+                        </div>
+
+                        <!-- Badge Overlay -->
+                        <div class="mt-4 p-3 rounded-xl bg-brand-accent/10 border border-brand-accent/30 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-brand-accent/20 flex items-center justify-center text-brand-accent">
+                                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Program Studi</p>
+                                    <p class="text-xs font-semibold text-white">Teknologi Pendidikan - UT</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-brand-500 font-mono">Aktif</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <footer class="site-footer">
-        <p>&copy; 2026 Gubuk Marhaen — Media Pembelajaran Kaderisasi GMNI</p>
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-slate-950/60 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-xs font-mono font-bold text-brand-500 tracking-wider uppercase mb-2">Profil Singkat</h2>
+                <h3 class="text-3xl font-extrabold text-white">Menghubungkan Metodologi & Eksekusi Praktis</h3>
+                <div class="w-16 h-1 bg-brand-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+                <!-- Left Card: Background -->
+                <div class="glass-panel p-8 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-white">Latar Belakang & Peran</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Sebagai karyawan di lingkungan institusi sekolah sekaligus mahasiswa <strong>Teknologi Pendidikan Universitas Terbuka</strong>, saya memiliki kombinasi unik antara pemahaman teori desain instruksional dan eksekusi teknis lapangan.
+                        </p>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Sehari-hari saya mengelola operasional sistem digital sekolah—mulai dari infrastruktur web, sistem presensi digital, jaringan perpustakaan, hingga penyusunan Prosedur Operasional Standar (POS) penilaian.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 font-mono">
+                        <span><i class="fa-solid fa-location-dot text-brand-500"></i> Indonesia</span>
+                        <span><i class="fa-solid fa-certificate text-brand-500"></i> PELURU & IT Ops Certified</span>
+                    </div>
+                </div>
+
+                <!-- Right Card: Core Pillars -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="glass-panel p-6 rounded-xl border border-slate-800 hover:border-brand-500/40 transition-all">
+                        <div class="text-brand-500 text-2xl mb-3"><i class="fa-solid fa-laptop-code"></i></div>
+                        <h5 class="text-white font-semibold mb-1">Web & Sistem Digital</h5>
+                        <p class="text-slate-400 text-xs">Pengelolaan domain, DNS, SSL, serta pemeliharaan aplikasi pendukung institusi.</p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-xl border border-slate-800 hover:border-brand-500/40 transition-all">
+                        <div class="text-brand-accent text-2xl mb-3"><i class="fa-solid fa-pen-nib"></i></div>
+                        <h5 class="text-white font-semibold mb-1">Desain Visual</h5>
+                        <p class="text-slate-400 text-xs">Visualisasi informasi, publikasi acara, & manipulasi aset grafis dengan Ibis Paint X.</p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-xl border border-slate-800 hover:border-brand-500/40 transition-all">
+                        <div class="text-yellow-500 text-2xl mb-3"><i class="fa-solid fa-sitemap"></i></div>
+                        <h5 class="text-white font-semibold mb-1">Tata Kelola & Organisasi</h5>
+                        <p class="text-slate-400 text-xs">Penerapan sistem meritokrasi, dinamika kepengurusan, & prosedur persidangan.</p>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-xl border border-slate-800 hover:border-brand-500/40 transition-all">
+                        <div class="text-emerald-400 text-2xl mb-3"><i class="fa-solid fa-chess"></i></div>
+                        <h5 class="text-white font-semibold mb-1">Manajemen Turnamen</h5>
+                        <p class="text-slate-400 text-xs">Penyusunan alur teknis & pairing catur Sistem Swiss dan Sistem Gugur.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Matrix Section -->
+    <section id="skills" class="py-20 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-xs font-mono font-bold text-brand-500 tracking-wider uppercase mb-2">Matriks Kompetensi</h2>
+                <h3 class="text-3xl font-extrabold text-white">Keahlian & Bidang Integrasi</h3>
+                <div class="w-16 h-1 bg-brand-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- Category 1: Teknologi Pendidikan & Desain Instructional -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-brand-500/20 text-brand-500 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white">Teknologi Pembelajaran</h4>
+                            <p class="text-xs text-slate-400">Instruksional & Media</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Model ADDIE / Kemp / Dick & Carey</span>
+                                <span class="text-brand-500 font-mono">Konseptual & Penerapan</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-brand-500 h-2 rounded-full w-[90%]"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Pengembangan Media Interaktif</span>
+                                <span class="text-brand-500 font-mono">Digital Content</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-brand-500 h-2 rounded-full w-[85%]"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Penyusunan POS & Standar Penilaian</span>
+                                <span class="text-brand-500 font-mono">Implementasi</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-brand-500 h-2 rounded-full w-[95%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 2: Desain Visual & Media -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-brand-accent/20 text-brand-accent flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-palette"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white">Desain Grafis & Layout</h4>
+                            <p class="text-xs text-slate-400">Visual & Aset Digital</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Ibis Paint X (Digital Art & Edits)</span>
+                                <span class="text-brand-accent font-mono">Mahir</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-brand-accent h-2 rounded-full w-[92%]"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Layout Pamphlet & Banner Ucapan</span>
+                                <span class="text-brand-accent font-mono">Kreatif</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-brand-accent h-2 rounded-full w-[88%]"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Manipulasi & Olah Gambar Visual</span>
+                                <span class="text-brand-accent font-mono">Komposisi Visual</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-brand-accent h-2 rounded-full w-[85%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 3: IT Infra & Ops Sekolah -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white">Web & Sistem Sekolah</h4>
+                            <p class="text-xs text-slate-400">Infrastruktur & Admin</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Domain, DNS & Sertifikat SSL</span>
+                                <span class="text-emerald-400 font-mono">Pengelolaan Web</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-emerald-500 h-2 rounded-full w-[88%]"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Presensi Digital & Perpustakaan</span>
+                                <span class="text-emerald-400 font-mono">Operasional</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-emerald-500 h-2 rounded-full w-[90%]"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Pairing Turnamen Catur (Swiss/Gugur)</span>
+                                <span class="text-emerald-400 font-mono">Teknis Pertandingan</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2">
+                                <div class="bg-emerald-500 h-2 rounded-full w-[95%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience & Timeline Section -->
+    <section id="experience" class="py-20 bg-slate-950/60 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-xs font-mono font-bold text-brand-500 tracking-wider uppercase mb-2">Jejak Langkah</h2>
+                <h3 class="text-3xl font-extrabold text-white">Pengalaman & Aktivitas Utama</h3>
+                <div class="w-16 h-1 bg-brand-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="relative border-l-2 border-slate-800 ml-4 md:ml-32 space-y-12">
+                
+                <!-- Timeline Item 1 -->
+                <div class="relative pl-8 group">
+                    <!-- Dot -->
+                    <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-brand-500 border-4 border-slate-950 group-hover:scale-125 transition-transform"></div>
+                    
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                        <h4 class="text-lg font-bold text-white">Karyawan & Dukungan Operasional IT Sekolah</h4>
+                        <span class="text-xs font-mono text-brand-500 bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-full w-fit">Aktif</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4 font-mono">Lingkungan Sekolah / Institusi Pendidikan</p>
+                    <div class="glass-panel p-6 rounded-xl border border-slate-800 text-sm text-slate-300 space-y-2">
+                        <p>• Mengelola konfigurasi domain, DNS, dan pengamanan SSL untuk portal/web institusi sekolah.</p>
+                        <p>• Mengatur operasional sistem jaringan presensi digital dan manajemen perpustakaan.</p>
+                        <p>• Membantu penyusunan Prosedur Operasional Standar (POS) penilaian dan ujian sekolah.</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 2 -->
+                <div class="relative pl-8 group">
+                    <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-brand-accent border-4 border-slate-950 group-hover:scale-125 transition-transform"></div>
+                    
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                        <h4 class="text-lg font-bold text-white">Mahasiswa Teknologi Pendidikan</h4>
+                        <span class="text-xs font-mono text-brand-accent bg-brand-accent/10 border border-brand-accent/20 px-3 py-1 rounded-full w-fit">Studi Berjalan</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4 font-mono">Universitas Terbuka (UT)</p>
+                    <div class="glass-panel p-6 rounded-xl border border-slate-800 text-sm text-slate-300 space-y-2">
+                        <p>• Mempelajari secara mendalam teori desain sistem instruksional (ADDIE, Kemp, Dick & Carey).</p>
+                        <p>• Mengembangkan gagasan pemanfaatan media pembelajaran berbasis digital & interaktif.</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 3 -->
+                <div class="relative pl-8 group">
+                    <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-yellow-500 border-4 border-slate-950 group-hover:scale-125 transition-transform"></div>
+                    
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                        <h4 class="text-lg font-bold text-white">Pengembang Organisasi, Sastra & Teknis Turnamen</h4>
+                        <span class="text-xs font-mono text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-3 py-1 rounded-full w-fit">Proyek / Event</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4 font-mono">Komunitas & Kaderisasi Desa</p>
+                    <div class="glass-panel p-6 rounded-xl border border-slate-800 text-sm text-slate-300 space-y-2">
+                        <p>• Menyusun artikel/esai bertema kaderisasi dan pemberdayaan masyarakat desa.</p>
+                        <p>• Menjadi pengatur sistem pertandingan & pairing pada turnamen catur (Swiss System / Knockout System).</p>
+                        <p>• Aktif dalam forum diskusi kepemimpinan, dinamika organisasi, serta sastra & filsafat Stoikisme.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio / Projects Section -->
+    <section id="portfolio" class="py-20 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-xs font-mono font-bold text-brand-500 tracking-wider uppercase mb-2">Hasil Karya & Inisiatif</h2>
+                <h3 class="text-3xl font-extrabold text-white">Portofolio & Fokus Projek</h3>
+                <div class="w-16 h-1 bg-brand-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <!-- Category Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button onclick="filterProjects('all')" class="project-btn active px-4 py-2 rounded-xl text-xs font-semibold bg-brand-500 text-slate-950 font-mono transition-all">Semua</button>
+                <button onclick="filterProjects('web')" class="project-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white font-mono transition-all">Web & IT Sekolah</button>
+                <button onclick="filterProjects('design')" class="project-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white font-mono transition-all">Desain Visual</button>
+                <button onclick="filterProjects('edu')" class="project-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white font-mono transition-all">Teknologi Pendidikan</button>
+                <button onclick="filterProjects('event')" class="project-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white font-mono transition-all">Event & Catur</button>
+            </div>
+
+            <!-- Project Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Card 1 -->
+                <div class="project-card web glass-panel rounded-2xl overflow-hidden border border-slate-800 hover:border-brand-500/50 transition-all flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md">Infrastructure</span>
+                            <i class="fa-solid fa-server text-slate-500"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Manajemen Domain & SSL Sekolah</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Konfigurasi DNS, pencatatan A Record/CNAME, serta pemasangan sertifikat SSL untuk menjamin keamanan & aksesibilitas situs sekolah.
+                        </p>
+                    </div>
+                    <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>DNS / SSL / Server</span>
+                        <span class="text-brand-500"><i class="fa-solid fa-check"></i> Implemented</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="project-card design glass-panel rounded-2xl overflow-hidden border border-slate-800 hover:border-brand-500/50 transition-all flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono text-brand-accent bg-brand-accent/10 px-2.5 py-1 rounded-md">Visual Graphic</span>
+                            <i class="fa-solid fa-image text-slate-500"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Desain Publikasi & Banner Ucapan</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Pengolahan aset visual, pamflet ucapan hari besar, dan materi publikasi digital sekolah menggunakan Ibis Paint X.
+                        </p>
+                    </div>
+                    <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>Ibis Paint X / Visual</span>
+                        <span class="text-brand-accent"><i class="fa-solid fa-check"></i> Completed</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="project-card edu glass-panel rounded-2xl overflow-hidden border border-slate-800 hover:border-brand-500/50 transition-all flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono text-brand-500 bg-brand-500/10 px-2.5 py-1 rounded-md">Instructional Design</span>
+                            <i class="fa-solid fa-graduation-cap text-slate-500"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Rancangan Media Pembelajaran ADDIE</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Penyusunan kerangka modul pembelajaran digital terstruktur berdasarkan tahap Analysis, Design, Development, Implementation, & Evaluation.
+                        </p>
+                    </div>
+                    <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>Teknologi Pendidikan</span>
+                        <span class="text-brand-500"><i class="fa-solid fa-check"></i> Framework</span>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="project-card event glass-panel rounded-2xl overflow-hidden border border-slate-800 hover:border-brand-500/50 transition-all flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono text-yellow-500 bg-yellow-500/10 px-2.5 py-1 rounded-md">Management</span>
+                            <i class="fa-solid fa-chess-king text-slate-500"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Sistem Pairing Turnamen Catur</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Penyusunan skema alur dan aturan pasangan (*pairing*) pertandingan catur menggunakan Sistem Swiss dan Sistem Gugur secara presisi.
+                        </p>
+                    </div>
+                    <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>Swiss & Knockout</span>
+                        <span class="text-yellow-500"><i class="fa-solid fa-check"></i> Event Ops</span>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="project-card web glass-panel rounded-2xl overflow-hidden border border-slate-800 hover:border-brand-500/50 transition-all flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md">School Ops</span>
+                            <i class="fa-solid fa-id-card text-slate-500"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Presensi Digital & POS Penilaian</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Integrasi sistem pencatatan log presensi berbasis digital dan penyusunan dokumen Prosedur Operasional Standar penilaian.
+                        </p>
+                    </div>
+                    <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>Digital Log & Standard</span>
+                        <span class="text-brand-500"><i class="fa-solid fa-check"></i> Active</span>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="project-card edu glass-panel rounded-2xl overflow-hidden border border-slate-800 hover:border-brand-500/50 transition-all flex flex-col justify-between">
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-md">Writing & Esai</span>
+                            <i class="fa-solid fa-feather text-slate-500"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">Esai Kaderisasi & Organisasi</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Penulisan esai kritis bertema pengembangan kepemimpinan, pemberdayaan pemuda desa, serta penerapan sistem meritokrasi.
+                        </p>
+                    </div>
+                    <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>Sastra & Pemikiran</span>
+                        <span class="text-purple-400"><i class="fa-solid fa-check"></i> Published</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy & Certifications Dual Section -->
+    <section id="philosophy" class="py-20 bg-slate-950/60 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                
+                <!-- Left: Stoicism & Philosophy Quote -->
+                <div class="space-y-6">
+                    <div>
+                        <h2 class="text-xs font-mono font-bold text-brand-500 tracking-wider uppercase mb-2">Nilai Personal</h2>
+                        <h3 class="text-3xl font-extrabold text-white">Filosofi Kerja & Prinsip Hidup</h3>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-2xl border border-slate-800 relative overflow-hidden">
+                        <i class="fa-solid fa-quote-right absolute -right-4 -bottom-4 text-8xl text-slate-800/30"></i>
+                        <p class="text-slate-300 text-sm leading-relaxed italic mb-6">
+                            "Berfokus pada apa yang berada dalam kendali kita (locus of control), mengeksekusi tugas dengan ketenangan Stoik, serta membangun iklim kerja yang berlandaskan meritokrasi dan keberlanjutan."
+                        </p>
+                        
+                        <div class="space-y-4 text-xs text-slate-400">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></span>
+                                <div>
+                                    <strong class="text-slate-200">Stoikisme & Epikureanisme:</strong> Keseimbangan rasionalitas, ketenangan mental dalam pemecahan masalah teknis.
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></span>
+                                <div>
+                                    <strong class="text-slate-200">Prinsip Meritokrasi:</strong> Menghargai gagasan dan pencapaian berdasarkan kapasitas, integritas, dan kontribusi nyata.
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></span>
+                                <div>
+                                    <strong class="text-slate-200">Sastra & Refleksi:</strong> Menulis sebagai sarana menjalin dinamika hubungan antarmanusia dan melatih kepekaan emosional.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Certifications & Recognition -->
+                <div class="space-y-6">
+                    <div>
+                        <h2 class="text-xs font-mono font-bold text-brand-accent tracking-wider uppercase mb-2">Kredensial</h2>
+                        <h3 class="text-3xl font-extrabold text-white">Sertifikasi & Pelatihan</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Cert 1 -->
+                        <div class="glass-panel p-5 rounded-xl border border-slate-800 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-xl shrink-0">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Program Pelatihan PELURU</h4>
+                                    <p class="text-xs text-slate-400">Pengembangan Kompetensi & Kepemimpinan</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded">Completed</span>
+                        </div>
+
+                        <!-- Academic Status -->
+                        <div class="glass-panel p-5 rounded-xl border border-slate-800 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl shrink-0">
+                                    <i class="fa-solid fa-university"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">S1 Teknologi Pendidikan</h4>
+                                    <p class="text-xs text-slate-400">Universitas Terbuka (UT)</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-mono text-brand-500 bg-brand-500/10 px-2.5 py-1 rounded">Active Student</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-xs font-mono font-bold text-brand-500 tracking-wider uppercase mb-2">Mari Berkomunikasi</h2>
+                <h3 class="text-3xl font-extrabold text-white">Hubungi atau Ajak Berkolaborasi</h3>
+                <div class="w-16 h-1 bg-brand-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Contact Info -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <h4 class="text-lg font-bold text-white">Informasi Kontak</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Terbuka untuk diskusi seputar teknologi pendidikan, tata kelola IT sekolah, konsultasi desain visual, maupun dinamika keorganisasian.
+                        </p>
+
+                        <div class="space-y-3 pt-2 text-sm">
+                            <div class="flex items-center gap-3 text-slate-300">
+                                <div class="w-9 h-9 rounded-lg bg-slate-800 text-brand-500 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-500">Email Utama</p>
+                                    <p class="font-mono text-xs">lutfianam@example.com</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 text-slate-300">
+                                <div class="w-9 h-9 rounded-lg bg-slate-800 text-brand-500 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-500">Program Studi</p>
+                                    <p class="text-xs">Teknologi Pendidikan UT</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 text-slate-300">
+                                <div class="w-9 h-9 rounded-lg bg-slate-800 text-brand-500 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-share-nodes"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-500">Jejaring</p>
+                                    <p class="text-xs">Profil Profesional Online</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Social Links -->
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex items-center justify-around text-slate-400">
+                        <a href="#" class="hover:text-brand-500 text-xl transition-colors" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-brand-500 text-xl transition-colors" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="hover:text-brand-500 text-xl transition-colors" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="hover:text-brand-500 text-xl transition-colors" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="lg:col-span-7">
+                    <div class="glass-panel p-8 rounded-2xl border border-slate-800">
+                        <form id="contact-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-mono text-slate-400 mb-2">Nama Lengkap</label>
+                                    <input type="text" required placeholder="Masukkan nama Anda" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-mono text-slate-400 mb-2">Email / Kontak</label>
+                                    <input type="email" required placeholder="nama@email.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-mono text-slate-400 mb-2">Subjek Pesan</label>
+                                <input type="text" required placeholder="Topik diskusi / kolaborasi" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-mono text-slate-400 mb-2">Isi Pesan</label>
+                                <textarea rows="4" required placeholder="Tuliskan pesan Anda di sini..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors resize-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-500 text-slate-950 font-bold hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/20 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> Kirim Pesan
+                            </button>
+                        </form>
+                        
+                        <div id="form-feedback" class="hidden mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs text-center font-mono">
+                            <i class="fa-solid fa-circle-check"></i> Pesan Anda telah terkirim! Terima kasih.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 bg-slate-950 border-t border-slate-800 text-center text-xs text-slate-500 font-mono">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 Lutfi Anam. Dikembangkan dengan HTML & Tailwind CSS.</p>
+            <p class="mt-1 text-slate-600">Teknologi Pendidikan UT • ID & Digital Web Operations</p>
+        </div>
     </footer>
 
-    <script src="js/script.js"></script>
+    <!-- Modal Ringkasan CV (Printable Preview) -->
+    <div id="cv-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl border border-slate-700 p-6 sm:p-8 max-h-[90vh] overflow-y-auto space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice text-brand-500 text-xl"></i>
+                    <h3 class="text-lg font-bold text-white">Ringkasan Kurikulum Vitae</h3>
+                </div>
+                <button onclick="toggleModalCV()" class="text-slate-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-white text-base">LUTFI ANAM</h4>
+                    <p class="text-brand-500 font-mono text-xs">Teknologi Pendidikan & IT Operations Sekolah</p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-white uppercase font-mono text-xs text-brand-500 mb-1">Pendidikan Utama</h5>
+                    <p>• S1 Teknologi Pendidikan - Universitas Terbuka</p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-white uppercase font-mono text-xs text-brand-500 mb-1">Sertifikasi & Pelatihan</h5>
+                    <p>• Program Pelatihan PELURU</p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-white uppercase font-mono text-xs text-brand-500 mb-1">Keahlian Kunci</h5>
+                    <p>• Desain Instruksional (ADDIE, Kemp, Dick & Carey)</p>
+                    <p>• Desain Grafis & Olah Aset Visual (Ibis Paint X)</p>
+                    <p>• Manajemen Web, DNS, SSL, Presensi Digital & Perpustakaan</p>
+                    <p>• Tata Kelola Organisasi & Pairing Turnamen Catur (Swiss/Gugur)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 border-t border-slate-800 pt-4">
+                <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono">
+                    <i class="fa-solid fa-print"></i> Cetak / Halaman
+                </button>
+                <button onclick="toggleModalCV()" class="px-4 py-2 rounded-xl bg-brand-500 text-slate-950 font-semibold text-xs font-mono">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        function filterProjects(category) {
+            const cards = document.querySelectorAll('.project-card');
+            const buttons = document.querySelectorAll('.project-btn');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-brand-500', 'text-slate-950');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+
+            event.target.classList.remove('bg-slate-800', 'text-slate-300');
+            event.target.classList.add('bg-brand-500', 'text-slate-950');
+
+            cards.forEach(card => {
+                if (category === 'all' || card.classList.contains(category)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleModalCV() {
+            const modal = document.getElementById('cv-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const feedback = document.getElementById('form-feedback');
+            const form = document.getElementById('contact-form');
+            
+            feedback.classList.remove('hidden');
+            form.reset();
+
+            setTimeout(() => {
+                feedback.classList.add('hidden');
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
