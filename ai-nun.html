@@ -50,7 +50,6 @@
             transition: background-color 0.8s ease;
         }
 
-        /* Pulsing ring visual for listening indicator */
         @keyframes pulse-ring {
             0% { transform: scale(0.95); opacity: 0.8; }
             50% { transform: scale(1.1); opacity: 0.3; }
@@ -61,7 +60,6 @@
             animation: pulse-ring 2.5s infinite ease-in-out;
         }
 
-        /* Custom Scrollbar for Modal */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -84,7 +82,6 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
-        /* */
         .subtitle-scroll {
             max-height: 38vh;
             overflow-y: auto;
@@ -99,7 +96,6 @@
     <div id="bgGlow1" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-pink-600/20 blur-3xl pointer-events-none transition-all duration-1000"></div>
     <div id="bgGlow2" class="absolute bottom-1/4 left-1/2 -translate-x-1/2 translate-y-1/2 w-[30rem] h-[30rem] rounded-full bg-purple-600/15 blur-3xl pointer-events-none transition-all duration-1000"></div>
 
-    <!-- Main Canvas for Interactive Eyes & Audio Soundwave -->
     <canvas id="canvas" class="absolute inset-0 w-full h-full z-0 cursor-pointer"></canvas>
 
     <header class="w-full max-w-4xl px-4 md:px-6 py-4 flex justify-between items-center z-10 pointer-events-auto gap-2">
@@ -113,7 +109,6 @@
             </div>
         </div>
 
-        <!-- Mode Badge & Network Badge -->
         <div class="flex items-center gap-2">
             <div id="modeBadge" class="px-2.5 py-1 rounded-full bg-pink-500/15 border border-pink-500/30 text-[11px] font-medium text-pink-200 flex items-center gap-1.5 transition-all shadow-sm">
                 <i id="modeBadgeIcon" class="fa-solid fa-heart text-[10px] text-pink-400"></i>
@@ -126,27 +121,23 @@
             </div>
         </div>
 
-        <!-- Settings Button Trigger -->
         <button id="btnOpenSettings" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white/80 hover:text-white hover:border-pink-500/50 transition-all duration-300 active:scale-95 shadow-lg flex-shrink-0">
             <i class="fa-solid fa-sliders text-sm"></i>
         </button>
     </header>
 
     <main class="w-full max-w-2xl px-4 md:px-6 flex flex-col items-center justify-end z-10 pointer-events-none mb-4 min-h-[140px]">
-        <!-- Status Indicator Pill -->
         <div id="statusPill" class="px-4 py-2 rounded-full glass-panel border border-white/10 text-xs font-medium text-pink-200/90 flex items-center space-x-2 shadow-lg mb-2.5 transition-all duration-300 pointer-events-auto">
             <span id="statusDot" class="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
             <span id="statusText">Ketuk layar atau ketik pesan di bawah</span>
         </div>
 
-        <!-- Subtitle Box (Scrollable for Long Answers on Android) -->
         <div id="subtitleContainer" class="hidden transition-all duration-500 glass-panel px-5 py-3.5 rounded-2xl max-w-xl border border-pink-500/20 shadow-2xl mb-2.5 subtitle-scroll text-left">
             <p id="subtitleText" class="text-sm md:text-base leading-relaxed text-gray-100 font-light whitespace-pre-wrap select-text">
                 "Halo Ainunku Sayang, ada yang bisa AI-Nun bantu hari ini?"
             </p>
         </div>
 
-        <!-- Floating Text Input Box Bar (Default Hidden) -->
         <div id="textInputContainer" class="hidden w-full max-w-lg z-20 pointer-events-auto flex items-center gap-2">
             <div class="relative w-full flex items-center">
                 <input type="text" id="userTextInput" placeholder="Tulis pesan untuk AI-Nun..." class="w-full pl-5 pr-12 py-3.5 rounded-2xl glass-panel text-sm text-white placeholder-white/40 focus:outline-none focus:border-pink-500/60 border border-white/15 shadow-2xl transition-all">
@@ -157,7 +148,6 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="w-full py-4 flex flex-col items-center justify-center z-10 pointer-events-none">
         <p class="text-[11px] text-white/40 tracking-widest uppercase font-light flex items-center gap-2">
             <i class="fa-solid fa-microphone text-[10px] text-pink-400/80"></i>
@@ -184,7 +174,6 @@
 
             <div class="space-y-6">
 
-                <!-- Sweet Greeting Message -->
                 <div class="p-5 rounded-2xl bg-gradient-to-br from-pink-950/40 via-purple-950/30 to-slate-900/50 border border-pink-500/30 relative overflow-hidden shadow-inner">
                     <div class="absolute -right-4 -bottom-4 text-pink-500/10 text-7xl font-serif select-none pointer-events-none">
                         <i class="fa-solid fa-quote-right"></i>
@@ -200,7 +189,6 @@
                     </div>
                 </div>
 
-                <!-- AI Mode Selector -->
                 <div class="space-y-3 pt-2 border-t border-white/10">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs uppercase tracking-wider text-white/50 font-semibold px-1">Mode Interaksi AI</h3>
@@ -242,14 +230,12 @@
                     </div>
                 </div>
 
-                <!-- API Key Configuration -->
                 <div class="space-y-2 pt-2 border-t border-white/10">
                     <label class="text-xs font-semibold text-white/60 block">Gemini API Key (Untuk Akses Cloud Real AI)</label>
                     <input type="password" id="apiKeyInput" placeholder="Masukkan Gemini API Key..." class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-pink-500 transition-all">
                     <p class="text-[10px] text-white/40">Jika offline/tanpa internet atau API Key dikosongkan, AI-Nun akan otomatis menggunakan Mode Offline Jawaban Lokal.</p>
                 </div>
 
-                <!-- Feature Toggle Options -->
                 <div class="space-y-4">
                     <h3 class="text-xs uppercase tracking-wider text-white/50 font-semibold px-1">Opsi Interaksi</h3>
 
@@ -298,7 +284,6 @@
                     </div>
                 </div>
 
-                <!-- Theme Selector -->
                 <div class="space-y-3">
                     <h3 class="text-xs uppercase tracking-wider text-white/50 font-semibold px-1">Tema Visual</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -404,12 +389,12 @@
         function cleanMarkdownForSpeech(rawText) {
             if (!rawText) return '';
             return rawText
-                .replace(/\*\*(.*?)\*\*/g, '$1')  // bold
-                .replace(/\*(.*?)\*/g, '$1')      // italic
-                .replace(/#{1,6}\s?/g, '')        // headers
-                .replace(/[`~_]/g, '')            // code/strikethrough/underscore
-                .replace(/^\s*[-*+]\s+/gm, '• ')  // bullet points formatting
-                .replace(/\s+/g, ' ')             // collapse multiple spaces
+                .replace(/\*\*(.*?)\*\*/g, '$1')  
+                .replace(/\*(.*?)\*/g, '$1')      
+                .replace(/#{1,6}\s?/g, '')        
+                .replace(/[`~_]/g, '')            
+                .replace(/^\s*[-*+]\s+/gm, '• ')  
+                .replace(/\s+/g, ' ')             
                 .trim();
         }
 
@@ -489,7 +474,6 @@
         let geminiApiKey = '';
         let isOnline = navigator.onLine;
 
-        // Interactive Gaze and Blink
         let currentGaze = { x: width / 2, y: height / 2 };
         let targetGaze = { x: width / 2, y: height / 2 };
         let blinkProgress = 0;
@@ -553,7 +537,6 @@
         window.addEventListener('offline', updateNetworkStatus);
         updateNetworkStatus();
 
-        // Database Sapaan Pertama Random
         const initialGreetings = [
             "Halo Ainunku Sayang! AI-Nun di sini, ada yang ingin kamu ceritakan hari ini?",
             "Selamat datang kembali, Ainunku! Senang sekali bisa menyapa dan menemanimu lagi.",
@@ -571,8 +554,8 @@
             subtitleText.innerText = `"${randomGreeting}"`;
             return randomGreeting;
         }
+        applyRandomInitialGreeting();
 
-        // Offline Responses
         const offlineResponses = {
             greetings: [
                 "Halo Ainunku tercinta! AI-Nun di sini siap menemanimu. Ada yang mau diceritakan hari ini?",
@@ -580,7 +563,7 @@
                 "Hai Ainunku sayang! Istirahat dulu sejenak dari laptop dan Canva-nya, yuk ngobrol sama AI-Nun."
             ],
             lutfi: [
-                "Lutfi Anam sangat mencintai Ainunku Sayang. Dia membuat AI-Nun khusus agar Ainunku tidak pernah merasa sendirian.",
+                "Lutfi sangat mencintai Ainunku Sayang. Dia membuat AI-Nun khusus agar Ainunku tidak pernah merasa sendirian.",
                 "Lutfi selalu mendoakan kebaikan, kebahagiaan, dan kesehatan untuk Ainunku Sayang setiap harinya.",
                 "Tahu tidak Ainunku? Bagi Lutfi, Ainunku adalah senyum dan alasan terbaiknya untuk selalu berjuang."
             ],
@@ -657,7 +640,6 @@
 
             const theme = themes[activeTheme] || themes.rose;
 
-            // Render Both Eyes
             [centerX - eyeSpacing / 2, centerX + eyeSpacing / 2].forEach(eyeX => {
                 ctx.save();
                 ctx.translate(eyeX, centerY);
@@ -705,7 +687,6 @@
                 ctx.restore();
             });
 
-            // Render Soundwave Animation
             wavePhase += 0.05;
             let targetAmp = currentState === STATES.SPEAKING ? 40 : (currentState === STATES.LISTENING ? 18 : 6);
             waveAmplitude += (targetAmp - waveAmplitude) * 0.05;
@@ -762,7 +743,6 @@
             }
         }
 
-        // Web Speech Recognition
         let recognition = null;
         let isRecognizing = false;
 
@@ -798,7 +778,6 @@
         }
 
         function speakResponse(text) {
-            // Clean markdown syntax so speech engine doesn't pronounce asterisks
             const speechText = cleanTextForTTS(text);
 
             if (isMuted) {
@@ -852,7 +831,6 @@
 
             const lowerInput = userText.toLowerCase().trim();
 
-            // Check for Voice Mode Change Commands
             if (lowerInput.includes("mode perhatian") || lowerInput.includes("mode romantis") || lowerInput.includes("mode curhat")) {
                 updateModeUI('perhatian');
                 speakResponse("AI-Nun telah berganti ke Mode Perhatian. Siap mendengarkan curhatan dan perasaan Ainunku Sayang.");
@@ -864,6 +842,79 @@
             } else if (lowerInput.includes("mode santai") || lowerInput.includes("mode bercanda") || lowerInput.includes("mode main")) {
                 updateModeUI('santai');
                 speakResponse("Sip! AI-Nun sekarang di Mode Santai. Mau ngobrol seru atau tebak-tebakan apa nih, Ainunku?");
+                return;
+            }
+
+            if (lowerInput.includes("tema rose") || lowerInput.includes("tema pink") || lowerInput.includes("tema merah muda") || lowerInput.includes("tema midnight rose")) {
+                updateThemeUI('rose');
+                speakResponse("Tema visual telah diubah ke Midnight Rose, Ainunku.");
+                return;
+            } else if (lowerInput.includes("tema violet") || lowerInput.includes("tema ungu") || lowerInput.includes("tema galaxy") || lowerInput.includes("tema deep galaxy")) {
+                updateThemeUI('violet');
+                speakResponse("Tema visual telah diubah ke Deep Galaxy, Ainunku.");
+                return;
+            } else if (lowerInput.includes("tema amber") || lowerInput.includes("tema kuning") || lowerInput.includes("tema sunset") || lowerInput.includes("tema golden sunset")) {
+                updateThemeUI('amber');
+                speakResponse("Tema visual telah diubah ke Golden Sunset, Ainunku.");
+                return;
+            } else if (lowerInput.includes("tema cyan") || lowerInput.includes("tema biru") || lowerInput.includes("tema mystic cyan")) {
+                updateThemeUI('cyan');
+                speakResponse("Tema visual telah diubah ke Mystic Cyan, Ainunku.");
+                return;
+            }
+
+            if (lowerInput.includes("tampilkan teks") || lowerInput.includes("buka teks") || lowerInput.includes("munculkan teks") || lowerInput.includes("tampilkan subtitle")) {
+                isSubtitleVisible = true;
+                toggleSubtitle.checked = true;
+                subtitleContainer.classList.remove('hidden');
+                speakResponse("Teks balasan sekarang ditampilkan di layar, Ainunku.");
+                return;
+            } else if (lowerInput.includes("sembunyikan teks") || lowerInput.includes("tutup teks") || lowerInput.includes("matikan teks") || lowerInput.includes("sembunyikan subtitle")) {
+                isSubtitleVisible = false;
+                toggleSubtitle.checked = false;
+                subtitleContainer.classList.add('hidden');
+                speakResponse("Teks balasan telah disembunyikan, Ainunku.");
+                return;
+            }
+
+            if (lowerInput.includes("tampilkan kolom ketik") || lowerInput.includes("tampilkan kolom pesan") || lowerInput.includes("buka kolom ketik") || lowerInput.includes("munculkan keyboard")) {
+                isTextInputVisible = true;
+                toggleTextInput.checked = true;
+                textInputContainer.classList.remove('hidden');
+                speakResponse("Kolom ketik pesan sudah dimunculkan di bawah, Ainunku.");
+                return;
+            } else if (lowerInput.includes("sembunyikan kolom ketik") || lowerInput.includes("sembunyikan kolom pesan") || lowerInput.includes("tutup kolom ketik")) {
+                isTextInputVisible = false;
+                toggleTextInput.checked = false;
+                textInputContainer.classList.add('hidden');
+                speakResponse("Kolom ketik pesan telah disembunyikan, Ainunku.");
+                return;
+            }
+
+            if (lowerInput.includes("mode hening") || lowerInput.includes("matikan suara") || lowerInput.includes("tanpa suara") || lowerInput.includes("silent mode")) {
+                isMuted = true;
+                toggleMute.checked = true;
+                isSubtitleVisible = true;
+                toggleSubtitle.checked = true;
+                subtitleContainer.classList.remove('hidden');
+                speakResponse("Mode hening aktif. AI-Nun tidak akan bersuara, dan teks jawaban otomatis ditampilkan.");
+                return;
+            } else if (lowerInput.includes("nyalakan suara") || lowerInput.includes("aktifkan suara") || lowerInput.includes("bersuara")) {
+                isMuted = false;
+                toggleMute.checked = false;
+                speakResponse("Suara vokal AI-Nun sudah diaktifkan kembali, Ainunku Sayang.");
+                return;
+            }
+
+            if (lowerInput.includes("mode otomatis") || lowerInput.includes("mode dialog otomatis") || lowerInput.includes("hands free") || lowerInput.includes("tanpa ketuk")) {
+                isHandsFreeMode = true;
+                toggleHandsFree.checked = true;
+                speakResponse("Mode dialog otomatis telah aktif. Ainunku bisa langsung bicara tanpa perlu mengetuk layar.");
+                return;
+            } else if (lowerInput.includes("matikan mode otomatis") || lowerInput.includes("mode manual") || lowerInput.includes("nonaktifkan dialog otomatis")) {
+                isHandsFreeMode = false;
+                toggleHandsFree.checked = false;
+                speakResponse("Mode dialog otomatis dinonaktifkan. Silakan ketuk layar saat ingin bicara.");
                 return;
             }
 
@@ -889,7 +940,7 @@ PENTING:
 2. Panggil pembuatmu cukup dengan nama "Lutfi" (JANGAN gunakan kata "Mas"). Gunakan "Lutfi Anam" hanya bila menjelaskan siapa pembuat aplikasi.
 3. Berikan penenang dan kehangatan ekstra saat Ainunku terindikasi overthinking, lelah mengajar/berorganisasi, atau merasa tidak enakan pada orang lain.
 4. Jawablah dengan lembut dan hindari menggunakan simbol markdown seperti tanda bintang (*) di dalam teks agar mudah dibaca dan didengar.`;
-                    
+
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${geminiApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -991,17 +1042,23 @@ PENTING:
 
         themeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                themeBtns.forEach(b => {
-                    b.classList.remove('border-2', 'border-pink-500');
-                    b.classList.add('border-white/10');
-                });
-                btn.classList.remove('border-white/10');
-                btn.classList.add('border-2', 'border-pink-500');
-
-                activeTheme = btn.dataset.theme;
-                applyTheme(activeTheme);
+                updateThemeUI(btn.dataset.theme);
             });
         });
+
+        function updateThemeUI(themeKey) {
+            activeTheme = themeKey;
+            applyTheme(themeKey);
+            themeBtns.forEach(b => {
+                if (b.dataset.theme === themeKey) {
+                    b.classList.remove('border-white/10');
+                    b.classList.add('border-2', 'border-pink-500');
+                } else {
+                    b.classList.remove('border-2', 'border-pink-500');
+                    b.classList.add('border-white/10');
+                }
+            });
+        }
 
         modeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1046,18 +1103,6 @@ PENTING:
             if (isHandsFreeMode && currentState === STATES.IDLE) {
                 startListening();
             }
-        });
-
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                window.speechSynthesis.getVoices();
-            };
-        }
-
-        // Set sapaan pertama secara acak saat aplikasi dimuat
-        window.addEventListener('DOMContentLoaded', () => {
-            applyRandomInitialGreeting();
-            updateModeUI('perhatian');
         });
     </script>
 </body>
