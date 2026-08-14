@@ -14,7 +14,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
     <!-- Custom Tailwind Configuration -->
     <script>
@@ -52,7 +52,7 @@
 
         @keyframes pulse-ring {
             0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 0.3; }
+            50% { transform: scale(1.08); opacity: 0.3; }
             100% { transform: scale(0.95); opacity: 0.8; }
         }
 
@@ -61,7 +61,8 @@
         }
 
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
@@ -76,7 +77,7 @@
         }
 
         .glass-panel {
-            background: rgba(20, 18, 30, 0.75);
+            background: rgba(20, 18, 30, 0.78);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -89,6 +90,14 @@
             touch-action: pan-y;
             pointer-events: auto;
         }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="w-screen h-screen relative flex flex-col justify-between items-center select-none font-sans">
@@ -96,6 +105,7 @@
     <div id="bgGlow1" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-pink-600/20 blur-3xl pointer-events-none transition-all duration-1000"></div>
     <div id="bgGlow2" class="absolute bottom-1/4 left-1/2 -translate-x-1/2 translate-y-1/2 w-[30rem] h-[30rem] rounded-full bg-purple-600/15 blur-3xl pointer-events-none transition-all duration-1000"></div>
 
+    <!-- Main Dynamic AI Avatar Canvas -->
     <canvas id="canvas" class="absolute inset-0 w-full h-full z-0 cursor-pointer"></canvas>
 
     <header class="w-full max-w-4xl px-4 md:px-6 py-4 flex justify-between items-center z-10 pointer-events-auto gap-2">
@@ -121,23 +131,50 @@
             </div>
         </div>
 
-        <button id="btnOpenSettings" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white/80 hover:text-white hover:border-pink-500/50 transition-all duration-300 active:scale-95 shadow-lg flex-shrink-0">
+        <button id="btnOpenSettings" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white/80 hover:text-white hover:border-pink-500/50 transition-all duration-300 active:scale-95 shadow-lg flex-shrink-0" title="Pengaturan AI-Nun">
             <i class="fa-solid fa-sliders text-sm"></i>
         </button>
     </header>
 
-    <main class="w-full max-w-2xl px-4 md:px-6 flex flex-col items-center justify-end z-10 pointer-events-none mb-4 min-h-[140px]">
+    <main class="w-full max-w-2xl px-4 md:px-6 flex flex-col items-center justify-end z-10 pointer-events-none mb-3 min-h-[160px]">
+        
+        <!-- Quick Suggestion Prompt Chips -->
+        <div id="chipContainer" class="w-full overflow-x-auto no-scrollbar flex items-center gap-2 py-1 mb-2.5 pointer-events-auto px-1">
+            <button class="prompt-chip px-3 py-1.5 rounded-full glass-panel text-[11px] font-medium text-pink-200/90 border border-pink-500/30 hover:border-pink-400 hover:bg-pink-500/20 transition-all flex-shrink-0 flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-heart-pulse text-pink-400 text-[10px]"></i>
+                <span>"Aku capek banget hari ini..."</span>
+            </button>
+            <button class="prompt-chip px-3 py-1.5 rounded-full glass-panel text-[11px] font-medium text-pink-200/90 border border-pink-500/30 hover:border-pink-400 hover:bg-pink-500/20 transition-all flex-shrink-0 flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-feather-pointed text-purple-400 text-[10px]"></i>
+                <span>"Bikin puisi romantis dong"</span>
+            </button>
+            <button class="prompt-chip px-3 py-1.5 rounded-full glass-panel text-[11px] font-medium text-pink-200/90 border border-pink-500/30 hover:border-pink-400 hover:bg-pink-500/20 transition-all flex-shrink-0 flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-mug-hot text-amber-400 text-[10px]"></i>
+                <span>"Lutfi lagi apa ya?"</span>
+            </button>
+            <button class="prompt-chip px-3 py-1.5 rounded-full glass-panel text-[11px] font-medium text-pink-200/90 border border-pink-500/30 hover:border-pink-400 hover:bg-pink-500/20 transition-all flex-shrink-0 flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-graduation-cap text-cyan-400 text-[10px]"></i>
+                <span>"Semangat ngajar di MI Darut Thulab"</span>
+            </button>
+        </div>
+
+        <!-- Status Indicator Pill -->
         <div id="statusPill" class="px-4 py-2 rounded-full glass-panel border border-white/10 text-xs font-medium text-pink-200/90 flex items-center space-x-2 shadow-lg mb-2.5 transition-all duration-300 pointer-events-auto">
             <span id="statusDot" class="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
             <span id="statusText">Ketuk layar atau ketik pesan di bawah</span>
         </div>
 
-        <div id="subtitleContainer" class="hidden transition-all duration-500 glass-panel px-5 py-3.5 rounded-2xl max-w-xl border border-pink-500/20 shadow-2xl mb-2.5 subtitle-scroll text-left">
-            <p id="subtitleText" class="text-sm md:text-base leading-relaxed text-gray-100 font-light whitespace-pre-wrap select-text">
+        <!-- Subtitle Container -->
+        <div id="subtitleContainer" class="hidden transition-all duration-500 glass-panel px-5 py-3.5 rounded-2xl max-w-xl border border-pink-500/20 shadow-2xl mb-2.5 subtitle-scroll text-left relative group">
+            <button id="btnCopySubtitle" class="absolute top-2.5 right-2.5 text-white/40 hover:text-white p-1 rounded-lg transition-all opacity-0 group-hover:opacity-100" title="Salin Pesan">
+                <i class="fa-regular fa-copy text-xs"></i>
+            </button>
+            <p id="subtitleText" class="text-sm md:text-base leading-relaxed text-gray-100 font-light whitespace-pre-wrap select-text pr-4">
                 "Halo Ainunku Sayang, ada yang bisa AI-Nun bantu hari ini?"
             </p>
         </div>
 
+        <!-- Text Input Container -->
         <div id="textInputContainer" class="hidden w-full max-w-lg z-20 pointer-events-auto flex items-center gap-2">
             <div class="relative w-full flex items-center">
                 <input type="text" id="userTextInput" placeholder="Tulis pesan untuk AI-Nun..." class="w-full pl-5 pr-12 py-3.5 rounded-2xl glass-panel text-sm text-white placeholder-white/40 focus:outline-none focus:border-pink-500/60 border border-white/15 shadow-2xl transition-all">
@@ -148,10 +185,10 @@
         </div>
     </main>
 
-    <footer class="w-full py-4 flex flex-col items-center justify-center z-10 pointer-events-none">
+    <footer class="w-full py-3 flex flex-col items-center justify-center z-10 pointer-events-none">
         <p class="text-[11px] text-white/40 tracking-widest uppercase font-light flex items-center gap-2">
             <i class="fa-solid fa-microphone text-[10px] text-pink-400/80"></i>
-            <span id="tapHintText">Ketuk latar belakang untuk bicara, atau ketik di atas</span>
+            <span id="tapHintText">Ketuk layar untuk bicara, atau ketik di atas</span>
         </p>
     </footer>
 
@@ -174,6 +211,7 @@
 
             <div class="space-y-6">
 
+                <!-- Dedicated Message from Lutfi Anam -->
                 <div class="p-5 rounded-2xl bg-gradient-to-br from-pink-950/40 via-purple-950/30 to-slate-900/50 border border-pink-500/30 relative overflow-hidden shadow-inner">
                     <div class="absolute -right-4 -bottom-4 text-pink-500/10 text-7xl font-serif select-none pointer-events-none">
                         <i class="fa-solid fa-quote-right"></i>
@@ -189,6 +227,7 @@
                     </div>
                 </div>
 
+                <!-- Interaction Modes -->
                 <div class="space-y-3 pt-2 border-t border-white/10">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs uppercase tracking-wider text-white/50 font-semibold px-1">Mode Interaksi AI</h3>
@@ -230,14 +269,16 @@
                     </div>
                 </div>
 
+                <!-- Gemini API Key Input -->
                 <div class="space-y-2 pt-2 border-t border-white/10">
                     <label class="text-xs font-semibold text-white/60 block">Gemini API Key (Untuk Akses Cloud Real AI)</label>
                     <input type="password" id="apiKeyInput" placeholder="Masukkan Gemini API Key..." class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-pink-500 transition-all">
-                    <p class="text-[10px] text-white/40">Jika offline/tanpa internet atau API Key dikosongkan, AI-Nun akan otomatis menggunakan Mode Offline Jawaban Lokal.</p>
+                    <p class="text-[10px] text-white/40">Tersimpan aman di browser kamu. Jika dikosongkan/offline, AI-Nun otomatis memakai Mode Jawaban Lokal.</p>
                 </div>
 
+                <!-- Interaction Toggles -->
                 <div class="space-y-4">
-                    <h3 class="text-xs uppercase tracking-wider text-white/50 font-semibold px-1">Opsi Interaksi</h3>
+                    <h3 class="text-xs uppercase tracking-wider text-white/50 font-semibold px-1">Opsi Interaksi & Suara</h3>
 
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
                         <div class="pr-4">
@@ -245,7 +286,7 @@
                             <span class="text-xs text-white/50 block mt-0.5">Menampilkan teks balasan AI di layar utama</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                            <input type="checkbox" id="toggleSubtitle" class="sr-only peer">
+                            <input type="checkbox" id="toggleSubtitle" class="sr-only peer" checked>
                             <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
                         </label>
                     </div>
@@ -256,15 +297,15 @@
                             <span class="text-xs text-white/50 block mt-0.5">Menampilkan area ketik teks di bagian bawah layar</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                            <input type="checkbox" id="toggleTextInput" class="sr-only peer">
+                            <input type="checkbox" id="toggleTextInput" class="sr-only peer" checked>
                             <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
                         </label>
                     </div>
 
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
                         <div class="pr-4">
-                            <label for="toggleMute" class="text-sm font-medium text-white block cursor-pointer">Mode Hening (Tanpa Suara)</label>
-                            <span class="text-xs text-white/50 block mt-0.5">Membungkam suara vokal balasan AI-Nun</span>
+                            <label for="toggleMute" class="text-sm font-medium text-white block cursor-pointer">Mode Hening (Tanpa Suara Vokal)</label>
+                            <span class="text-xs text-white/50 block mt-0.5">Membungkam suara vokal pembacaan balasan AI</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
                             <input type="checkbox" id="toggleMute" class="sr-only peer">
@@ -274,8 +315,19 @@
 
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
                         <div class="pr-4">
+                            <label for="toggleSoundFX" class="text-sm font-medium text-white block cursor-pointer">Efek Suara Nada UI (Chime Sound)</label>
+                            <span class="text-xs text-white/50 block mt-0.5">Memutar nada halus saat mulai mendengar & menjawab</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                            <input type="checkbox" id="toggleSoundFX" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
+                        <div class="pr-4">
                             <label for="toggleHandsFree" class="text-sm font-medium text-white block cursor-pointer">Mode Dialog Otomatis</label>
-                            <span class="text-xs text-white/50 block mt-0.5">Otomatis mendengarkan tanpa perlu mengetuk layar</span>
+                            <span class="text-xs text-white/50 block mt-0.5">Otomatis mendengarkan ulang setelah AI selesai menjawab</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
                             <input type="checkbox" id="toggleHandsFree" class="sr-only peer">
@@ -284,6 +336,7 @@
                     </div>
                 </div>
 
+                <!-- Theme Selection -->
                 <div class="space-y-3">
                     <h3 class="text-xs uppercase tracking-wider text-white/50 font-semibold px-1">Tema Visual</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -329,6 +382,7 @@
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
+            initHeartParticles();
         });
 
         // DOM elements
@@ -338,6 +392,7 @@
         const tapHintText = document.getElementById('tapHintText');
         const subtitleContainer = document.getElementById('subtitleContainer');
         const subtitleText = document.getElementById('subtitleText');
+        const btnCopySubtitle = document.getElementById('btnCopySubtitle');
         const textInputContainer = document.getElementById('textInputContainer');
         const userTextInput = document.getElementById('userTextInput');
         const btnSendText = document.getElementById('btnSendText');
@@ -349,10 +404,12 @@
         const toggleSubtitle = document.getElementById('toggleSubtitle');
         const toggleTextInput = document.getElementById('toggleTextInput');
         const toggleMute = document.getElementById('toggleMute');
+        const toggleSoundFX = document.getElementById('toggleSoundFX');
         const toggleHandsFree = document.getElementById('toggleHandsFree');
         const apiKeyInput = document.getElementById('apiKeyInput');
         const themeBtns = document.querySelectorAll('.theme-btn');
         const modeBtns = document.querySelectorAll('.mode-btn');
+        const promptChips = document.querySelectorAll('.prompt-chip');
         const networkBadge = document.getElementById('networkBadge');
         const networkDot = document.getElementById('networkDot');
         const networkText = document.getElementById('networkText');
@@ -385,6 +442,60 @@
         };
 
         let currentMode = 'perhatian';
+        let conversationHistory = []; // Keep track of past dialog context
+
+        // Audio synthesizer using Web Audio API for soft sound FX
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playChimeSound(type) {
+            if (!toggleSoundFX.checked) return;
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'listen') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'reply') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(659.25, now); // E5
+                    osc.frequency.exponentialRampToValueAtTime(880.00, now + 0.2); // A5
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch (e) {
+                console.warn('Audio chime error:', e);
+            }
+        }
 
         function cleanMarkdownForSpeech(rawText) {
             if (!rawText) return '';
@@ -466,18 +577,37 @@
         };
 
         let currentState = STATES.IDLE;
-        let isSubtitleVisible = false;
-        let isTextInputVisible = false;
+        let isSubtitleVisible = true;
+        let isTextInputVisible = true;
         let isMuted = false;
         let isHandsFreeMode = false;
         let activeTheme = 'rose';
         let geminiApiKey = '';
         let isOnline = navigator.onLine;
 
+        // Eye gaze tracking state
         let currentGaze = { x: width / 2, y: height / 2 };
         let targetGaze = { x: width / 2, y: height / 2 };
         let blinkProgress = 0;
         let isBlinking = false;
+
+        // Heart Particles
+        let heartParticles = [];
+
+        function initHeartParticles() {
+            heartParticles = [];
+            for (let i = 0; i < 20; i++) {
+                heartParticles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 8 + 4,
+                    speedY: Math.random() * 0.4 + 0.1,
+                    opacity: Math.random() * 0.5 + 0.2,
+                    swing: Math.random() * 0.02
+                });
+            }
+        }
+        initHeartParticles();
 
         window.addEventListener('mousemove', (e) => {
             targetGaze.x = e.clientX;
@@ -520,14 +650,76 @@
         }
         scheduleNextBlink();
 
+        function loadSavedSettings() {
+            try {
+                const saved = localStorage.getItem('ainun_settings_v2');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.geminiApiKey) {
+                        geminiApiKey = parsed.geminiApiKey;
+                        apiKeyInput.value = geminiApiKey;
+                    }
+                    if (parsed.theme) updateThemeUI(parsed.theme);
+                    if (parsed.mode) updateModeUI(parsed.mode);
+                    if (parsed.isSubtitleVisible !== undefined) {
+                        isSubtitleVisible = parsed.isSubtitleVisible;
+                        toggleSubtitle.checked = isSubtitleVisible;
+                        if (isSubtitleVisible) subtitleContainer.classList.remove('hidden');
+                        else subtitleContainer.classList.add('hidden');
+                    }
+                    if (parsed.isTextInputVisible !== undefined) {
+                        isTextInputVisible = parsed.isTextInputVisible;
+                        toggleTextInput.checked = isTextInputVisible;
+                        if (isTextInputVisible) textInputContainer.classList.remove('hidden');
+                        else textInputContainer.classList.add('hidden');
+                    }
+                    if (parsed.isMuted !== undefined) {
+                        isMuted = parsed.isMuted;
+                        toggleMute.checked = isMuted;
+                    }
+                    if (parsed.isSoundFX !== undefined) {
+                        toggleSoundFX.checked = parsed.isSoundFX;
+                    }
+                    if (parsed.isHandsFreeMode !== undefined) {
+                        isHandsFreeMode = parsed.isHandsFreeMode;
+                        toggleHandsFree.checked = isHandsFreeMode;
+                    }
+                } else {
+                    // Default view on first visit
+                    subtitleContainer.classList.remove('hidden');
+                    textInputContainer.classList.remove('hidden');
+                }
+            } catch (e) {
+                console.warn('Error reading saved settings:', e);
+            }
+        }
+
+        function saveSettingsToStorage() {
+            try {
+                const data = {
+                    geminiApiKey,
+                    theme: activeTheme,
+                    mode: currentMode,
+                    isSubtitleVisible,
+                    isTextInputVisible,
+                    isMuted,
+                    isSoundFX: toggleSoundFX.checked,
+                    isHandsFreeMode
+                };
+                localStorage.setItem('ainun_settings_v2', JSON.stringify(data));
+            } catch (e) {
+                console.warn('Error saving settings:', e);
+            }
+        }
+
         function updateNetworkStatus() {
             isOnline = navigator.onLine;
             if (isOnline) {
-                networkBadge.className = "px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-medium text-emerald-300 flex items-center gap-1.5 transition-all";
+                networkBadge.className = "px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-medium text-emerald-300 flex items-center gap-1.5 transition-all";
                 networkDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
                 networkText.innerText = geminiApiKey ? "Online (Gemini AI)" : "Online (Jawaban Lokal)";
             } else {
-                networkBadge.className = "px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] font-medium text-amber-300 flex items-center gap-1.5 transition-all";
+                networkBadge.className = "px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] font-medium text-amber-300 flex items-center gap-1.5 transition-all";
                 networkDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400";
                 networkText.innerText = "Offline Mode (Lokal)";
             }
@@ -535,7 +727,6 @@
 
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
-        updateNetworkStatus();
 
         const initialGreetings = [
             "Halo Ainunku Sayang! AI-Nun di sini, ada yang ingin kamu ceritakan hari ini?",
@@ -576,6 +767,10 @@
                 "Jangan terlalu memaksakan diri ya Ainunku Sayang. Kalau capek berorganisasi atau ngedit di Canva, istirahat dulu. Lutfi dan AI-Nun sangat peduli padamu.",
                 "Ainunku adalah sosok yang hebat, guru yang luar biasa di MI Darut Thulab, dan pengabdi organisasi yang tulus. Senyum ya!"
             ],
+            puisi: [
+                "Di antara deretan waktu dan helai hari,\nAda nama Ainunku yang selalu berseri.\nJangan biarkan lelah meredupkan binar matamu,\nSebab kasih Lutfi dan AI-Nun selalu memelukmu.",
+                "Bunga bermekaran di Botoputih yang tenang,\nMenyambut senyum Ainunku yang selalu terang.\nIstirahatlah manisku, rehatkan jemarimu,\nHari ini kamu sudah berjuang luar biasa menyinari sekitarmu."
+            ],
             rindu: [
                 "Kalau Ainunku merasa rindu, AI-Nun siap menyampaikan salam hangat dari Lutfi untukmu di Botoputih.",
                 "Rasa rindu itu bukti betapa berartinya kehadiran seseorang. Semoga hari Ainunku Sayang selalu dipenuhi kehangatan."
@@ -592,14 +787,16 @@
             const lower = userText.toLowerCase();
 
             if (currentMode === 'asisten') {
-                return `Siap Ainunku! Ini catatan singkat untukmu:\n• ${userText}\nAI-Nun selalu siap mencatat dan mengingatkan tugas Ainunku.`;
+                return `Siap Ainunku! Ini catatan singkat untukmu:\n• Pesan: "${userText}"\n• AI-Nun selalu siap membantu dan mencatat tugas-tugas Ainunku.`;
             } else if (currentMode === 'santai') {
                 return "Hehe, siap Ainunku! Mau lanjut cerita seru atau tebak-tebakan nih?";
             }
 
             let pool = offlineResponses.fallback;
 
-            if (lower.includes("halo") || lower.includes("hai") || lower.includes("selamat") || lower.includes("sapa")) {
+            if (lower.includes("puisi") || lower.includes("sajak")) {
+                pool = offlineResponses.puisi;
+            } else if (lower.includes("halo") || lower.includes("hai") || lower.includes("selamat") || lower.includes("sapa")) {
                 pool = offlineResponses.greetings;
             } else if (lower.includes("lutfi") || lower.includes("anam") || lower.includes("pembuat") || lower.includes("siapa kamu")) {
                 pool = offlineResponses.lutfi;
@@ -617,14 +814,42 @@
         let wavePhase = 0;
         let waveAmplitude = 10;
 
+        function drawHeart(x, y, size, color, opacity) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = color;
+            ctx.globalAlpha = opacity;
+            ctx.beginPath();
+            const d = size;
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-d / 2, -d / 2, -d, d / 3, 0, d);
+            ctx.bezierCurveTo(d, d / 3, d / 2, -d / 2, 0, 0);
+            ctx.fill();
+            ctx.restore();
+        }
+
         function renderFrame() {
             ctx.clearRect(0, 0, width, height);
 
+            const theme = themes[activeTheme] || themes.rose;
+
+            // Render floating background hearts
+            heartParticles.forEach(p => {
+                p.y -= p.speedY;
+                p.x += Math.sin(p.y * p.swing) * 0.5;
+                if (p.y < -20) {
+                    p.y = height + 20;
+                    p.x = Math.random() * width;
+                }
+                drawHeart(p.x, p.y, p.size, theme.eyeColor, p.opacity);
+            });
+
+            // Smooth gaze movement
             currentGaze.x += (targetGaze.x - currentGaze.x) * 0.08;
             currentGaze.y += (targetGaze.y - currentGaze.y) * 0.08;
 
             const centerX = width / 2;
-            const centerY = height / 2 - 50;
+            const centerY = height / 2 - 40;
             const eyeSpacing = Math.min(width * 0.22, 140);
             const baseEyeRadius = Math.min(width * 0.08, 48);
 
@@ -638,8 +863,7 @@
             const gazeOffsetX = Math.cos(gazeAngle) * gazeDist;
             const gazeOffsetY = Math.sin(gazeAngle) * gazeDist;
 
-            const theme = themes[activeTheme] || themes.rose;
-
+            // Render AI Eyes
             [centerX - eyeSpacing / 2, centerX + eyeSpacing / 2].forEach(eyeX => {
                 ctx.save();
                 ctx.translate(eyeX, centerY);
@@ -648,17 +872,17 @@
                 if (currentState === STATES.LISTENING) {
                     eyeScaleY *= 1.15;
                 } else if (currentState === STATES.SPEAKING) {
-                    eyeScaleY *= 0.85;
+                    eyeScaleY *= 0.88;
                 }
 
                 ctx.scale(1, Math.max(0.02, eyeScaleY));
 
-                let glowGrad = ctx.createRadialGradient(0, 0, baseEyeRadius * 0.2, 0, 0, baseEyeRadius * 2);
+                let glowGrad = ctx.createRadialGradient(0, 0, baseEyeRadius * 0.2, 0, 0, baseEyeRadius * 2.2);
                 glowGrad.addColorStop(0, theme.eyeColor);
                 glowGrad.addColorStop(1, 'transparent');
                 ctx.fillStyle = glowGrad;
                 ctx.beginPath();
-                ctx.arc(0, 0, baseEyeRadius * 2, 0, Math.PI * 2);
+                ctx.arc(0, 0, baseEyeRadius * 2.2, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.beginPath();
@@ -687,9 +911,10 @@
                 ctx.restore();
             });
 
+            // Dynamic Audio Soundwave Render
             wavePhase += 0.05;
-            let targetAmp = currentState === STATES.SPEAKING ? 40 : (currentState === STATES.LISTENING ? 18 : 6);
-            waveAmplitude += (targetAmp - waveAmplitude) * 0.05;
+            let targetAmp = currentState === STATES.SPEAKING ? 38 : (currentState === STATES.LISTENING ? 22 : 8);
+            waveAmplitude += (targetAmp - waveAmplitude) * 0.06;
 
             const waveY = height * 0.72;
             ctx.save();
@@ -721,9 +946,10 @@
                 case STATES.IDLE:
                     statusDot.className = "w-2 h-2 rounded-full bg-pink-400 animate-pulse";
                     statusText.innerText = "Ketuk layar atau ketik pesan di bawah";
-                    tapHintText.innerText = isHandsFreeMode ? "Mode Dialog Otomatis Aktif" : "Ketuk latar belakang untuk bicara, atau ketik di atas";
+                    tapHintText.innerText = isHandsFreeMode ? "Mode Dialog Otomatis Aktif" : "Ketuk layar untuk bicara, atau ketik di atas";
                     break;
                 case STATES.LISTENING:
+                    playChimeSound('listen');
                     statusDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
                     statusText.innerText = "AI-Nun sedang mendengarkan...";
                     tapHintText.innerText = "Berbicara sekarang...";
@@ -733,11 +959,14 @@
                     statusText.innerText = "AI-Nun sedang berpikir...";
                     break;
                 case STATES.SPEAKING:
+                    playChimeSound('reply');
                     statusDot.className = "w-2 h-2 rounded-full bg-pink-500 animate-bounce";
                     statusText.innerText = "AI-Nun sedang menjawab...";
                     if (text) {
                         const displayFormattedText = cleanMarkdownForSpeech(text);
                         subtitleText.innerText = `"${displayFormattedText}"`;
+                        // Auto-scroll subtitle container to top
+                        subtitleContainer.scrollTop = 0;
                     }
                     break;
             }
@@ -827,97 +1056,85 @@
         }
 
         async function processUserInput(userText) {
+            getAudioContext(); // Unlock audio context on user gesture
             setState(STATES.THINKING);
 
             const lowerInput = userText.toLowerCase().trim();
 
+            // Voice Command Controls
             if (lowerInput.includes("mode perhatian") || lowerInput.includes("mode romantis") || lowerInput.includes("mode curhat")) {
                 updateModeUI('perhatian');
+                saveSettingsToStorage();
                 speakResponse("AI-Nun telah berganti ke Mode Perhatian. Siap mendengarkan curhatan dan perasaan Ainunku Sayang.");
                 return;
             } else if (lowerInput.includes("mode asisten") || lowerInput.includes("mode kerja") || lowerInput.includes("mode produktif")) {
                 updateModeUI('asisten');
+                saveSettingsToStorage();
                 speakResponse("AI-Nun berganti ke Mode Asisten Harian. Ada tugas, jadwal, atau hal yang perlu AI-Nun catat?");
                 return;
             } else if (lowerInput.includes("mode santai") || lowerInput.includes("mode bercanda") || lowerInput.includes("mode main")) {
                 updateModeUI('santai');
+                saveSettingsToStorage();
                 speakResponse("Sip! AI-Nun sekarang di Mode Santai. Mau ngobrol seru atau tebak-tebakan apa nih, Ainunku?");
                 return;
             }
 
-            if (lowerInput.includes("tema rose") || lowerInput.includes("tema pink") || lowerInput.includes("tema merah muda") || lowerInput.includes("tema midnight rose")) {
+            if (lowerInput.includes("tema rose") || lowerInput.includes("tema pink") || lowerInput.includes("tema midnight rose")) {
                 updateThemeUI('rose');
+                saveSettingsToStorage();
                 speakResponse("Tema visual telah diubah ke Midnight Rose, Ainunku.");
                 return;
-            } else if (lowerInput.includes("tema violet") || lowerInput.includes("tema ungu") || lowerInput.includes("tema galaxy") || lowerInput.includes("tema deep galaxy")) {
+            } else if (lowerInput.includes("tema violet") || lowerInput.includes("tema ungu") || lowerInput.includes("tema deep galaxy")) {
                 updateThemeUI('violet');
+                saveSettingsToStorage();
                 speakResponse("Tema visual telah diubah ke Deep Galaxy, Ainunku.");
                 return;
-            } else if (lowerInput.includes("tema amber") || lowerInput.includes("tema kuning") || lowerInput.includes("tema sunset") || lowerInput.includes("tema golden sunset")) {
+            } else if (lowerInput.includes("tema amber") || lowerInput.includes("tema sunset") || lowerInput.includes("tema golden sunset")) {
                 updateThemeUI('amber');
+                saveSettingsToStorage();
                 speakResponse("Tema visual telah diubah ke Golden Sunset, Ainunku.");
                 return;
-            } else if (lowerInput.includes("tema cyan") || lowerInput.includes("tema biru") || lowerInput.includes("tema mystic cyan")) {
+            } else if (lowerInput.includes("tema cyan") || lowerInput.includes("tema mystic cyan")) {
                 updateThemeUI('cyan');
+                saveSettingsToStorage();
                 speakResponse("Tema visual telah diubah ke Mystic Cyan, Ainunku.");
                 return;
             }
 
-            if (lowerInput.includes("tampilkan teks") || lowerInput.includes("buka teks") || lowerInput.includes("munculkan teks") || lowerInput.includes("tampilkan subtitle")) {
+            if (lowerInput.includes("tampilkan teks") || lowerInput.includes("buka teks")) {
                 isSubtitleVisible = true;
                 toggleSubtitle.checked = true;
                 subtitleContainer.classList.remove('hidden');
+                saveSettingsToStorage();
                 speakResponse("Teks balasan sekarang ditampilkan di layar, Ainunku.");
                 return;
-            } else if (lowerInput.includes("sembunyikan teks") || lowerInput.includes("tutup teks") || lowerInput.includes("matikan teks") || lowerInput.includes("sembunyikan subtitle")) {
+            } else if (lowerInput.includes("sembunyikan teks") || lowerInput.includes("tutup teks")) {
                 isSubtitleVisible = false;
                 toggleSubtitle.checked = false;
                 subtitleContainer.classList.add('hidden');
+                saveSettingsToStorage();
                 speakResponse("Teks balasan telah disembunyikan, Ainunku.");
                 return;
             }
 
-            if (lowerInput.includes("tampilkan kolom ketik") || lowerInput.includes("tampilkan kolom pesan") || lowerInput.includes("buka kolom ketik") || lowerInput.includes("munculkan keyboard")) {
-                isTextInputVisible = true;
-                toggleTextInput.checked = true;
-                textInputContainer.classList.remove('hidden');
-                speakResponse("Kolom ketik pesan sudah dimunculkan di bawah, Ainunku.");
-                return;
-            } else if (lowerInput.includes("sembunyikan kolom ketik") || lowerInput.includes("sembunyikan kolom pesan") || lowerInput.includes("tutup kolom ketik")) {
-                isTextInputVisible = false;
-                toggleTextInput.checked = false;
-                textInputContainer.classList.add('hidden');
-                speakResponse("Kolom ketik pesan telah disembunyikan, Ainunku.");
-                return;
-            }
-
-            if (lowerInput.includes("mode hening") || lowerInput.includes("matikan suara") || lowerInput.includes("tanpa suara") || lowerInput.includes("silent mode")) {
+            if (lowerInput.includes("mode hening") || lowerInput.includes("matikan suara")) {
                 isMuted = true;
                 toggleMute.checked = true;
                 isSubtitleVisible = true;
                 toggleSubtitle.checked = true;
                 subtitleContainer.classList.remove('hidden');
+                saveSettingsToStorage();
                 speakResponse("Mode hening aktif. AI-Nun tidak akan bersuara, dan teks jawaban otomatis ditampilkan.");
                 return;
-            } else if (lowerInput.includes("nyalakan suara") || lowerInput.includes("aktifkan suara") || lowerInput.includes("bersuara")) {
+            } else if (lowerInput.includes("nyalakan suara") || lowerInput.includes("aktifkan suara")) {
                 isMuted = false;
                 toggleMute.checked = false;
+                saveSettingsToStorage();
                 speakResponse("Suara vokal AI-Nun sudah diaktifkan kembali, Ainunku Sayang.");
                 return;
             }
 
-            if (lowerInput.includes("mode otomatis") || lowerInput.includes("mode dialog otomatis") || lowerInput.includes("hands free") || lowerInput.includes("tanpa ketuk")) {
-                isHandsFreeMode = true;
-                toggleHandsFree.checked = true;
-                speakResponse("Mode dialog otomatis telah aktif. Ainunku bisa langsung bicara tanpa perlu mengetuk layar.");
-                return;
-            } else if (lowerInput.includes("matikan mode otomatis") || lowerInput.includes("mode manual") || lowerInput.includes("nonaktifkan dialog otomatis")) {
-                isHandsFreeMode = false;
-                toggleHandsFree.checked = false;
-                speakResponse("Mode dialog otomatis dinonaktifkan. Silakan ketuk layar saat ingin bicara.");
-                return;
-            }
-
+            // Real Gemini Cloud AI API Request
             if (isOnline && geminiApiKey) {
                 try {
                     const activeModeConfig = MODES[currentMode] || MODES.perhatian;
@@ -941,11 +1158,17 @@ PENTING:
 3. Berikan penenang dan kehangatan ekstra saat Ainunku terindikasi overthinking, lelah mengajar/berorganisasi, atau merasa tidak enakan pada orang lain.
 4. Jawablah dengan lembut dan hindari menggunakan simbol markdown seperti tanda bintang (*) di dalam teks agar mudah dibaca dan didengar.`;
 
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${geminiApiKey}`, {
+                    // Keep context history up to last 10 messages
+                    conversationHistory.push({ role: 'user', parts: [{ text: userText }] });
+                    if (conversationHistory.length > 10) {
+                        conversationHistory = conversationHistory.slice(-10);
+                    }
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ role: 'user', parts: [{ text: userText }] }],
+                            contents: conversationHistory,
                             systemInstruction: { parts: [{ text: systemPrompt }] }
                         })
                     });
@@ -954,6 +1177,7 @@ PENTING:
                         const data = await response.json();
                         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
                         if (reply) {
+                            conversationHistory.push({ role: 'model', parts: [{ text: reply }] });
                             speakResponse(reply);
                             return;
                         }
@@ -963,13 +1187,15 @@ PENTING:
                 }
             }
 
+            // Fallback Local Response
             setTimeout(() => {
                 const reply = getOfflineResponse(userText);
                 speakResponse(reply);
-            }, 800);
+            }, 700);
         }
 
         function startListening() {
+            getAudioContext();
             if (currentState === STATES.SPEAKING || currentState === STATES.THINKING) return;
 
             if (recognition) {
@@ -1001,7 +1227,30 @@ PENTING:
             }
         });
 
+        // Prompt Chip Clicks
+        promptChips.forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playChimeSound('click');
+                const chipText = chip.innerText.replace(/^"|"$/g, '');
+                processUserInput(chipText);
+            });
+        });
+
+        // Copy subtitle text
+        btnCopySubtitle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playChimeSound('click');
+            const cleanText = subtitleText.innerText.replace(/^"|"$/g, '');
+            document.execCommand('copy');
+            statusText.innerText = "Teks berhasil disalin!";
+            setTimeout(() => {
+                if (currentState === STATES.IDLE) statusText.innerText = "Ketuk layar atau ketik pesan di bawah";
+            }, 2000);
+        });
+
         canvas.addEventListener('click', () => {
+            getAudioContext();
             if (!hasGreetedOnFirstTouch) {
                 hasGreetedOnFirstTouch = true;
                 const initialText = subtitleText.innerText.replace(/^"|"$/g, '');
@@ -1018,12 +1267,14 @@ PENTING:
 
         btnOpenSettings.addEventListener('click', (e) => {
             e.stopPropagation();
+            playChimeSound('click');
             settingsModal.classList.remove('opacity-0', 'pointer-events-none');
             modalCard.classList.remove('scale-95');
             modalCard.classList.add('scale-100');
         });
 
         function closeModal() {
+            playChimeSound('click');
             settingsModal.classList.add('opacity-0', 'pointer-events-none');
             modalCard.classList.remove('scale-100');
             modalCard.classList.add('scale-95');
@@ -1042,6 +1293,7 @@ PENTING:
 
         themeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
+                playChimeSound('click');
                 updateThemeUI(btn.dataset.theme);
             });
         });
@@ -1062,6 +1314,7 @@ PENTING:
 
         modeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
+                playChimeSound('click');
                 const selectedMode = btn.dataset.mode;
                 updateModeUI(selectedMode);
             });
@@ -1097,6 +1350,7 @@ PENTING:
                 textInputContainer.classList.add('hidden');
             }
 
+            saveSettingsToStorage();
             updateNetworkStatus();
             closeModal();
 
@@ -1104,6 +1358,10 @@ PENTING:
                 startListening();
             }
         });
+
+        // Initialize saved settings on startup
+        loadSavedSettings();
+        updateNetworkStatus();
     </script>
 </body>
 </html>
