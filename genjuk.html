@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Juknis & TOR IPNU IPPNU</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ipnu: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#16a34a',
+                            600: '#15803d',
+                            700: '#166534',
+                            800: '#14532d',
+                            900: '#064e3b',
+                            950: '#022c22'
+                        },
+                        gold: {
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f1f5f9;
+        }
+        /* Card modern dengan efek glassmorphism halus */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .paper-preview {
+            background-color: #ffffff;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15), 0 4px 18px rgba(0, 0, 0, 0.05);
+            font-family: 'Merriweather', Georgia, serif;
+            color: #1e293b;
+            line-height: 1.7;
+            transition: all 0.2s ease;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 12px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #16a34a;
+            border-radius: 12px;
+        }
+        .btn-primary {
+            background: linear-gradient(145deg, #15803d, #166534);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px -8px #166534;
+        }
+        /* Animasi modal */
+        .modal-enter {
+            animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes modalFadeIn {
+            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-backdrop {
+            animation: backdropFade 0.3s ease;
+        }
+        @keyframes backdropFade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px; box-shadow: none; }
+            .no-print { display: none !important; }
+        }
+        /* Gaya untuk tab aktif */
+        .tab-active {
+            background: #15803d !important;
+            color: #fff !important;
+            box-shadow: 0 4px 12px -4px rgba(21, 128, 61, 0.4);
+        }
+        .tab-inactive {
+            background: transparent !important;
+            color: #94a3b8 !important;
+        }
+        .tab-inactive:hover {
+            color: #e2e8f0 !important;
+            background: rgba(255,255,255,0.05) !important;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- ======================== WELCOME MODAL ======================== -->
+    <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 modal-backdrop no-print" style="background: rgba(2, 44, 34, 0.7); backdrop-filter: blur(6px);">
+        <div class="modal-enter bg-white max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden relative border border-emerald-100/50">
+            <!-- Decorative header -->
+            <div class="bg-gradient-to-br from-ipnu-900 via-ipnu-800 to-emerald-900 px-8 pt-10 pb-8 text-white relative">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-gold-500 text-ipnu-950 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">v2.0</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center text-3xl border border-white/20 shadow-lg">
+                        <i class="fa-solid fa-file-pen text-gold-400"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black tracking-tight">GEN-JUKNIS</h1>
+                        <p class="text-emerald-100 text-sm font-medium opacity-90">Generator Juknis &amp; Term of Reference (TOR)</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm text-emerald-100/90 leading-relaxed max-w-lg">
+                    Solusi cerdas untuk menyusun dokumen kaderisasi IPNU IPPNU sesuai standar
+                    <span class="font-semibold text-white">Pimpinan Wilayah Jawa Tengah</span>.
+                </p>
+            </div>
+            <!-- Body -->
+            <div class="px-8 py-6 space-y-4">
+                <div class="flex items-start gap-3 text-sm text-slate-700">
+                    <i class="fa-solid fa-circle-check text-emerald-600 mt-1 text-lg"></i>
+                    <p><span class="font-bold">Lengkapi form</span> di panel kiri, lihat pratinjau dokumen <span class="font-bold">TOR, Juknis, Rundown, &amp; RAB</span> secara langsung di panel kanan.</p>
+                </div>
+                <div class="flex items-start gap-3 text-sm text-slate-700">
+                    <i class="fa-solid fa-arrow-pointer text-amber-600 mt-1 text-lg"></i>
+                    <p>Gunakan <span class="font-bold">Quick Presets</span> untuk memuat template MAKESTA, LAKMUD, atau Pelantikan PK dengan cepat.</p>
+                </div>
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-ipnu-100 text-ipnu-800 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-code"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">Dikembangkan oleh</p>
+                            <a href="https://lutfianam.github.io" target="_blank" class="text-sm font-bold text-ipnu-700 hover:text-ipnu-900 transition flex items-center gap-1">
+                                Lutfi Anam
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <a href="https://lutfianam.github.io" target="_blank" class="text-xs bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded-xl font-bold text-slate-700 transition flex items-center gap-2">
+                        <i class="fa-regular fa-eye"></i> Portfolio
+                    </a>
+                </div>
+                <button onclick="closeWelcomeModal()" class="w-full btn-primary text-white font-bold py-3 rounded-2xl shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 transition flex items-center justify-center gap-3 text-sm">
+                    <i class="fa-solid fa-rocket"></i> Mulai Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================== HEADER ======================== -->
+    <header class="sticky top-0 z-40 bg-ipnu-900 text-white shadow-xl border-b border-ipnu-700 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToHome()">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-gold-400 to-emerald-600 flex items-center justify-center shadow-lg font-bold text-slate-900 text-xl border-2 border-white/20">
+                        <i class="fa-solid fa-file-signature text-white"></i>
+                    </div>
+                    <div>
+                        <div class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                            GEN-JUKNIS <span class="bg-gold-500 text-slate-950 text-[10px] px-2 py-0.5 rounded font-black tracking-wider uppercase">IPNU IPPNU</span>
+                        </div>
+                        <div class="text-xs text-ipnu-100 font-medium opacity-90">Generator Juknis & Term of Reference (TOR) Sesuai PPW Jateng</div>
+                    </div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="hidden lg:flex items-center space-x-2">
+                    <span class="text-xs text-ipnu-200 font-semibold mr-1">Quick Presets:</span>
+                    <button onclick="loadPreset('makesta')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-ipnu-800 hover:bg-ipnu-700 text-gold-400 border border-gold-500/30 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt"></i> MAKESTA
+                    </button>
+                    <button onclick="loadPreset('makesta-u')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-900/80 hover:bg-amber-800 text-amber-200 border border-amber-500/30 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-star"></i> MAKESTA-U
+                    </button>
+                    <button onclick="loadPreset('lakmud')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-ipnu-800 hover:bg-ipnu-700 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group"></i> LAKMUD
+                    </button>
+                    <button onclick="loadPreset('pk')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-ipnu-800 hover:bg-ipnu-700 text-purple-200 border border-purple-500/30 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-building-columns"></i> Pelantikan PK
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-2 border-l border-ipnu-700 pl-3">
+                    <button onclick="saveDraft()" title="Simpan Draf" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan
+                    </button>
+                    <button onclick="loadDraft()" title="Muat Draf" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-folder-open"></i> Buka
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================== MAIN ======================== -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-emerald-500 flex items-center gap-3 transition-all duration-300 transform translate-y-full opacity-0">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-lg" id="toast-icon"></i>
+            <span id="toast-msg" class="text-xs font-semibold">Berhasil!</span>
+        </div>
+
+        <!-- Top Bar Info -->
+        <div class="mb-6 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-ipnu-100 text-ipnu-700 flex items-center justify-center font-bold text-lg shrink-0">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-extrabold text-slate-900">Form Kustomisasi Dokumen</h1>
+                    <p class="text-xs text-slate-500">Isi parameter di panel kiri untuk menghasilkan draf TOR & Juknis resmi.</p>
+                </div>
+            </div>
+            <div id="compliance-status" class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 flex items-center gap-2 text-xs font-bold shrink-0">
+                <i class="fa-solid fa-shield-halved text-emerald-600 text-sm"></i>
+                <span id="compliance-text">Pedoman PPW Jateng: Sesuai Standar</span>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- ========== LEFT PANEL ========== -->
+            <div class="lg:col-span-5 space-y-5 no-print">
+
+                <!-- Card 1: Informasi Utama -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-ipnu-600"></i> 1. Informasi Utama
+                        </h2>
+                        <span class="text-[11px] font-bold text-ipnu-700 bg-ipnu-50 px-2 py-0.5 rounded">Langkah 1</span>
+                    </div>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Jenis Kegiatan / Master Template:</label>
+                            <select id="f-type" onchange="onTypeChange()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-bold text-slate-800 focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                                <option value="makesta">MAKESTA (Masa Kesetiaan Anggota Standar)</option>
+                                <option value="makesta-u">MAKESTA Unggulan (Sekolah / Madrasah Negeri)</option>
+                                <option value="lakmud">LAKMUD (Latihan Kader Muda)</option>
+                                <option value="pk">Pelantikan & Rapat Anggota PK</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Penyelenggara (Tingkat / Lembaga):</label>
+                            <input type="text" id="f-organizer" value="Pimpinan Komisariat IPNU IPPNU MA NU 01 Temanggung" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Kecamatan (PAC) & Kabupaten (PC):</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="f-pac" value="PAC Temanggung" placeholder="PAC Kecamatan" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                                <input type="text" id="f-pc" value="PC Temanggung" placeholder="PC Kab/Kota" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Tema Kegiatan:</label>
+                            <textarea id="f-theme" rows="2" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">Membentuk Pelajar NU yang Beraqidah Strong, Berwawasan Global, dan Setia Pada Pancasila</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Waktu & Format -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-gold-600"></i> 2. Waktu, Kuota & Format
+                        </h2>
+                        <span class="text-[11px] font-bold text-ipnu-700 bg-ipnu-50 px-2 py-0.5 rounded">Langkah 2</span>
+                    </div>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1.5">Pilihan Durasi:</label>
+                            <div class="flex items-center gap-1.5 mb-2">
+                                <button type="button" onclick="setDuration(1)" data-days="1" class="duration-btn flex-1 py-1.5 px-2 rounded-xl text-xs font-bold border transition text-center bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200">
+                                    <i class="fa-solid fa-sun mr-1 text-amber-500"></i> 1 Hari
+                                </button>
+                                <button type="button" onclick="setDuration(2)" data-days="2" class="duration-btn flex-1 py-1.5 px-2 rounded-xl text-xs font-bold border transition text-center bg-ipnu-600 text-white border-ipnu-700 shadow">
+                                    <i class="fa-solid fa-moon mr-1 text-gold-300"></i> 2 Hari 1 Malam
+                                </button>
+                                <button type="button" onclick="setDuration(3)" data-days="3" class="duration-btn flex-1 py-1.5 px-2 rounded-xl text-xs font-bold border transition text-center bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200">
+                                    <i class="fa-solid fa-calendar-days mr-1 text-emerald-600"></i> 3 Hari 2 Malam
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Tanggal Kegiatan:</label>
+                                <input type="text" id="f-date" value="24 - 25 Oktober 2026" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Durasi (Hari):</label>
+                                <input type="number" id="f-days" value="2" min="1" max="5" oninput="onCustomDaysInput(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-semibold focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Tempat Pelaksanaan:</label>
+                            <input type="text" id="f-location" value="Gedung Aula MA NU 01 Temanggung" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Target Kuota:</label>
+                                <input type="number" id="f-quota" value="45" oninput="onQuotaChange(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-semibold focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Format Pelaksanaan:</label>
+                                <select id="f-format" onchange="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                                    <option value="tatap-muka">Tatap Muka (Menginap/Full Day)</option>
+                                    <option value="oneday">One Day Process (1 Hari)</option>
+                                    <option value="virtual">Virtual / Online</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Ketua Panitia:</label>
+                                <input type="text" id="f-chair" value="Rekan Ahmad Syarif" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Sekretaris Panitia:</label>
+                                <input type="text" id="f-sec" value="Rekanita Nur Laila" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-ipnu-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Estimasi Total RAB (Rp):</label>
+                            <input type="text" id="f-budget" value="4.500.000" oninput="updateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-bold text-emerald-800 focus:ring-2 focus:ring-ipnu-500 focus:outline-none" readonly>
+                            <span class="text-[10px] text-slate-500 italic">*Dihitung otomatis dari kalkulator RAB di bawah.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Silabus & Rundown -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-emerald-600"></i> 3. Silabus & Rundown
+                        </h2>
+                        <button onclick="addRundownItem()" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-lg transition">
+                            <i class="fa-solid fa-plus"></i> Tambah Sesi
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-500">
+                        <i class="fa-solid fa-arrows-up-down text-ipnu-600 mr-1"></i> <strong>Drag & Drop:</strong> Tarik ikon grip untuk mengubah urutan.
+                    </p>
+                    <div id="rundown-editor" class="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                        <!-- dynamic -->
+                    </div>
+                </div>
+
+                <!-- Card 4: Kalkulator RAB -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-amber-600"></i> 4. Rencana Anggaran (RAB)
+                        </h2>
+                        <button onclick="addRABItem()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1 rounded-lg transition">
+                            <i class="fa-solid fa-plus"></i> Tambah Pos
+                        </button>
+                    </div>
+                    <div id="rab-editor" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+                        <!-- dynamic -->
+                    </div>
+                    <div class="p-3 bg-slate-900 text-white rounded-xl flex items-center justify-between font-bold text-xs">
+                        <span>TOTAL ESTIMASI RAB:</span>
+                        <span id="rab-total-display" class="text-gold-400 text-sm font-mono">Rp 0</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ========== RIGHT PANEL: LIVE PREVIEW ========== -->
+            <div class="lg:col-span-7 space-y-4">
+
+                <!-- Toolbar Preview -->
+                <div class="bg-slate-900 text-white rounded-2xl p-3 shadow-lg flex flex-wrap items-center justify-between gap-3 no-print">
+                    <div class="flex flex-wrap items-center gap-1 bg-slate-800 p-1 rounded-xl">
+                        <button onclick="switchDocTab('welcome')" id="tab-btn-welcome" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-ipnu-600 text-white shadow">
+                            <i class="fa-solid fa-house text-gold-400"></i> Panduan
+                        </button>
+                        <button onclick="switchDocTab('tor')" id="tab-btn-tor" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                            <i class="fa-solid fa-file-lines text-gold-400"></i> TOR
+                        </button>
+                        <button onclick="switchDocTab('juknis')" id="tab-btn-juknis" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                            <i class="fa-solid fa-clipboard-check text-emerald-400"></i> Juknis
+                        </button>
+                        <button onclick="switchDocTab('rundown')" id="tab-btn-rundown" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                            <i class="fa-solid fa-table-list text-amber-400"></i> Rundown
+                        </button>
+                        <button onclick="switchDocTab('rab')" id="tab-btn-rab" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                            <i class="fa-solid fa-file-invoice-dollar text-cyan-400"></i> RAB
+                        </button>
+                        <button onclick="switchDocTab('surat')" id="tab-btn-surat" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                            <i class="fa-solid fa-envelope-open-text text-purple-400"></i> Surat
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="downloadDocx()" title="Download .doc" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow transition">
+                            <i class="fa-solid fa-file-word"></i> Word
+                        </button>
+                        <button onclick="copyCurrentDocument()" class="bg-gold-500 hover:bg-gold-600 text-slate-950 font-extrabold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow transition">
+                            <i class="fa-solid fa-copy"></i> Salin
+                        </button>
+                        <button onclick="printDocument()" class="bg-white/10 hover:bg-white/20 text-white font-bold px-2.5 py-2 rounded-xl text-xs flex items-center gap-1.5 border border-white/20 transition">
+                            <i class="fa-solid fa-print"></i> Cetak
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document Preview -->
+                <div id="printable-area" class="paper-preview rounded-2xl p-6 sm:p-10 border border-slate-200/80 transition-all duration-200 min-h-[750px]">
+                    <div id="doc-content" class="space-y-6 text-sm text-slate-900 leading-relaxed">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ======================== FOOTER ======================== -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-10 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2 text-white font-bold">
+                <i class="fa-solid fa-graduation-cap text-gold-400"></i> Generator Juknis & TOR IPNU IPPNU
+            </div>
+            <div class="text-slate-500">
+                &copy; 2026 · Dikembangkan oleh <a href="https://lutfianam.github.io" target="_blank" class="text-emerald-400 hover:text-emerald-300 transition">Lutfi Anam</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======================== JAVASCRIPT ======================== -->
+    <script>
+        // ===== GLOBAL STATE =====
+        let currentTab = 'welcome';
+        let rundownList = [];
+        let rabList = [];
+        let dragSourceIndex = null;
+
+        // ===== PRESET DATA =====
+        const PRESETS = {
+            'makesta': {
+                type: 'makesta',
+                organizer: 'Pimpinan Komisariat IPNU IPPNU MA NU 01 Temanggung',
+                pac: 'PAC Temanggung',
+                pc: 'PC Temanggung',
+                theme: 'Membentuk Pelajar NU yang Beraqidah Strong, Berwawasan Global, dan Setia Pada Pancasila',
+                date: '24 - 25 Oktober 2026',
+                days: 2,
+                location: 'Gedung Aula MA NU 01 Temanggung',
+                quota: 45,
+                format: 'tatap-muka',
+                chair: 'Rekan Ahmad Syarif',
+                sec: 'Rekanita Nur Laila',
+                budget: '4.500.000'
+            },
+            'makesta-u': {
+                type: 'makesta-u',
+                organizer: 'PC IPNU IPPNU Kab. Temanggung cq Tim Penetrasi Sekolah Negeri',
+                pac: 'PAC Temanggung',
+                pc: 'PC Temanggung',
+                theme: 'Mewujudkan Elit Pelajar Sekolah Negeri yang Nasionalis, Religius, dan Berkarakter Moderat',
+                date: '14 - 15 November 2026',
+                days: 2,
+                location: 'Balai Diklat Pemkab Temanggung',
+                quota: 50,
+                format: 'tatap-muka',
+                chair: 'Rekan Muhammad Faisal',
+                sec: 'Rekanita Siti Aminah',
+                budget: '8.500.000'
+            },
+            'lakmud': {
+                type: 'lakmud',
+                organizer: 'PAC IPNU IPPNU Kecamatan Temanggung',
+                pac: 'PAC Temanggung',
+                pc: 'PC Temanggung',
+                theme: 'Mencetak Kader Pimpinan yang Kritikal, Analitis, dan Kapabel Dalam Manajemen Organisasi',
+                date: '18 - 20 Desember 2026',
+                days: 3,
+                location: 'Gedung MWC NU Kecamatan',
+                quota: 35,
+                format: 'tatap-muka',
+                chair: 'Rekan Farhan Hamid',
+                sec: 'Rekanita Zahra',
+                budget: '12.000.000'
+            },
+            'pk': {
+                type: 'pk',
+                organizer: 'Panitia RAT & Pelantikan PK IPNU IPPNU SMA NU',
+                pac: 'PAC Temanggung',
+                pc: 'PC Temanggung',
+                theme: 'Regenerasi Kepemimpinan Estafet Khidmah Komisariat IPNU IPPNU Masa Khidmah 2026-2027',
+                date: '05 September 2026',
+                days: 1,
+                location: 'Aula Utama SMA NU',
+                quota: 60,
+                format: 'oneday',
+                chair: 'Rekan Irfan',
+                sec: 'Rekanita Dina',
+                budget: '2.500.000'
+            }
+        };
+
+        // ===== GET PRESET RAB & RUNDOWN =====
+        function getPresetRAB(type, days, quota) {
+            days = parseInt(days) || 1; quota = parseInt(quota) || 30;
+            if (type === 'makesta') {
+                return [
+                    { category: 'Kesekretariatan', item: 'Penggandaan Proposal & Juknis', vol: 10, unit: 'Eks', price: 15000 },
+                    { category: 'Kesekretariatan', item: 'Cetak ID Card & Sertifikat', vol: quota, unit: 'Siswa', price: 12000 },
+                    { category: 'Konsumsi', item: 'Makan Peserta & Panitia ('+days+' Hari)', vol: quota*days*3, unit: 'Porsi', price: 15000 },
+                    { category: 'Konsumsi', item: 'Snack Pemateri', vol: 15, unit: 'Box', price: 10000 },
+                    { category: 'Perlengkapan', item: 'Sewa Backdrop & Sound ('+days+' Hari)', vol: days, unit: 'Hari', price: 300000 },
+                    { category: 'Acara', item: 'Transport Pemateri (6 Sesi)', vol: 6, unit: 'Orang', price: 150000 },
+                    { category: 'Operasional', item: 'Transport Panitia', vol: 1, unit: 'Paket', price: 300000 },
+                    { category: 'Lain-lain', item: 'Dana Tak Terduga', vol: 1, unit: 'Paket', price: 250000 }
+                ];
+            } else if (type === 'makesta-u') {
+                return [
+                    { category: 'Kesekretariatan', item: 'Cetak Booklet Juknis & ID Card', vol: quota, unit: 'Set', price: 25000 },
+                    { category: 'Kesekretariatan', item: 'Sertifikat Resmi Cabang', vol: quota, unit: 'Lembar', price: 15000 },
+                    { category: 'Konsumsi', item: 'Makan Prasmanan ('+days+' Hari)', vol: quota*days*3, unit: 'Porsi', price: 20000 },
+                    { category: 'Konsumsi', item: 'Coffee Break VVIP', vol: 30, unit: 'Box', price: 15000 },
+                    { category: 'Perlengkapan', item: 'Sewa Gedung & LCD ('+days+' Hari)', vol: days, unit: 'Hari', price: 750000 },
+                    { category: 'Acara', item: 'Honor Pemateri Ahli', vol: 6, unit: 'Orang', price: 300000 },
+                    { category: 'Pubdok', item: 'Plakat & Souvenir', vol: 5, unit: 'Buah', price: 100000 }
+                ];
+            } else if (type === 'lakmud') {
+                return [
+                    { category: 'Kesekretariatan', item: 'Cetak Modul LAKMUD', vol: quota, unit: 'Buku', price: 35000 },
+                    { category: 'Kesekretariatan', item: 'Sertifikat & ID Card', vol: quota, unit: 'Set', price: 20000 },
+                    { category: 'Konsumsi', item: 'Konsumsi Peserta ('+days+' Hari)', vol: (quota+15)*days*3, unit: 'Porsi', price: 18000 },
+                    { category: 'Perlengkapan', item: 'Sewa Aula & Sound ('+days+' Hari)', vol: days, unit: 'Hari', price: 500000 },
+                    { category: 'Acara', item: 'Transport Master Trainer', vol: 8, unit: 'Orang', price: 250000 },
+                    { category: 'Pubdok', item: 'Banner & Dokumentasi', vol: 1, unit: 'Paket', price: 500000 }
+                ];
+            } else {
+                return [
+                    { category: 'Kesekretariatan', item: 'Penggandaan Undangan', vol: 1, unit: 'Paket', price: 200000 },
+                    { category: 'Konsumsi', item: 'Snack Box', vol: quota, unit: 'Box', price: 10000 },
+                    { category: 'Perlengkapan', item: 'Dekorasi & Sound', vol: 1, unit: 'Paket', price: 400000 },
+                    { category: 'Acara', item: 'Honor Pembaca Doa', vol: 2, unit: 'Orang', price: 200000 }
+                ];
+            }
+        }
+
+        function getPresetRundown(type, days) {
+            days = parseInt(days) || 1;
+            if (type === 'makesta') {
+                if (days === 1) {
+                    return [
+                        { day: 'Hari 1', time: '08.00 - 09.00', title: 'Registrasi & Pembukaan', speaker: 'Panitia & MWC NU' },
+                        { day: 'Hari 1', time: '09.00 - 10.30', title: 'Materi 1: Ke-Aswaja-an & Ke-NU-an I', speaker: 'K.H. Ahmad Dahlan' },
+                        { day: 'Hari 1', time: '10.30 - 12.00', title: 'Materi 2: Ke-IPNU-an & Ke-IPPNU-an I', speaker: 'PC IPNU IPPNU' },
+                        { day: 'Hari 1', time: '12.00 - 13.00', title: 'ISHOMA', speaker: 'Sie Acara' },
+                        { day: 'Hari 1', time: '13.00 - 14.30', title: 'Materi 3: Ke-Indonesia-an', speaker: 'Danramil' },
+                        { day: 'Hari 1', time: '14.30 - 16.00', title: 'Materi 4: Kepemimpinan Dasar', speaker: 'Instruktur PAC' },
+                        { day: 'Hari 1', time: '16.00 - 17.00', title: 'Orientasi CBP-KPP & RTL', speaker: 'Komandan CBP KPP' },
+                        { day: 'Hari 1', time: '17.00 - 18.00', title: 'Pembaiatan & Penutupan', speaker: 'Instruktur Cabang' }
+                    ];
+                } else if (days === 2) {
+                    return [
+                        { day: 'Hari 1', time: '08.00 - 09.00', title: 'Registrasi & Check-In', speaker: 'Sekretariat' },
+                        { day: 'Hari 1', time: '09.00 - 10.30', title: 'Pembukaan & Stadium General', speaker: 'MWC NU & Kepala Sekolah' },
+                        { day: 'Hari 1', time: '10.30 - 12.00', title: 'Materi 1: Ke-Aswaja-an I', speaker: 'K.H. Ahmad Dahlan' },
+                        { day: 'Hari 1', time: '12.00 - 13.00', title: 'ISHOMA', speaker: 'Sie Acara' },
+                        { day: 'Hari 1', time: '13.00 - 14.30', title: 'Materi 2: Ke-NU-an I', speaker: 'MWC NU' },
+                        { day: 'Hari 1', time: '14.30 - 16.00', title: 'Materi 3: Ke-Indonesia-an', speaker: 'Danramil' },
+                        { day: 'Hari 1', time: '16.00 - 19.30', title: 'Sholat, Makan, Mujahadah', speaker: 'Sie Keagamaan' },
+                        { day: 'Hari 1', time: '19.30 - 21.00', title: 'Materi 4: Ke-IPNU-an & Ke-IPPNU-an', speaker: 'PC' },
+                        { day: 'Hari 1', time: '21.00 - 22.30', title: 'Materi 5: Organisasi Dasar', speaker: 'Instruktur PAC' },
+                        { day: 'Hari 1', time: '22.30 - 04.30', title: 'Istirahat & Qiyamul Lail', speaker: 'Sie Acara' },
+                        { day: 'Hari 2', time: '04.30 - 07.00', title: 'Sholat Subuh & Sarapan', speaker: 'Sie Konsumsi' },
+                        { day: 'Hari 2', time: '07.00 - 08.30', title: 'Materi 6: Kepemimpinan', speaker: 'Alumni' },
+                        { day: 'Hari 2', time: '08.30 - 10.00', title: 'Materi 7: Studi Gender', speaker: 'IPPNU PC' },
+                        { day: 'Hari 2', time: '10.00 - 11.30', title: 'Materi 8 & 9: CBP-KPP & RTL', speaker: 'Komandan CBP KPP' },
+                        { day: 'Hari 2', time: '11.30 - 13.00', title: 'ISHOMA & Persiapan Baiat', speaker: 'Panitia' },
+                        { day: 'Hari 2', time: '13.00 - 14.30', title: 'Pembaiatan & Penutupan', speaker: 'Instruktur Cabang' }
+                    ];
+                } else {
+                    return [
+                        { day: 'Hari 1', time: '13.00 - 14.00', title: 'Check-In Peserta', speaker: 'Panitia' },
+                        { day: 'Hari 1', time: '14.00 - 15.30', title: 'Pembukaan Resmi', speaker: 'MWC NU' },
+                        { day: 'Hari 1', time: '16.00 - 17.30', title: 'Materi 1: Ke-Aswaja-an I', speaker: 'Kiai MWC NU' },
+                        { day: 'Hari 1', time: '19.30 - 21.30', title: 'Materi 2: Ke-NU-an I', speaker: 'PC NU' },
+                        { day: 'Hari 2', time: '08.00 - 10.00', title: 'Materi 3: Ke-IPNU IPPNU-an', speaker: 'PC IPNU IPPNU' },
+                        { day: 'Hari 2', time: '10.00 - 12.00', title: 'Materi 4: Ke-Indonesia-an', speaker: 'Pakar Kebangsaan' },
+                        { day: 'Hari 2', time: '13.30 - 15.30', title: 'Materi 5: Organisasi & Kepemimpinan', speaker: 'Instruktur PAC' },
+                        { day: 'Hari 2', time: '19.30 - 22.00', title: 'Malam Keakraban', speaker: 'Fasilitator' },
+                        { day: 'Hari 3', time: '08.00 - 10.00', title: 'Materi 6: Gender & CBP-KPP', speaker: 'CBP KPP' },
+                        { day: 'Hari 3', time: '10.00 - 11.30', title: 'Penyusunan RTL', speaker: 'Tim Instruktur' },
+                        { day: 'Hari 3', time: '11.30 - 13.00', title: 'Pembaiatan & Penutupan', speaker: 'Pimpinan Cabang' }
+                    ];
+                }
+            } else if (type === 'makesta-u') {
+                if (days === 1) {
+                    return [
+                        { day: 'Hari 1', time: '08.00 - 09.00', title: 'Registrasi & Mandat Kepsek', speaker: 'Sekretariat PC' },
+                        { day: 'Hari 1', time: '09.00 - 10.30', title: 'Pembukaan & Audiensi', speaker: 'Kankemenag' },
+                        { day: 'Hari 1', time: '10.30 - 12.00', title: 'Materi 1: Ke-Aswaja-an Moderat', speaker: 'PW NU Jateng' },
+                        { day: 'Hari 1', time: '13.00 - 14.30', title: 'Materi 2: Ke-Indonesia-an', speaker: 'Kesbangpol' },
+                        { day: 'Hari 1', time: '14.30 - 16.00', title: 'Materi 3: Ke-IPNU IPPNU di Sekolah Negeri', speaker: 'PW IPNU IPPNU' },
+                        { day: 'Hari 1', time: '16.00 - 17.30', title: 'Deklarasi PK & Pembaiatan', speaker: 'PC & Instruktur' }
+                    ];
+                } else {
+                    return [
+                        { day: 'Hari 1', time: '08.00 - 09.00', title: 'Registrasi & Mandat Kepsek', speaker: 'Sekretariat PC' },
+                        { day: 'Hari 1', time: '09.00 - 10.30', title: 'Pembukaan & Audiensi', speaker: 'Kankemenag' },
+                        { day: 'Hari 1', time: '10.30 - 12.00', title: 'Materi 1: Ke-Aswaja-an Moderat', speaker: 'PW NU Jateng' },
+                        { day: 'Hari 1', time: '12.00 - 13.30', title: 'ISHOMA', speaker: 'Panitia' },
+                        { day: 'Hari 1', time: '13.30 - 15.30', title: 'Materi 2 & 3: Ke-Indonesia-an & Radikalisme', speaker: 'Kesbangpol' },
+                        { day: 'Hari 1', time: '15.30 - 17.30', title: 'Materi 4 & 5: Ke-IPNU IPPNU di Sekolah Negeri', speaker: 'PW IPNU IPPNU' },
+                        { day: 'Hari 1', time: '19.30 - 21.30', title: 'Diskusi Isu Strategis', speaker: 'Fasilitator' },
+                        { day: 'Hari 2', time: '08.00 - 11.00', title: 'Deklarasi PK & Baiat', speaker: 'PC & Instruktur' }
+                    ];
+                }
+            } else if (type === 'lakmud') {
+                if (days <= 2) {
+                    return [
+                        { day: 'Hari 1', time: '08.00 - 09.30', title: 'Check-In & Screening', speaker: 'Tim Instruktur PC' },
+                        { day: 'Hari 1', time: '09.30 - 11.30', title: 'Pembukaan & Materi 1: Ke-Aswaja-an II', speaker: 'Rois Syuriah MWC' },
+                        { day: 'Hari 1', time: '13.00 - 15.00', title: 'Materi 2: Ke-NU-an II', speaker: 'PW IPNU Jateng' },
+                        { day: 'Hari 1', time: '15.30 - 17.30', title: 'Materi 3: Scientific Problem Solving', speaker: 'Instruktur Senior' },
+                        { day: 'Hari 1', time: '19.30 - 22.00', title: 'Materi 4: Manajemen Konflik', speaker: 'Tim Instruktur' },
+                        { day: 'Hari 2', time: '08.00 - 10.30', title: 'Materi 5: Networking & Lobbying', speaker: 'Pakar Komunikasi' },
+                        { day: 'Hari 2', time: '10.30 - 12.30', title: 'Simulasi Persidangan & RTL', speaker: 'Peserta & Instruktur' },
+                        { day: 'Hari 2', time: '13.30 - 15.00', title: 'Pembaiatan & Penutupan', speaker: 'PC IPNU IPPNU' }
+                    ];
+                } else {
+                    return [
+                        { day: 'Hari 1', time: '14.00 - 16.00', title: 'Check-In & Screening', speaker: 'Tim Instruktur PC' },
+                        { day: 'Hari 1', time: '16.00 - 18.00', title: 'Pembukaan LAKMUD', speaker: 'Pimpinan Cabang' },
+                        { day: 'Hari 1', time: '20.00 - 22.00', title: 'Materi 1: Ke-Aswaja-an II', speaker: 'Rois Syuriah MWC' },
+                        { day: 'Hari 2', time: '08.00 - 10.30', title: 'Materi 2: Ke-NU-an II', speaker: 'PW IPNU Jateng' },
+                        { day: 'Hari 2', time: '10.30 - 12.00', title: 'Materi 3: Scientific Problem Solving', speaker: 'Instruktur Senior' },
+                        { day: 'Hari 2', time: '13.30 - 15.30', title: 'Materi 4: Networking & Lobbying', speaker: 'Pakar Komunikasi' },
+                        { day: 'Hari 2', time: '15.30 - 18.00', title: 'Materi 5: Manajemen Konflik', speaker: 'Tim Instruktur' },
+                        { day: 'Hari 3', time: '08.00 - 11.00', title: 'Simulasi Persidangan & RTL', speaker: 'Peserta & Instruktur' },
+                        { day: 'Hari 3', time: '11.00 - 12.30', title: 'Pembaiatan & Penutupan', speaker: 'PC IPNU IPPNU' }
+                    ];
+                }
+            } else {
+                return [
+                    { day: 'Hari 1', time: '08.00 - 08.30', title: 'Pembukaan & Mars', speaker: 'Paduan Suara PK' },
+                    { day: 'Hari 1', time: '08.30 - 09.30', title: 'Pelantikan Pengurus PK', speaker: 'PC IPNU IPPNU' },
+                    { day: 'Hari 1', time: '09.30 - 10.30', title: 'Sambutan & Serah Terima', speaker: 'Kepala Sekolah' },
+                    { day: 'Hari 1', time: '10.30 - 12.30', title: 'RAT & Program Kerja', speaker: 'Presidium Sidang' }
+                ];
+            }
+        }
+
+        // ===== UI FUNCTIONS =====
+        function setDuration(days) {
+            days = parseInt(days) || 1;
+            document.getElementById('f-days').value = days;
+            document.querySelectorAll('.duration-btn').forEach(btn => {
+                const btnDays = parseInt(btn.getAttribute('data-days'));
+                if (btnDays === days) {
+                    btn.className = 'duration-btn flex-1 py-1.5 px-2 rounded-xl text-xs font-bold border transition text-center bg-ipnu-600 text-white border-ipnu-700 shadow';
+                } else {
+                    btn.className = 'duration-btn flex-1 py-1.5 px-2 rounded-xl text-xs font-bold border transition text-center bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200';
+                }
+            });
+            const type = document.getElementById('f-type').value;
+            const quota = parseInt(document.getElementById('f-quota').value) || 30;
+            rundownList = getPresetRundown(type, days);
+            rabList = getPresetRAB(type, days, quota);
+            renderRundownEditor();
+            renderRABEditor();
+            updateAll();
+        }
+
+        function onCustomDaysInput(val) {
+            const days = parseInt(val) || 1;
+            setDuration(days);
+        }
+
+        function onQuotaChange(val) {
+            const quota = parseInt(val) || 30;
+            const type = document.getElementById('f-type').value;
+            const days = parseInt(document.getElementById('f-days').value) || 1;
+            rabList = getPresetRAB(type, days, quota);
+            renderRABEditor();
+            updateAll();
+        }
+
+        function loadPreset(key) {
+            const data = PRESETS[key];
+            if (!data) return;
+            document.getElementById('f-type').value = data.type;
+            document.getElementById('f-organizer').value = data.organizer;
+            document.getElementById('f-pac').value = data.pac;
+            document.getElementById('f-pc').value = data.pc;
+            document.getElementById('f-theme').value = data.theme;
+            document.getElementById('f-date').value = data.date;
+            document.getElementById('f-location').value = data.location;
+            document.getElementById('f-quota').value = data.quota;
+            document.getElementById('f-format').value = data.format;
+            document.getElementById('f-chair').value = data.chair;
+            document.getElementById('f-sec').value = data.sec;
+            rabList = getPresetRAB(data.type, data.days, data.quota);
+            renderRABEditor();
+            setDuration(data.days);
+            showToast("Preset " + key.toUpperCase() + " dimuat!");
+        }
+
+        function renderRundownEditor() {
+            const container = document.getElementById('rundown-editor');
+            if (!container) return;
+            container.innerHTML = '';
+            rundownList.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 border border-slate-200 p-2 rounded-xl text-xs space-y-1.5 flex items-center gap-2';
+                div.draggable = true;
+                div.ondragstart = (e) => { dragSourceIndex = index; e.dataTransfer.effectAllowed = 'move'; };
+                div.ondragover = (e) => { e.preventDefault(); };
+                div.ondrop = (e) => {
+                    e.preventDefault();
+                    if (dragSourceIndex !== null && dragSourceIndex !== index) {
+                        const moved = rundownList.splice(dragSourceIndex, 1)[0];
+                        rundownList.splice(index, 0, moved);
+                        renderRundownEditor();
+                        updateDocumentDisplay();
+                    }
+                };
+                div.innerHTML = `
+                    <div class="cursor-grab text-slate-400 hover:text-slate-600 px-1"><i class="fa-solid fa-grip-vertical"></i></div>
+                    <div class="flex-1 space-y-1">
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" value="${item.day}" oninput="updateRundownItem(${index}, 'day', this.value)" placeholder="Hari" class="w-1/4 bg-white border rounded px-1.5 py-1 font-bold text-[11px]">
+                            <input type="text" value="${item.time}" oninput="updateRundownItem(${index}, 'time', this.value)" placeholder="Waktu" class="w-2/4 bg-white border rounded px-1.5 py-1 font-mono text-[11px]">
+                            <button onclick="removeRundownItem(${index})" class="text-rose-600 hover:text-rose-800 p-1 shrink-0"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" value="${item.title}" oninput="updateRundownItem(${index}, 'title', this.value)" placeholder="Nama Sesi" class="flex-1 bg-white border rounded px-1.5 py-1 font-semibold text-[11px]">
+                            <input type="text" value="${item.speaker}" oninput="updateRundownItem(${index}, 'speaker', this.value)" placeholder="Pemateri" class="w-1/3 bg-white border rounded px-1.5 py-1 text-[11px]">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addRundownItem() {
+            rundownList.push({ day: 'Hari 1', time: '00.00 - 00.00', title: 'Sesi Baru', speaker: 'Pemateri' });
+            renderRundownEditor();
+            updateAll();
+        }
+
+        function removeRundownItem(index) {
+            rundownList.splice(index, 1);
+            renderRundownEditor();
+            updateAll();
+        }
+
+        function updateRundownItem(index, field, value) {
+            if (rundownList[index]) { rundownList[index][field] = value; updateDocumentDisplay(); }
+        }
+
+        function renderRABEditor() {
+            const container = document.getElementById('rab-editor');
+            container.innerHTML = '';
+            let grandTotal = 0;
+            rabList.forEach((item, index) => {
+                const subtotal = (parseInt(item.vol)||0) * (parseInt(item.price)||0);
+                grandTotal += subtotal;
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 border border-slate-200 p-2 rounded-xl text-xs space-y-1.5';
+                div.innerHTML = `
+                    <div class="flex items-center gap-1.5">
+                        <input type="text" value="${item.category}" oninput="updateRABItem(${index}, 'category', this.value)" placeholder="Kategori" class="w-1/3 bg-white border rounded px-1.5 py-1 font-bold text-[11px] text-ipnu-800">
+                        <input type="text" value="${item.item}" oninput="updateRABItem(${index}, 'item', this.value)" placeholder="Nama Pos" class="flex-1 bg-white border rounded px-1.5 py-1 font-semibold text-[11px]">
+                        <button onclick="removeRABItem(${index})" class="text-rose-600 hover:text-rose-800 p-1 shrink-0"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] text-slate-500 font-bold shrink-0">Vol:</span>
+                        <input type="number" min="1" value="${item.vol}" oninput="updateRABItem(${index}, 'vol', this.value)" class="w-14 bg-white border rounded px-1.5 py-1 text-center font-bold">
+                        <input type="text" value="${item.unit}" oninput="updateRABItem(${index}, 'unit', this.value)" placeholder="Unit" class="w-16 bg-white border rounded px-1 py-1 text-center text-[10px]">
+                        <span class="text-[10px] text-slate-500 font-bold shrink-0">@Rp:</span>
+                        <input type="number" step="500" value="${item.price}" oninput="updateRABItem(${index}, 'price', this.value)" class="flex-1 bg-white border rounded px-1.5 py-1 font-mono text-right text-[11px]">
+                        <span class="w-20 font-mono font-bold text-right text-emerald-800 text-[11px] shrink-0">Rp ${subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            document.getElementById('rab-total-display').innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+            document.getElementById('f-budget').value = grandTotal.toLocaleString('id-ID');
+        }
+
+        function addRABItem() {
+            rabList.push({ category: 'Lain-lain', item: 'Pos Baru', vol: 1, unit: 'Paket', price: 100000 });
+            renderRABEditor();
+            updateAll();
+        }
+
+        function removeRABItem(index) {
+            rabList.splice(index, 1);
+            renderRABEditor();
+            updateAll();
+        }
+
+        function updateRABItem(index, field, value) {
+            if (field === 'vol' || field === 'price') {
+                rabList[index][field] = parseInt(value) || 0;
+            } else {
+                rabList[index][field] = value;
+            }
+            renderRABEditor();
+            updateDocumentDisplay();
+        }
+
+        function validateRules() {
+            const type = document.getElementById('f-type').value;
+            const days = parseInt(document.getElementById('f-days').value) || 1;
+            const quota = parseInt(document.getElementById('f-quota').value) || 0;
+            const format = document.getElementById('f-format').value;
+            const badge = document.getElementById('compliance-status');
+            const text = document.getElementById('compliance-text');
+            let ok = true, warn = [];
+            if (type === 'makesta' || type === 'makesta-u') {
+                if (format === 'virtual') { ok = false; warn.push('MAKESTA dilarang Virtual/Online'); }
+                if (format === 'oneday' || days < 2) { ok = false; warn.push('MAKESTA wajib min. 2 Hari'); }
+            }
+            if (type === 'makesta-u' && quota > 50) { ok = false; warn.push('MAKESTA Unggulan maks. 50 peserta'); }
+            if (type === 'lakmud' && quota > 40) { ok = false; warn.push('LAKMUD idealnya maks. 40 peserta'); }
+            if (ok) {
+                badge.className = 'px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 flex items-center gap-2 text-xs font-bold shrink-0';
+                text.innerText = 'Pedoman PPW Jateng: Sesuai Standar';
+            } else {
+                badge.className = 'px-4 py-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 flex items-center gap-2 text-xs font-bold shrink-0';
+                text.innerText = warn[0];
+            }
+        }
+
+        function updateAll() {
+            validateRules();
+            updateDocumentDisplay();
+        }
+
+        function switchDocTab(tab) {
+            currentTab = tab;
+            ['welcome','tor','juknis','rundown','rab','surat'].forEach(t => {
+                const btn = document.getElementById('tab-btn-'+t);
+                if (btn) {
+                    if (t === tab) {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-ipnu-600 text-white shadow';
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white';
+                    }
+                }
+            });
+            updateDocumentDisplay();
+        }
+
+        function updateDocumentDisplay() {
+            const container = document.getElementById('doc-content');
+            const type = document.getElementById('f-type').value;
+            const organizer = document.getElementById('f-organizer').value;
+            const pac = document.getElementById('f-pac').value;
+            const pc = document.getElementById('f-pc').value;
+            const theme = document.getElementById('f-theme').value;
+            const date = document.getElementById('f-date').value;
+            const days = document.getElementById('f-days').value;
+            const location = document.getElementById('f-location').value;
+            const quota = document.getElementById('f-quota').value;
+            const format = document.getElementById('f-format').value;
+            const chair = document.getElementById('f-chair').value;
+            const sec = document.getElementById('f-sec').value;
+            const budget = document.getElementById('f-budget').value;
+            const typeNames = { 'makesta':'MASA KESETIAAN ANGGOTA (MAKESTA)','makesta-u':'MAKESTA UNGGULAN (SEKOLAH NEGERI)','lakmud':'LATIHAN KADER MUDA (LAKMUD)','pk':'PELANTIKAN & RAT KOMISARIAT' };
+            const titleStr = typeNames[type] || 'KEGIATAN KADERISASI';
+
+            if (currentTab === 'welcome') {
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="p-6 bg-gradient-to-br from-ipnu-900 via-ipnu-800 to-emerald-900 rounded-2xl text-white shadow-md border border-emerald-500/20">
+                            <span class="bg-gold-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded uppercase tracking-wider">Pusat Kaderisasi</span>
+                            <h2 class="text-xl sm:text-2xl font-black mt-2">Selamat Datang di Generator Juknis & TOR</h2>
+                            <p class="text-xs text-emerald-100 max-w-2xl leading-relaxed mt-1">Aplikasi ini membantu Rekan & Rekanita menyusun Juknis, TOR, Rundown, dan RAB kaderisasi sesuai Pedoman Pimpinan Wilayah Jawa Tengah.</p>
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="font-extrabold text-sm text-slate-900 uppercase tracking-wide flex items-center gap-2"><i class="fa-solid fa-book-bookmark text-emerald-600"></i> Tautan Pedoman Resmi</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <a href="#" class="p-3.5 bg-slate-50 hover:bg-emerald-50/60 border border-slate-200 rounded-xl transition flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center"><i class="fa-solid fa-file-pdf"></i></div>
+                                    <div><h4 class="font-bold text-xs">Pedoman Kaderisasi PW</h4><p class="text-[11px] text-slate-500">Standar jenjang Makesta, Lakmud, Lakut</p></div>
+                                </a>
+                                <a href="#" class="p-3.5 bg-slate-50 hover:bg-emerald-50/60 border border-slate-200 rounded-xl transition flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center"><i class="fa-solid fa-gavel"></i></div>
+                                    <div><h4 class="font-bold text-xs">POPA & Aturan Administrasi</h4><p class="text-[11px] text-slate-500">Tata kelola surat & atribut resmi</p></div>
+                                </a>
+                                <a href="#" class="p-3.5 bg-slate-50 hover:bg-emerald-50/60 border border-slate-200 rounded-xl transition flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center"><i class="fa-solid fa-building"></i></div>
+                                    <div><h4 class="font-bold text-xs">PPW Jawa Tengah</h4><p class="text-[11px] text-slate-500">Regulasi khusus kegiatan di Jateng</p></div>
+                                </a>
+                                <a href="#" class="p-3.5 bg-slate-50 hover:bg-emerald-50/60 border border-slate-200 rounded-xl transition flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center"><i class="fa-solid fa-award"></i></div>
+                                    <div><h4 class="font-bold text-xs">Modul & Silabus</h4><p class="text-[11px] text-slate-500">Materi wajib & sistem evaluasi baiat</p></div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-2">
+                                <h4 class="font-extrabold text-xs text-emerald-900 uppercase flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-600"></i> Saran</h4>
+                                <ul class="text-xs text-emerald-950 space-y-1 list-disc list-inside"><li>Sertakan 9 Materi Wajib</li><li>Gunakan RAB Realistis</li><li>Koordinasi dengan Instruktur</li><li>Sertakan RTL konkret</li></ul>
+                            </div>
+                            <div class="p-4 bg-rose-50/80 border border-rose-200 rounded-2xl space-y-2">
+                                <h4 class="font-extrabold text-xs text-rose-900 uppercase flex items-center gap-2"><i class="fa-solid fa-circle-xmark text-rose-600"></i> Larangan</h4>
+                                <ul class="text-xs text-rose-950 space-y-1 list-disc list-inside"><li>Dilarang Virtual/Online</li><li>Dilarang One Day Process</li><li>Jangan melebihi kuota ideal</li><li>Jangan ringkas materi wajib</li></ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (currentTab === 'tor') {
+                container.innerHTML = `
+                    <div class="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500">TERM OF REFERENCE (TOR)</h4>
+                        <h2 class="text-xl font-black tracking-tight uppercase">${titleStr}</h2>
+                        <h3 class="text-sm font-bold text-ipnu-800">${organizer.toUpperCase()}</h3>
+                        <p class="text-xs italic text-slate-600">Wilayah ${pac} - ${pc}</p>
+                    </div>
+                    <div class="space-y-4 text-xs sm:text-sm text-justify leading-relaxed">
+                        <div><h4 class="font-bold uppercase border-l-4 border-ipnu-600 pl-2 mb-2">I. LATAR BELAKANG</h4><p>IPNU dan IPPNU merupakan badan otonom NU yang membina generasi muda Islam Ahlussunnah wal Jamaah pada basis pelajar. Berdasarkan PPW Jateng, kaderisasi ${titleStr} menjadi fondasi utama membentengi dari intoleransi dan radikalisme.</p></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-ipnu-600 pl-2 mb-2">II. TEMA</h4><div class="p-3 bg-ipnu-50 border border-ipnu-200 rounded-xl italic font-semibold text-center">"${theme}"</div></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-ipnu-600 pl-2 mb-2">III. MAKSUD & TUJUAN</h4><ul class="list-disc list-inside pl-2"><li>Mengenalkan Aswaja An-Nahdliyah</li><li>Pemahaman organisasi IPNU IPPNU</li><li>Mencetak kader loyal, integritas, dan kepemimpinan</li>${type==='makesta-u'?'<li>Membuka basis PK di Sekolah Negeri</li>':''}${type==='lakmud'?'<li>Meningkatkan analisis masalah & tata kelola</li>':''}</ul></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-ipnu-600 pl-2 mb-2">IV. TARGET PESERTA</h4><p>Jumlah <strong>${quota} Orang</strong> dari wilayah ${pac}. ${type==='makesta-u'?'Khusus seleksi sekolah negeri 25 Putra & 25 Putri.':''}</p></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-ipnu-600 pl-2 mb-2">V. WAKTU & TEMPAT</h4><table class="w-full text-xs my-2 border border-slate-200"><tr><td class="p-2 font-bold w-1/3 bg-slate-50">Hari / Tanggal</td><td class="p-2">${date} (${days} Hari)</td></tr><tr><td class="p-2 font-bold bg-slate-50">Tempat</td><td class="p-2">${location}</td></tr><tr><td class="p-2 font-bold bg-slate-50">Format</td><td class="p-2 font-bold text-ipnu-700 uppercase">${format.replace('-',' ')}</td></tr></table></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-ipnu-600 pl-2 mb-2">VI. ANGGARAN</h4><p>Total estimasi <strong>Rp ${budget},-</strong> (rincian terlampir pada Tabel RAB).</p></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-ipnu-600 pl-2 mb-2">VII. PENUTUP</h4><p>Demikian TOR ini disusun sebagai pedoman acuan kerja.</p></div>
+                        <div class="pt-6 border-t border-slate-200 grid grid-cols-2 text-center text-xs font-sans"><div><p class="mb-12">Ketua Panitia,</p><p class="font-bold underline">${chair}</p></div><div><p class="mb-12">Sekretaris Panitia,</p><p class="font-bold underline">${sec}</p></div></div>
+                    </div>
+                `;
+            } else if (currentTab === 'juknis') {
+                container.innerHTML = `
+                    <div class="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500">PETUNJUK TEKNIS (JUKNIS)</h4>
+                        <h2 class="text-xl font-black tracking-tight uppercase">${titleStr}</h2>
+                        <h3 class="text-sm font-bold text-ipnu-800">${organizer.toUpperCase()}</h3>
+                    </div>
+                    <div class="space-y-4 text-xs sm:text-sm text-justify leading-relaxed">
+                        <div><h4 class="font-bold uppercase border-l-4 border-gold-500 pl-2 mb-2">BAB I: KETENTUAN UMUM</h4><ul class="list-disc list-inside pl-2"><li>Mengacu pada PPW IPNU IPPNU Jateng.</li><li>Dilarang Virtual/Online dan One Day Process.</li><li>Panitia bertanggung jawab penuh.</li></ul></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-gold-500 pl-2 mb-2">BAB II: PERSYARATAN PESERTA</h4><ol class="list-decimal list-inside pl-2"><li>Pelajar/santri aktif di ${pac}.</li>${type==='makesta-u'?'<li>Surat Mandat Kepala Sekolah Negeri & esai.</li>':''}${type==='lakmud'?'<li>Fotokopi Sertifikat MAKESTA & seleksi.</li>':''}<li>Mengisi formulir & membayar kontribusi.</li><li>Membawa perlengkapan ibadah, pakaian sopan, alat tulis.</li></ol></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-gold-500 pl-2 mb-2">BAB III: TATA TERTIB & KELULUSAN</h4><ul class="list-disc list-inside pl-2"><li>Kehadiran minimal 90%.</li><li>Izin tertulis dari Sie Acara.</li><li>Syarat kelulusan: lulus post-test & selesaikan 3 RTL.</li></ul></div>
+                        <div><h4 class="font-bold uppercase border-l-4 border-gold-500 pl-2 mb-2">BAB IV: TIM INSTRUKTUR</h4><p>Materi oleh narasumber qualified dan Tim Instruktur Resmi PC ${pc}.</p></div>
+                        <div class="pt-6 border-t border-slate-200 grid grid-cols-2 text-center text-xs font-sans"><div><p class="mb-12">Ketua Panitia,</p><p class="font-bold underline">${chair}</p></div><div><p class="mb-12">Sekretaris Panitia,</p><p class="font-bold underline">${sec}</p></div></div>
+                    </div>
+                `;
+            } else if (currentTab === 'rundown') {
+                let rows = rundownList.map((item, idx) => `
+                    <tr class="${idx%2===0?'bg-white':'bg-slate-50'} border-b text-xs">
+                        <td class="p-2.5 font-bold text-ipnu-800 border-r w-20">${item.day}</td>
+                        <td class="p-2.5 font-mono font-bold border-r w-32">${item.time}</td>
+                        <td class="p-2.5 font-semibold border-r">${item.title}</td>
+                        <td class="p-2.5 text-slate-600">${item.speaker||'-'}</td>
+                    </tr>
+                `).join('');
+                container.innerHTML = `
+                    <div class="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500">RUNDOWN & SILABUS</h4>
+                        <h2 class="text-xl font-black tracking-tight uppercase">${titleStr}</h2>
+                        <h3 class="text-sm font-bold text-ipnu-800">${organizer.toUpperCase()}</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs flex justify-between"><span><i class="fa-solid fa-circle-info text-emerald-600 mr-1"></i> 9 Muatan Wajib PPW Jateng</span><span class="font-bold">${days} Hari</span></div>
+                        <div class="overflow-x-auto border rounded-xl"><table class="w-full text-left border-collapse"><thead><tr class="bg-ipnu-900 text-white text-xs"><th class="p-3 border-r">Hari</th><th class="p-3 border-r">Waktu</th><th class="p-3 border-r">Materi</th><th class="p-3">Pemateri</th></tr></thead><tbody>${rows}</tbody></table></div>
+                        <div class="pt-6 border-t border-slate-200 grid grid-cols-2 text-center text-xs"><div><p class="mb-12">Ketua Panitia,</p><p class="font-bold underline">${chair}</p></div><div><p class="mb-12">Sekretaris Panitia,</p><p class="font-bold underline">${sec}</p></div></div>
+                    </div>
+                `;
+            } else if (currentTab === 'rab') {
+                let grand = 0;
+                let rows = rabList.map((item, idx) => {
+                    const sub = (parseInt(item.vol)||0)*(parseInt(item.price)||0);
+                    grand += sub;
+                    return `<tr class="${idx%2===0?'bg-white':'bg-slate-50'} border-b text-xs"><td class="p-2 border-r font-bold">${item.category}</td><td class="p-2 border-r">${item.item}</td><td class="p-2 border-r text-center">${item.vol} ${item.unit}</td><td class="p-2 border-r text-right font-mono">Rp ${(parseInt(item.price)||0).toLocaleString('id-ID')}</td><td class="p-2 text-right font-mono font-bold text-emerald-900">Rp ${sub.toLocaleString('id-ID')}</td></tr>`;
+                }).join('');
+                container.innerHTML = `
+                    <div class="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500">RENCANA ANGGARAN BIAYA (RAB)</h4>
+                        <h2 class="text-xl font-black tracking-tight uppercase">${titleStr}</h2>
+                        <h3 class="text-sm font-bold text-ipnu-800">${organizer.toUpperCase()}</h3>
+                    </div>
+                    <div class="overflow-x-auto border rounded-xl"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-900 text-white text-xs"><th class="p-2.5 border-r">Kategori</th><th class="p-2.5 border-r">Rincian</th><th class="p-2.5 border-r text-center">Volume</th><th class="p-2.5 border-r text-right">Harga Satuan</th><th class="p-2.5 text-right">Jumlah</th></tr></thead><tbody>${rows}<tr class="bg-amber-100 font-extrabold text-xs border-t-2 border-slate-900"><td colspan="4" class="p-3 text-right uppercase">TOTAL</td><td class="p-3 text-right font-mono text-emerald-900 text-sm">Rp ${grand.toLocaleString('id-ID')}</td></tr></tbody></table></div>
+                    <div class="pt-6 border-t border-slate-200 grid grid-cols-2 text-center text-xs"><div><p class="mb-12">Ketua Panitia,</p><p class="font-bold underline">${chair}</p></div><div><p class="mb-12">Bendahara,</p><p class="font-bold underline">${sec}</p></div></div>
+                `;
+            } else if (currentTab === 'surat') {
+                container.innerHTML = `
+                    <div class="space-y-5">
+                        <div class="text-center border-b-2 border-slate-900 pb-4"><h4 class="text-xs font-bold uppercase tracking-widest text-slate-500">TAUTAN BERKAS SURAT-MENYURAT</h4><h2 class="text-xl font-black tracking-tight uppercase">${organizer.toUpperCase()}</h2></div>
+                        <div class="overflow-x-auto border rounded-xl"><table class="w-full text-left border-collapse text-xs"><thead><tr class="bg-ipnu-900 text-white"><th class="p-2.5 border-r text-center w-12">No</th><th class="p-2.5 border-r">Jenis Surat</th><th class="p-2.5 border-r w-36">No. Surat</th><th class="p-2.5 border-r">Tautan</th><th class="p-2.5">Keterangan</th></tr></thead><tbody>
+                        <tr><td class="p-2.5 text-center border-r">1</td><td class="p-2.5 border-r">Permohonan Pemateri</td><td class="p-2.5 border-r font-mono">[Isi]</td><td class="p-2.5 border-r text-blue-600 underline">[Link]</td><td>Pemateri Cabang</td></tr>
+                        <tr><td class="p-2.5 text-center border-r">2</td><td class="p-2.5 border-r">Rekomendasi Instruktur</td><td class="p-2.5 border-r font-mono">[Isi]</td><td class="p-2.5 border-r text-blue-600 underline">[Link]</td><td>Ke PC</td></tr>
+                        <tr><td class="p-2.5 text-center border-r">3</td><td class="p-2.5 border-r">Undangan Pembukaan</td><td class="p-2.5 border-r font-mono">[Isi]</td><td class="p-2.5 border-r text-blue-600 underline">[Link]</td><td>MWC NU</td></tr>
+                        <tr><td class="p-2.5 text-center border-r">4</td><td class="p-2.5 border-r">Mandat Peserta Sekolah</td><td class="p-2.5 border-r font-mono">[Isi]</td><td class="p-2.5 border-r text-blue-600 underline">[Link]</td><td>Persyaratan</td></tr>
+                        <tr><td class="p-2.5 text-center border-r">5</td><td class="p-2.5 border-r">Berita Acara & Baiat</td><td class="p-2.5 border-r font-mono">[Isi]</td><td class="p-2.5 border-r text-blue-600 underline">[Link]</td><td>Instruktur</td></tr>
+                        <tr><td class="p-2.5 text-center border-r">6</td><td class="p-2.5 border-r">Form RTL Peserta</td><td class="p-2.5 border-r font-mono">[Isi]</td><td class="p-2.5 border-r text-blue-600 underline">[Link]</td><td>Pasca-kaderisasi</td></tr>
+                    </tbody></table></div></div>
+                `;
+            }
+        }
+
+        // ===== UTILITIES =====
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').style.display = 'none';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const msgSpan = document.getElementById('toast-msg');
+            msgSpan.innerText = msg;
+            toast.classList.remove('translate-y-full', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-full', 'opacity-0');
+            }, 3000);
+        }
+
+        function saveDraft() {
+            const data = {
+                type: document.getElementById('f-type').value,
+                organizer: document.getElementById('f-organizer').value,
+                pac: document.getElementById('f-pac').value,
+                pc: document.getElementById('f-pc').value,
+                theme: document.getElementById('f-theme').value,
+                date: document.getElementById('f-date').value,
+                days: document.getElementById('f-days').value,
+                location: document.getElementById('f-location').value,
+                quota: document.getElementById('f-quota').value,
+                format: document.getElementById('f-format').value,
+                chair: document.getElementById('f-chair').value,
+                sec: document.getElementById('f-sec').value,
+                rundownList, rabList
+            };
+            localStorage.setItem('ipnu_juknis_draft_v2', JSON.stringify(data));
+            showToast('Draf disimpan!');
+        }
+
+        function loadDraft() {
+            const saved = localStorage.getItem('ipnu_juknis_draft_v2');
+            if (!saved) { showToast('Tidak ada draf.'); return; }
+            try {
+                const data = JSON.parse(saved);
+                document.getElementById('f-type').value = data.type || 'makesta';
+                document.getElementById('f-organizer').value = data.organizer || '';
+                document.getElementById('f-pac').value = data.pac || '';
+                document.getElementById('f-pc').value = data.pc || '';
+                document.getElementById('f-theme').value = data.theme || '';
+                document.getElementById('f-date').value = data.date || '';
+                document.getElementById('f-location').value = data.location || '';
+                document.getElementById('f-quota').value = data.quota || 30;
+                document.getElementById('f-format').value = data.format || 'tatap-muka';
+                document.getElementById('f-chair').value = data.chair || '';
+                document.getElementById('f-sec').value = data.sec || '';
+                if (data.rundownList) rundownList = data.rundownList;
+                if (data.rabList) rabList = data.rabList;
+                setDuration(data.days || 2);
+                renderRundownEditor();
+                renderRABEditor();
+                updateAll();
+                showToast('Draf dimuat!');
+            } catch (e) { showToast('Gagal memuat draf.'); }
+        }
+
+        function downloadDocx() {
+            const content = document.getElementById('doc-content').innerHTML;
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body{font-family:Arial;font-size:11pt;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #333;padding:5px;}</style></head><body>";
+            const footer = "</body></html>";
+            const blob = new Blob(['\ufeff' + header + content + footer], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Juknis_TOR_IPNU_IPPNU_' + currentTab.toUpperCase() + '.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Export Word berhasil!');
+        }
+
+        function copyCurrentDocument() {
+            const doc = document.getElementById('doc-content');
+            const temp = document.createElement('textarea');
+            temp.value = doc.innerText;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast('Naskah disalin!');
+        }
+
+        function printDocument() { window.print(); }
+
+        function resetToHome() { loadPreset('makesta'); }
+
+        // ===== INIT =====
+        window.onload = function() {
+            loadPreset('makesta');
+            // Show welcome modal
+            document.getElementById('welcomeModal').style.display = 'flex';
+        };
+    </script>
+
+</body>
+</html>
