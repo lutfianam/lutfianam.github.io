@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ular Tangga Truth or Dare Interaktif</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* 3D Card Flip Animation */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Dice 3D Animation */
+        .dice-box {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease-out;
+        }
+        .dice-face {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+        .face-1 { transform: translateZ(30px); }
+        .face-2 { transform: rotateY(180deg) translateZ(30px); }
+        .face-3 { transform: rotateY(90deg) translateZ(30px); }
+        .face-4 { transform: rotateY(-90deg) translateZ(30px); }
+        .face-5 { transform: rotateX(90deg) translateZ(30px); }
+        .face-6 { transform: rotateX(-90deg) translateZ(30px); }
+
+        /* Board Styling */
+        .board-grid {
+            display: grid;
+            gap: 3px;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-width: 580px;
+        }
+        .tile {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 3px;
+            border-radius: 6px;
+            font-size: 0.70rem;
+            font-weight: 700;
+            user-select: none;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        /* Glassmorphism UI */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Pawn Markers */
+        .pawn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: absolute;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6 flex flex-col items-center justify-between">
+
+    <!-- HEADER BAR -->
+    <header class="w-full max-w-5xl flex flex-wrap items-center justify-between gap-4 mb-4 glass-panel p-4 rounded-2xl shadow-xl">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-white text-xl shadow-lg">
+                <i class="fa-solid fa-dice-d20"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 bg-clip-text text-transparent">
+                    Ular Tangga Truth or Dare
+                </h1>
+                <p class="text-xs text-slate-400">Game Papan Interaktif & Rahasia Teman</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="openModal('howToPlayModal')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-circle-question text-pink-400"></i> Cara Bermain
+            </button>
+            <button onclick="openModal('customQuestionsModal')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-purple-400"></i> Buat Soal
+            </button>
+            <button onclick="openModal('settingsModal')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition">
+                <i class="fa-solid fa-gear text-indigo-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="w-full max-w-5xl flex-1 flex flex-col items-center justify-center">
+
+        <!-- LOBBY / SETUP SCREEN -->
+        <section id="lobbyScreen" class="w-full max-w-xl glass-panel p-6 rounded-3xl shadow-2xl border border-slate-700/50 my-auto">
+            <div class="text-center mb-6">
+                <span class="px-3 py-1 bg-pink-500/20 text-pink-300 text-xs font-semibold rounded-full border border-pink-500/30">Pengaturan Ruang Main</span>
+                <h2 class="text-2xl font-bold mt-2">Siapkan Permainan Baru</h2>
+                <p class="text-sm text-slate-400">Atur pemain, mode jawaban, dan pertanyaan custom sebelum mulai.</p>
+            </div>
+
+            <!-- Player List Setup -->
+            <div class="space-y-4 mb-6">
+                <label class="block text-sm font-semibold text-slate-300">Daftar Pemain (2 - 4 Orang):</label>
+                <div id="playerInputsContainer" class="space-y-2">
+                    <!-- Dynamic Player Inputs inserted by JS -->
+                </div>
+                <button onclick="addPlayerInput()" id="addPlayerBtn" class="text-xs text-pink-400 hover:text-pink-300 font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-plus"></i> Tambah Pemain
+                </button>
+            </div>
+
+            <!-- Game Mode Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-300 mb-2">Mode Jawaban Truth or Dare:</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-3 rounded-2xl flex flex-col justify-between hover:border-pink-500/50 transition relative">
+                        <input type="radio" name="gameMode" value="SPOKEN" class="peer sr-only" checked>
+                        <div class="peer-checked:border-pink-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <div>
+                            <div class="flex items-center gap-2 text-pink-400 font-bold text-sm mb-1">
+                                <i class="fa-solid fa-comments"></i> Mode Bicara Lisan
+                            </div>
+                            <p class="text-xs text-slate-400">Jawab / lakukan tantangan langsung dengan bicara secara fisik atau via voice call.</p>
+                        </div>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-3 rounded-2xl flex flex-col justify-between hover:border-purple-500/50 transition relative">
+                        <input type="radio" name="gameMode" value="TEXT" class="peer sr-only">
+                        <div class="peer-checked:border-purple-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <div>
+                            <div class="flex items-center gap-2 text-purple-400 font-bold text-sm mb-1">
+                                <i class="fa-solid fa-keyboard"></i> Mode Ketik Jawaban
+                            </div>
+                            <p class="text-xs text-slate-400">Wajib mengetik jawaban di layar. Jawaban akan ditampilkan ke semua pemain & dicatat.</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Board Size Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-300 mb-2">Pilihan Ukuran Papan (Jumlah Petak):</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-2.5 rounded-2xl flex flex-col items-center text-center hover:border-pink-500/50 transition relative">
+                        <input type="radio" name="boardSize" value="36" class="peer sr-only" checked>
+                        <div class="peer-checked:border-pink-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <span class="text-sm font-extrabold text-pink-400">36 Petak</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Papan 6 x 6</span>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-2.5 rounded-2xl flex flex-col items-center text-center hover:border-purple-500/50 transition relative">
+                        <input type="radio" name="boardSize" value="64" class="peer sr-only">
+                        <div class="peer-checked:border-purple-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <span class="text-sm font-extrabold text-purple-400">64 Petak</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Papan 8 x 8</span>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-2.5 rounded-2xl flex flex-col items-center text-center hover:border-amber-500/50 transition relative">
+                        <input type="radio" name="boardSize" value="100" class="peer sr-only">
+                        <div class="peer-checked:border-amber-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <span class="text-sm font-extrabold text-amber-400">100 Petak</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Papan 10 x 10</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question Source Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-300 mb-2">Pilihan Bank Soal:</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-3 rounded-2xl flex flex-col items-center text-center hover:border-pink-500/50 transition relative">
+                        <input type="radio" name="questionSource" value="ALL" class="peer sr-only" checked>
+                        <div class="peer-checked:border-pink-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <i class="fa-solid fa-layer-group text-pink-400 text-lg mb-1"></i>
+                        <span class="text-xs font-bold text-slate-200">Default + Custom</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Gabungan semua soal</span>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-3 rounded-2xl flex flex-col items-center text-center hover:border-sky-500/50 transition relative">
+                        <input type="radio" name="questionSource" value="DEFAULT" class="peer sr-only">
+                        <div class="peer-checked:border-sky-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <i class="fa-solid fa-bolt text-sky-400 text-lg mb-1"></i>
+                        <span class="text-xs font-bold text-slate-200">Hanya Default</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Langsung main instan</span>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-700 bg-slate-800/60 p-3 rounded-2xl flex flex-col items-center text-center hover:border-purple-500/50 transition relative">
+                        <input type="radio" name="questionSource" value="CUSTOM" class="peer sr-only">
+                        <div class="peer-checked:border-purple-500 border-2 border-transparent absolute inset-0 rounded-2xl pointer-events-none"></div>
+                        <i class="fa-solid fa-user-pen text-purple-400 text-lg mb-1"></i>
+                        <span class="text-xs font-bold text-slate-200">Hanya Custom</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Soal buatan kalian</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Custom Questions Badge Info -->
+            <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60 flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-folder-open text-purple-400 text-lg"></i>
+                    <div>
+                        <div class="text-xs text-slate-400">Bank Soal Permainan:</div>
+                        <div id="customCountBadge" class="text-xs font-bold text-slate-200">0 Soal Custom | 30+ Soal Default Ready</div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openModal('defaultBankModal')" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-xl font-semibold transition text-slate-200">
+                        Lihat Default
+                    </button>
+                    <button onclick="openModal('customQuestionsModal')" class="text-xs bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-xl font-semibold transition">
+                        Kelola Custom
+                    </button>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:from-pink-600 hover:to-indigo-700 text-white font-extrabold rounded-2xl shadow-lg shadow-pink-500/20 text-lg transition transform hover:-translate-y-0.5">
+                <i class="fa-solid fa-play mr-2"></i> Mulai Permainan
+            </button>
+        </section>
+
+        <!-- GAME SCREEN (Hidden by default) -->
+        <section id="gameScreen" class="w-full hidden flex-col lg:flex-row items-center justify-center gap-6 my-auto">
+
+            <!-- LEFT: GAME BOARD -->
+            <div class="relative flex flex-col items-center">
+                <!-- Board Canvas / Grid -->
+                <div class="glass-panel p-3 rounded-3xl border border-slate-700/60 shadow-2xl relative">
+                    <div id="boardGrid" class="board-grid">
+                        <!-- Tiles dynamically generated in JS -->
+                    </div>
+
+                    <!-- SVG Overlay for Snakes and Ladders lines -->
+                    <svg id="boardSvg" class="absolute inset-0 w-full h-full pointer-events-none z-10 p-3" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <!-- Lines drawn dynamically -->
+                    </svg>
+                </div>
+
+                <!-- Board Legend -->
+                <div class="flex flex-wrap items-center justify-center gap-3 mt-3 text-xs text-slate-300">
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-500/40 border border-emerald-400"></span> Tangga</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-500/40 border border-rose-400"></span> Ular</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-sky-500/40 border border-sky-400"></span> Truth</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-500/40 border border-amber-400"></span> Dare</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-purple-500/40 border border-purple-400"></span> Choice</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: DASHBOARD & CONTROLS -->
+            <div class="w-full lg:w-80 flex flex-col gap-4">
+
+                <!-- Turn Banner Card -->
+                <div class="glass-panel p-4 rounded-2xl border border-slate-700/60 shadow-xl text-center">
+                    <div class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Giliran Bermain</div>
+                    <div id="turnPlayerName" class="text-xl font-extrabold text-pink-400 flex items-center justify-center gap-2">
+                        <span id="turnPawnDot" class="w-4 h-4 rounded-full bg-pink-500 inline-block shadow"></span>
+                        <span id="activePlayerText">Player 1</span>
+                    </div>
+                    <div id="turnStatusSub" class="text-xs text-slate-400 mt-1">Tekan tombol untuk melempar dadu</div>
+                </div>
+
+                <!-- Roll Dice Section -->
+                <div class="glass-panel p-5 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col items-center justify-center">
+                    
+                    <!-- 3D Dice Graphic Container -->
+                    <div class="my-4 h-20 flex items-center justify-center">
+                        <div id="diceBox" class="dice-box">
+                            <div class="dice-face face-1">1</div>
+                            <div class="dice-face face-2">2</div>
+                            <div class="dice-face face-3">3</div>
+                            <div class="dice-face face-4">4</div>
+                            <div class="dice-face face-5">5</div>
+                            <div class="dice-face face-6">6</div>
+                        </div>
+                    </div>
+
+                    <button id="rollDiceBtn" onclick="rollDice()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-extrabold rounded-xl shadow-lg transition transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-dice text-xl"></i> Kocok Dadu
+                    </button>
+                </div>
+
+                <!-- Players Status List -->
+                <div class="glass-panel p-4 rounded-2xl border border-slate-700/60 shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Posisi Pemain</h3>
+                    <div id="playerPositionsList" class="space-y-2">
+                        <!-- Dynamically filled -->
+                    </div>
+                </div>
+
+                <!-- Live Game Log -->
+                <div class="glass-panel p-4 rounded-2xl border border-slate-700/60 shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                        <span>Catatan Aktivitas</span>
+                        <i class="fa-solid fa-list-ul"></i>
+                    </h3>
+                    <div id="gameLogBox" class="h-28 overflow-y-auto space-y-1 text-xs text-slate-300 pr-1">
+                        <div class="text-slate-500 italic">Game dimulai. Selamat bermain!</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+    <!-- MODAL 1: HOW TO PLAY / CARA BERMAIN -->
+    <div id="howToPlayModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-panel bg-slate-900/90 w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl p-6 border border-slate-700 shadow-2xl relative">
+            <button onclick="closeModal('howToPlayModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/40 text-pink-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Aturan & Cara Bermain</h2>
+                    <p class="text-xs text-slate-400">Panduan lengkap Ular Tangga + Truth or Dare</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-sm text-slate-300">
+                <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-pink-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-flag"></i> 1. Tujuan Utama</h3>
+                    <p class="text-xs leading-relaxed">Berlomba mencapai **Petak 36 (FINISH)** paling pertama dengan melempar dadu secara bergantian.</p>
+                </div>
+
+                <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-emerald-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-arrow-up-right-dots"></i> 2. Tangga & Ular</h3>
+                    <ul class="text-xs space-y-1 list-disc list-inside">
+                        <li>**Tangga:** Jika mendarat di bawah tangga, pion otomatis naik ke petak atas.</li>
+                        <li>**Ular:** Jika mendarat di kepala ular, pion otomatis merosot ke petak ekor di bawah.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-purple-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-masks-theater"></i> 3. Petak Truth or Dare</h3>
+                    <ul class="text-xs space-y-1 list-disc list-inside">
+                        <li><strong class="text-sky-300">Petak Truth:</strong> Wajib menjawab 1 pertanyaan jujur secara terbuka.</li>
+                        <li><strong class="text-amber-300">Petak Dare:</strong> Wajib melakukan 1 aksi/tantangan seru.</li>
+                        <li><strong class="text-purple-300">Petak Choice:</strong> Bebas memilih antara mengambil kartu *Truth* atau *Dare*.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-indigo-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-sliders"></i> 4. Mode Jawaban</h3>
+                    <ul class="text-xs space-y-1 list-disc list-inside">
+                        <li>**Mode Bicara Lisan:** Dijawab langsung dengan ucapan/aksi saat kumpul bersama.</li>
+                        <li>**Mode Ketik Jawaban:** Diketik langsung di web, lalu hasilnya muncul di layar dan disimpan di riwayat aktivitas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="closeModal('howToPlayModal')" class="w-full mt-6 py-3 bg-slate-800 hover:bg-slate-700 font-bold rounded-xl text-sm border border-slate-700">
+                Paham & Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CUSTOM QUESTIONS MANAGER -->
+    <div id="customQuestionsModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-panel bg-slate-900/90 w-full max-w-xl max-h-[85vh] overflow-y-auto rounded-3xl p-6 border border-slate-700 shadow-2xl relative">
+            <button onclick="closeModal('customQuestionsModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h2 class="text-xl font-bold text-white mb-1"><i class="fa-solid fa-pen-to-square text-purple-400 mr-2"></i> Tambah Soal Custom</h2>
+            <p class="text-xs text-slate-400 mb-4">Buat pertanyaan atau tantangan rahasia buatanmu sendiri sebelum game dimulai.</p>
+
+            <!-- Form -->
+            <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-3 mb-6">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Tipe Soal:</label>
+                    <select id="customTypeInput" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                        <option value="TRUTH">TRUTH (Pertanyaan Jujur)</option>
+                        <option value="DARE">DARE (Tantangan Aksi)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Teks Pertanyaan / Tantangan:</label>
+                    <textarea id="customTextInput" rows="3" placeholder="Contoh: Sebutkan 1 rahasia terbesarmu yang belum ada yang tahu!" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Pembuat (Opsional / Anonim):</label>
+                    <input type="text" id="customAuthorInput" placeholder="Misal: Anonim / Budi" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                </div>
+
+                <button onclick="saveCustomQuestion()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 font-bold rounded-xl text-xs transition">
+                    <i class="fa-solid fa-plus mr-1"></i> Simpan Soal
+                </button>
+            </div>
+
+            <!-- List of Custom Questions -->
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Daftar Soal Custom Saat Ini:</h3>
+            <div id="customQuestionsList" class="space-y-2 max-h-48 overflow-y-auto text-xs pr-1">
+                <div class="text-slate-500 italic">Belum ada soal custom yang dibuat.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: TRUTH OR DARE CARD POP-UP -->
+    <div id="todCardModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="w-full max-w-md perspective-1000">
+            <div id="cardFlipper" class="transform-style-3d glass-panel bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative">
+
+                <!-- CARD HEADER -->
+                <div class="text-center mb-4">
+                    <span id="todBadge" class="px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                        TRUTH CARD
+                    </span>
+                    <h3 id="todTargetPlayer" class="text-lg font-bold text-white mt-3">
+                        Giliran: <span class="text-pink-400">Budi</span>
+                    </h3>
+                </div>
+
+                <!-- CARD BODY -->
+                <div id="todCardBox" class="bg-gradient-to-b from-slate-800/90 to-slate-900 p-5 rounded-2xl border border-slate-700/80 my-4 text-center min-h-[140px] flex flex-col items-center justify-center">
+                    <p id="todQuestionText" class="text-sm md:text-base font-semibold text-slate-100 leading-relaxed">
+                        "Loading pertanyaan..."
+                    </p>
+                    <span id="todAuthorText" class="text-[10px] text-slate-400 mt-3 block italic">
+                        Oleh: Sistem
+                    </span>
+                </div>
+
+                <!-- CARD ACTIONS (SPOKEN MODE) -->
+                <div id="todSpokenActions" class="space-y-2">
+                    <button onclick="finishTodAction()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 font-extrabold text-white rounded-xl shadow-lg text-sm transition">
+                        <i class="fa-solid fa-circle-check mr-2"></i> Sudah Dijawab / Dilakukan
+                    </button>
+                </div>
+
+                <!-- CARD ACTIONS (TEXT INPUT MODE) -->
+                <div id="todTextActions" class="space-y-3 hidden">
+                    <textarea id="todAnswerInput" rows="3" placeholder="Tulis jawaban jujurmu di sini..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-pink-500"></textarea>
+                    <button onclick="submitTodAnswerText()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-extrabold text-white rounded-xl shadow-lg text-sm transition">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> Kirim & Tampilkan Jawaban
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: CHOICE SELECTION (FOR CHOICE TILES) -->
+    <div id="choiceModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-panel bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fa-solid fa-dice-d6"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">Petak Pilihan Bebas!</h3>
+            <p class="text-xs text-slate-400 mb-6">Kamu mendarat di Petak Choice. Pilih tantangan yang ingin kamu jalani:</p>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="selectChoice('TRUTH')" class="p-4 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/50 rounded-2xl flex flex-col items-center gap-2 transition">
+                    <i class="fa-solid fa-comment-dots text-sky-400 text-2xl"></i>
+                    <span class="font-extrabold text-sky-300 text-xs">TRUTH</span>
+                </button>
+                <button onclick="selectChoice('DARE')" class="p-4 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 rounded-2xl flex flex-col items-center gap-2 transition">
+                    <i class="fa-solid fa-fire text-amber-400 text-2xl"></i>
+                    <span class="font-extrabold text-amber-300 text-xs">DARE</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: SETTINGS / GOOGLE SHEETS INTEGRATION -->
+    <div id="settingsModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-panel bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-md w-full shadow-2xl relative">
+            <button onclick="closeModal('settingsModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h2 class="text-lg font-bold text-white mb-2"><i class="fa-solid fa-gear text-indigo-400 mr-2"></i> Pengaturan & Backend</h2>
+            <p class="text-xs text-slate-400 mb-4">Atur integrasi opsional ke Google Sheets (Google Apps Script Web App).</p>
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">URL Web App Google Apps Script (Opsional):</label>
+                    <input type="url" id="sheetsApiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-indigo-500">
+                    <p class="text-[10px] text-slate-500 mt-1">Jika diisi, jawaban dan data room akan dikirimkan secara otomatis ke Google Sheets.</p>
+                </div>
+
+                <button onclick="saveSettings()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 font-bold rounded-xl text-white transition">
+                    Simpan Pengaturan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: WINNER ANNOUNCEMENT -->
+    <div id="winnerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-panel bg-slate-900 border border-amber-500/40 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
+            <div class="w-20 h-20 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 animate-bounce">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-1">PEMENANG!</h2>
+            <p id="winnerName" class="text-xl font-extrabold text-amber-400 mb-4">Player 1</p>
+            <p class="text-xs text-slate-400 mb-6">Selamat! Kamu berhasil mencapai Petak 36 terlebih dahulu!</p>
+
+            <button onclick="resetToLobby()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-pink-600 hover:from-amber-600 hover:to-pink-700 font-extrabold text-white rounded-xl shadow-lg text-sm transition">
+                Main Lagi
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 7: DEFAULT BANK PREVIEW -->
+    <div id="defaultBankModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-panel bg-slate-900/95 w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl p-6 border border-slate-700 shadow-2xl relative">
+            <button onclick="closeModal('defaultBankModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Bank Soal Default (Bawaan Sistem)</h2>
+                    <p class="text-xs text-slate-400">Daftar pertanyaan & tantangan siap pakai tanpa perlu buat soal baru</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Truth Column -->
+                <div class="bg-slate-800/60 p-4 rounded-2xl border border-sky-500/30">
+                    <h3 class="font-bold text-sky-400 text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-comment-dots"></i> Daftar TRUTH (<span id="defaultTruthCount">0</span>)
+                    </h3>
+                    <div id="defaultTruthList" class="space-y-2 max-h-60 overflow-y-auto text-xs text-slate-300 pr-1"></div>
+                </div>
+
+                <!-- Dare Column -->
+                <div class="bg-slate-800/60 p-4 rounded-2xl border border-amber-500/30">
+                    <h3 class="font-bold text-amber-400 text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-fire"></i> Daftar DARE (<span id="defaultDareCount">0</span>)
+                    </h3>
+                    <div id="defaultDareList" class="space-y-2 max-h-60 overflow-y-auto text-xs text-slate-300 pr-1"></div>
+                </div>
+            </div>
+
+            <button onclick="closeModal('defaultBankModal')" class="w-full mt-6 py-3 bg-slate-800 hover:bg-slate-700 font-bold rounded-xl text-sm border border-slate-700">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL CONSTANTS & CONFIG
+        const PLAYER_COLORS = [
+            { name: 'Merah', hex: '#ef4444', bg: 'bg-red-500' },
+            { name: 'Biru', hex: '#3b82f6', bg: 'bg-blue-500' },
+            { name: 'Hijau', hex: '#10b981', bg: 'bg-emerald-500' },
+            { name: 'Kuning', hex: '#f59e0b', bg: 'bg-amber-500' }
+        ];
+
+        // Dynamic Board Spec Generator based on Total Tiles (36, 64, or 100)
+        function generateBoardSpec(totalTiles) {
+            if (totalTiles === 64) {
+                return {
+                    cols: 8,
+                    ladders: { 4: 18, 12: 31, 22: 43, 38: 59, 47: 62 },
+                    snakes: { 62: 40, 53: 29, 42: 19, 27: 7 },
+                    truthTiles: [6, 15, 24, 35, 45, 54],
+                    dareTiles: [9, 20, 31, 41, 51, 60],
+                    choiceTiles: [17, 33, 49]
+                };
+            } else if (totalTiles === 100) {
+                return {
+                    cols: 10,
+                    ladders: { 2: 38, 7: 14, 15: 26, 21: 42, 36: 44, 51: 67, 71: 91, 78: 98 },
+                    snakes: { 99: 78, 95: 75, 92: 73, 74: 53, 62: 19, 49: 11, 46: 25, 16: 6 },
+                    truthTiles: [5, 14, 27, 39, 48, 57, 68, 83, 93],
+                    dareTiles: [9, 18, 33, 43, 55, 65, 77, 86, 96],
+                    choiceTiles: [23, 45, 63, 85]
+                };
+            }
+            // Default 36 Tiles (6x6)
+            return {
+                cols: 6,
+                ladders: { 3: 16, 10: 25, 19: 31 },
+                snakes: { 34: 15, 23: 8, 14: 4 },
+                truthTiles: [5, 11, 18, 26, 32],
+                dareTiles: [8, 15, 22, 29, 35],
+                choiceTiles: [17, 28]
+            };
+        }
+
+        // EXPANDED DEFAULT QUESTION BANK
+        const DEFAULT_TRUTH_BANK = [
+            { text: "Apa kebiasaan teranehmu saat sedang sendirian di kamar?", author: "Sistem (Default)" },
+            { text: "Siapa orang di ruangan/kelompok ini yang pertama kali membuatmu penasaran?", author: "Sistem (Default)" },
+            { text: "Kapan terakhir kali kamu berbohong demi kebaikan, dan apa bohongnya?", author: "Sistem (Default)" },
+            { text: "Apa hal paling memalukan yang pernah terjadi padamu saat di tempat umum?", author: "Sistem (Default)" },
+            { text: "Jika kamu bisa bertukar kehidupan dengan salah satu pemain di sini selama sehari, siapa yang kamu pilih?", author: "Sistem (Default)" },
+            { text: "Apa rahasia terbesar yang belum pernah kamu ceritakan ke orang tua atau teman dekatmu?", author: "Sistem (Default)" },
+            { text: "Siapa mantan/gebetan yang paling susah buat kamu lupakan sampai sekarang?", author: "Sistem (Default)" },
+            { text: "Apa ketakutan atau fobia paling konyol yang kamu miliki?", author: "Sistem (Default)" },
+            { text: "Pernahkah kamu menyukai pacar/gebetan teman sendiri? Ceritakan jujur!", author: "Sistem (Default)" },
+            { text: "Apa penyesalan terbesar yang pernah kamu lakukan dalam hubungan atau pertemanan?", author: "Sistem (Default)" },
+            { text: "Berapa isi saldo rekening/dompet digitalmu saat ini secara pasti?", author: "Sistem (Default)" },
+            { text: "Siapa di antara pemain di sini yang menurutmu paling pintar dan paling malas?", author: "Sistem (Default)" },
+            { text: "Kapan terakhir kali kamu menangis dan apa penyebabnya?", author: "Sistem (Default)" },
+            { text: "Pernahkah kamu kepo sosmed seseorang pakai akun palsu/second account? Akun siapa?", author: "Sistem (Default)" },
+            { text: "Apa pesan chat terparah/paling canggung yang salah kirim ke orang lain?", author: "Sistem (Default)" }
+        ];
+
+        const DEFAULT_DARE_BANK = [
+            { text: "Biarkan pemain di sebelah kananmu menata gaya rambutmu selama 2 putaran!", author: "Sistem (Default)" },
+            { text: "Kirim pesan singkat 'Aku kangen banget' ke kontak ke-3 di HP-mu tanpa penjelasan!", author: "Sistem (Default)" },
+            { text: "Bicara dengan menggunakan bahasa daerah atau bahasa asing selama 2 putaran penuh!", author: "Sistem (Default)" },
+            { text: "Peragakan gaya hewan peliharaan sampai pemain lain bisa menebaknya!", author: "Sistem (Default)" },
+            { text: "Tunjukkan foto terlama yang ada di galeri HP-mu kepada semua pemain!", author: "Sistem (Default)" },
+            { text: "Biarkan pemain lain mengirim 1 emoji acak ke story Instagram/WhatsApp kamu!", author: "Sistem (Default)" },
+            { text: "Nyanyikan lagu favoritmu dengan suara keras selama 30 detik tanpa tertawa!", author: "Sistem (Default)" },
+            { text: "Tatap mata pemain di sebelah kirimu selama 20 detik tanpa berkedip!", author: "Sistem (Default)" },
+            { text: "Lakukan 10 kali push-up atau squat saat ini juga!", author: "Sistem (Default)" },
+            { text: "Biarkan pemain lain membacakan 3 pesan WhatsApp teratas di HP-mu!", author: "Sistem (Default)" },
+            { text: "Ganti nama profil WhatsApp/medsos kamu jadi 'Aku Suka Pisang' selama 10 menit!", author: "Sistem (Default)" },
+            { text: "Tirukan gaya bicara salah satu pemain di sini sampai mereka bisa menebak siapa!", author: "Sistem (Default)" },
+            { text: "Kirim pesan suara (voice note) bernyanyi ke grup chat keluarga/teman!", author: "Sistem (Default)" },
+            { text: "Jalankan sisa permainan sambil duduk bersila di lantai atau posisi tidak biasa!", author: "Sistem (Default)" },
+            { text: "Posting foto selfie paling kocak/muka jelek di story medsos kamu sekarang!", author: "Sistem (Default)" }
+        ];
+
+        // GAME STATE
+        let gameState = {
+            totalTiles: 36,
+            boardSpec: generateBoardSpec(36),
+            players: [], // [{ id: 0, name: 'Budi', color: '#ef4444', pos: 1 }]
+            currentTurnIndex: 0,
+            mode: 'SPOKEN', // 'SPOKEN' or 'TEXT'
+            questionSource: 'ALL', // 'ALL', 'DEFAULT', 'CUSTOM'
+            customQuestions: [],
+            sheetsUrl: '',
+            isMoving: false,
+            activeChoiceTile: null
+        };
+
+        // WEB AUDIO SYNTHESIZER FOR SOUND EFFECTS
+        let audioCtx;
+        function playSound(type) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            const now = audioCtx.currentTime;
+            
+            if (type === 'roll') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'ladder') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'snake') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.4);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'card') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(800, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+
+        // INIT SETUP FUNCTIONS
+        window.onload = () => {
+            initLobbyInputs();
+            renderDefaultBank();
+        };
+
+        function initLobbyInputs() {
+            const container = document.getElementById('playerInputsContainer');
+            if (container) container.innerHTML = '';
+            addPlayerInput('Player 1');
+            addPlayerInput('Player 2');
+        }
+
+        function addPlayerInput(defaultName = '') {
+            const container = document.getElementById('playerInputsContainer');
+            const currentCount = container.children.length;
+            if (currentCount >= 4) {
+                // Maksimal 4 pemain
+                return;
+            }
+
+            const playerId = Date.now() + Math.random().toString(36).substring(2, 7);
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-2';
+            div.id = `player-input-row-${playerId}`;
+            
+            const num = currentCount + 1;
+            const fallbackName = typeof defaultName === 'string' && defaultName ? defaultName : `Player ${num}`;
+            const color = PLAYER_COLORS[currentCount % 4];
+
+            div.innerHTML = `
+                <div class="w-8 h-8 rounded-full shadow border-2 border-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-xs" style="background-color: ${color.hex}">${num}</div>
+                <input type="text" class="player-input flex-1 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-pink-500" placeholder="${fallbackName}" value="${defaultName === fallbackName ? '' : defaultName}">
+                ${currentCount >= 2 ? `<button onclick="removePlayerInput('${playerId}')" class="text-red-400 hover:text-red-300 p-2.5 transition transform hover:scale-110"><i class="fa-solid fa-trash"></i></button>` : '<div class="w-[44px]"></div>'}
+            `;
+            container.appendChild(div);
+            updatePlayerInputColors();
+        }
+
+        function removePlayerInput(id) {
+            const row = document.getElementById(`player-input-row-${id}`);
+            if (row) row.remove();
+            updatePlayerInputColors();
+        }
+
+        function updatePlayerInputColors() {
+            const container = document.getElementById('playerInputsContainer');
+            Array.from(container.children).forEach((row, index) => {
+                const colorBox = row.querySelector('.rounded-full');
+                if (colorBox && PLAYER_COLORS[index]) {
+                    colorBox.style.backgroundColor = PLAYER_COLORS[index].hex;
+                    colorBox.innerText = index + 1;
+                }
+                const delBtn = row.querySelector('button');
+                if (index < 2) {
+                    if (delBtn) delBtn.outerHTML = '<div class="w-[44px]"></div>';
+                } else {
+                    if (!delBtn) {
+                        const id = row.id.replace('player-input-row-', '');
+                        row.insertAdjacentHTML('beforeend', `<button onclick="removePlayerInput('${id}')" class="text-red-400 hover:text-red-300 p-2.5 transition transform hover:scale-110"><i class="fa-solid fa-trash"></i></button>`);
+                        row.querySelector('div:last-child').remove();
+                    }
+                }
+            });
+        }
+
+        function renderDefaultBank() {
+            document.getElementById('defaultTruthCount').innerText = DEFAULT_TRUTH_BANK.length;
+            document.getElementById('defaultDareCount').innerText = DEFAULT_DARE_BANK.length;
+
+            document.getElementById('defaultTruthList').innerHTML = DEFAULT_TRUTH_BANK.map(q => `
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-sky-500/20 mb-2">
+                    <p class="text-slate-300">${q.text}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('defaultDareList').innerHTML = DEFAULT_DARE_BANK.map(q => `
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-amber-500/20 mb-2">
+                    <p class="text-slate-300">${q.text}</p>
+                </div>
+            `).join('');
+        }
+
+        function saveCustomQuestion() {
+            const type = document.getElementById('customTypeInput').value;
+            const text = document.getElementById('customTextInput').value.trim();
+            const author = document.getElementById('customAuthorInput').value.trim() || 'Anonim';
+
+            if (!text) return;
+
+            gameState.customQuestions.push({ type, text, author });
+            document.getElementById('customTextInput').value = '';
+            document.getElementById('customAuthorInput').value = '';
+            
+            updateCustomQuestionsUI();
+        }
+
+        function updateCustomQuestionsUI() {
+            const list = document.getElementById('customQuestionsList');
+            const badge = document.getElementById('customCountBadge');
+            
+            badge.innerText = `${gameState.customQuestions.length} Soal Custom | ${DEFAULT_TRUTH_BANK.length + DEFAULT_DARE_BANK.length} Soal Default Ready`;
+
+            if (gameState.customQuestions.length === 0) {
+                list.innerHTML = '<div class="text-slate-500 italic">Belum ada soal custom yang dibuat.</div>';
+                return;
+            }
+
+            list.innerHTML = gameState.customQuestions.map((q, i) => `
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700/50 flex justify-between items-start gap-3 mb-2">
+                    <div class="flex-1">
+                        <span class="${q.type === 'TRUTH' ? 'text-sky-400 border-sky-500/50' : 'text-amber-400 border-amber-500/50'} font-bold text-[10px] uppercase border px-1.5 py-0.5 rounded-md mb-1 inline-block">${q.type}</span>
+                        <p class="text-slate-200 mt-1">${q.text}</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Oleh: ${q.author}</p>
+                    </div>
+                    <button onclick="removeCustomQuestion(${i})" class="text-red-400 hover:text-red-300 p-2 flex-shrink-0 transition transform hover:scale-110"><i class="fa-solid fa-times"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function removeCustomQuestion(index) {
+            gameState.customQuestions.splice(index, 1);
+            updateCustomQuestionsUI();
+        }
+
+        function rollDice() {
+            if (gameState.isMoving) return;
+            gameState.isMoving = true;
+            document.getElementById('rollDiceBtn').disabled = true;
+
+            const diceBox = document.getElementById('diceBox');
+            const result = Math.floor(Math.random() * 6) + 1;
+            
+            // Random rotations for animation (multiple spins)
+            const rotX = Math.floor(Math.random() * 4) * 360 + 720;
+            const rotY = Math.floor(Math.random() * 4) * 360 + 720;
+            
+            let finalRotX = rotX;
+            let finalRotY = rotY;
+
+            // Target face calculation based on layout of .dice-face
+            switch (result) {
+                case 1: finalRotX += 0; finalRotY += 0; break;
+                case 2: finalRotX += 0; finalRotY += 180; break;
+                case 3: finalRotX += 0; finalRotY += -90; break;
+                case 4: finalRotX += 0; finalRotY += 90; break;
+                case 5: finalRotX += -90; finalRotY += 0; break;
+                case 6: finalRotX += 90; finalRotY += 0; break;
+            }
+
+            diceBox.style.transform = `rotateX(${finalRotX}deg) rotateY(${finalRotY}deg)`;
+            playSound('roll');
+
+            setTimeout(() => {
+                const activePlayer = gameState.players[gameState.currentTurnIndex];
+                addLog(`🎲 ${activePlayer.name} melempar dadu: dapat angka <span class="text-pink-400 font-bold">${result}</span>`);
+                movePlayer(activePlayer, result);
+            }, 1000); // Wait for dice animation to complete
+        }
+
+        // BOARD GRID RENDER (Zig-zag Grid)
+        function renderBoardGrid() {
+            const board = document.getElementById('boardGrid');
+            board.innerHTML = '';
+
+            const cols = gameState.boardSpec.cols;
+            const rows = Math.ceil(gameState.totalTiles / cols);
+
+            board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+            // Rows from rows-1 down to 0
+            for (let r = rows - 1; r >= 0; r--) {
+                const isEvenRowFromBottom = (r % 2 === 0);
+                for (let c = 0; c < cols; c++) {
+                    const colIndex = isEvenRowFromBottom ? c : (cols - 1 - c);
+                    const tileNum = (r * cols) + colIndex + 1;
+
+                    const tile = document.createElement('div');
+                    tile.id = `tile-${tileNum}`;
+                    tile.className = `tile ${getTileBgClass(tileNum)}`;
+                    
+                    let badge = '';
+                    const isSmall = cols >= 8;
+                    const badgeClass = isSmall ? 'text-[7px]' : 'text-[9px]';
+
+                    if (tileNum === 1) badge = `<span class="${badgeClass} font-extrabold text-emerald-400">START</span>`;
+                    else if (tileNum === gameState.totalTiles) badge = `<span class="${badgeClass} font-extrabold text-amber-400">FINISH</span>`;
+                    else if (gameState.boardSpec.truthTiles.includes(tileNum)) badge = `<span class="${badgeClass} font-extrabold text-sky-300">${isSmall ? 'T' : 'TRUTH'}</span>`;
+                    else if (gameState.boardSpec.dareTiles.includes(tileNum)) badge = `<span class="${badgeClass} font-extrabold text-amber-300">${isSmall ? 'D' : 'DARE'}</span>`;
+                    else if (gameState.boardSpec.choiceTiles.includes(tileNum)) badge = `<span class="${badgeClass} font-extrabold text-purple-300">${isSmall ? 'C' : 'CHOICE'}</span>`;
+
+                    tile.innerHTML = `
+                        <div class="flex items-center justify-between w-full">
+                            <span class="opacity-60 text-slate-300 ${isSmall ? 'text-[9px]' : 'text-xs'}">${tileNum}</span>
+                            ${badge}
+                        </div>
+                        <div id="pawns-tile-${tileNum}" class="flex flex-wrap gap-0.5 items-center justify-center min-h-[18px] w-full"></div>
+                    `;
+                    board.appendChild(tile);
+                }
+            }
+
+            setTimeout(drawSnakesAndLaddersSvg, 100);
+        }
+
+        function getTileBgClass(num) {
+            if (num === 1 || num === gameState.totalTiles) return 'bg-slate-800 border-2 border-amber-500/50';
+            if (gameState.boardSpec.truthTiles.includes(num)) return 'bg-sky-950/60 border border-sky-800/50';
+            if (gameState.boardSpec.dareTiles.includes(num)) return 'bg-amber-950/60 border border-amber-800/50';
+            if (gameState.boardSpec.choiceTiles.includes(num)) return 'bg-purple-950/60 border border-purple-800/50';
+            return 'bg-slate-800/50 border border-slate-700/40';
+        }
+
+        // SVG CONNECTIONS FOR SNAKES & LADDERS WITH DETAILED GRAPHICS
+        function drawSnakesAndLaddersSvg() {
+            const svg = document.getElementById('boardSvg');
+            if (!svg) return;
+            svg.innerHTML = '';
+
+            const boardGrid = document.getElementById('boardGrid');
+            if (!boardGrid) return;
+            const boardRect = boardGrid.getBoundingClientRect();
+
+            // Helper to get center of a tile in % relative to board
+            function getTileCenter(tileNum) {
+                const tileEl = document.getElementById(`tile-${tileNum}`);
+                if (!tileEl) return { x: 0, y: 0 };
+                const rect = tileEl.getBoundingClientRect();
+                const x = ((rect.left + rect.width / 2 - boardRect.left) / boardRect.width) * 100;
+                const y = ((rect.top + rect.height / 2 - boardRect.top) / boardRect.height) * 100;
+                return { x, y };
+            }
+
+            // Draw Graphic Ladders (Side Rails + Rungs)
+            for (const [start, end] of Object.entries(gameState.boardSpec.ladders)) {
+                const p1 = getTileCenter(start); // bottom tile
+                const p2 = getTileCenter(end);   // top tile
+                drawGraphicLadder(p1, p2, svg);
+            }
+
+            // Draw Graphic Snakes (Wavy Body + Patterns + Cobra Head + Eyes + Tongue)
+            for (const [head, tail] of Object.entries(gameState.boardSpec.snakes)) {
+                const pHead = getTileCenter(head); // top head tile
+                const pTail = getTileCenter(tail); // bottom tail tile
+                drawGraphicSnake(pHead, pTail, svg);
+            }
+        }
+
+        // Draw Stylized Ladder
+        function drawGraphicLadder(p1, p2, svg) {
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            if (len === 0) return;
+
+            const ux = dx / len;
+            const uy = dy / len;
+            const offset = 1.8; // Perpendicular offset in %
+            const nx = -uy * offset;
+            const ny = ux * offset;
+
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+            // Side Rail 1
+            const rail1 = createSvgElement('line', {
+                x1: p1.x + nx, y1: p1.y + ny,
+                x2: p2.x + nx, y2: p2.y + ny,
+                stroke: '#f59e0b', 'stroke-width': '2.8', 'stroke-linecap': 'round'
+            });
+
+            // Side Rail 2
+            const rail2 = createSvgElement('line', {
+                x1: p1.x - nx, y1: p1.y - ny,
+                x2: p2.x - nx, y2: p2.y - ny,
+                stroke: '#f59e0b', 'stroke-width': '2.8', 'stroke-linecap': 'round'
+            });
+
+            g.appendChild(rail1);
+            g.appendChild(rail2);
+
+            // Rungs (Cross steps)
+            const numRungs = Math.max(3, Math.floor(len / 7));
+            for (let i = 1; i <= numRungs; i++) {
+                const t = i / (numRungs + 1);
+                const rx1 = (p1.x + nx) + t * ((p2.x + nx) - (p1.x + nx));
+                const ry1 = (p1.y + ny) + t * ((p2.y + ny) - (p1.y + ny));
+                const rx2 = (p1.x - nx) + t * ((p2.x - nx) - (p1.x - nx));
+                const ry2 = (p1.y - ny) + t * ((p2.y - ny) - (p1.y - ny));
+
+                const rung = createSvgElement('line', {
+                    x1: rx1, y1: ry1, x2: rx2, y2: ry2,
+                    stroke: '#fef08a', 'stroke-width': '2', 'stroke-linecap': 'round'
+                });
+                g.appendChild(rung);
+            }
+
+            svg.appendChild(g);
+        }
+
+        // Draw Stylized Wavy Snake
+        function drawGraphicSnake(pHead, pTail, svg) {
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+            const dx = pTail.x - pHead.x;
+            const dy = pTail.y - pHead.y;
+            const midX = (pHead.x + pTail.x) / 2;
+            const midY = (pHead.y + pTail.y) / 2;
+
+            // Offset control points to create S-curve snake wiggle
+            const cp1x = pHead.x + dx * 0.25 + 12;
+            const cp1y = pHead.y + dy * 0.25;
+            const cp2x = pHead.x + dx * 0.75 - 12;
+            const cp2y = pHead.y + dy * 0.75;
+
+            const pathD = `M ${pHead.x} ${pHead.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pTail.x} ${pTail.y}`;
+
+            // Snake Outer Shadow / Thickness
+            const bodyShadow = createSvgElement('path', {
+                d: pathD, stroke: '#881337', 'stroke-width': '7', fill: 'none', 'stroke-linecap': 'round'
+            });
+
+            // Snake Main Body (Vibrant Red/Rose)
+            const bodyMain = createSvgElement('path', {
+                d: pathD, stroke: '#f43f5e', 'stroke-width': '5', fill: 'none', 'stroke-linecap': 'round'
+            });
+
+            // Snake Body Pattern (Yellow Dots/Stripes)
+            const bodyPattern = createSvgElement('path', {
+                d: pathD, stroke: '#fef08a', 'stroke-width': '2', 'stroke-dasharray': '3 4', fill: 'none'
+            });
+
+            g.appendChild(bodyShadow);
+            g.appendChild(bodyMain);
+            g.appendChild(bodyPattern);
+
+            // Snake Head
+            const headCircle = createSvgElement('circle', {
+                cx: pHead.x, cy: pHead.y, r: '3.5', fill: '#e11d48', stroke: '#881337', 'stroke-width': '0.8'
+            });
+            g.appendChild(headCircle);
+
+            // Snake Eyes
+            const eye1 = createSvgElement('circle', { cx: pHead.x - 1, cy: pHead.y - 1, r: '0.8', fill: '#ffffff' });
+            const eye2 = createSvgElement('circle', { cx: pHead.x + 1, cy: pHead.y - 1, r: '0.8', fill: '#ffffff' });
+            g.appendChild(eye1);
+            g.appendChild(eye2);
+
+            // Snake Forked Tongue
+            const tongue = createSvgElement('path', {
+                d: `M ${pHead.x} ${pHead.y - 3.5} L ${pHead.x} ${pHead.y - 6} M ${pHead.x} ${pHead.y - 6} L ${pHead.x - 1} ${pHead.y - 7.5} M ${pHead.x} ${pHead.y - 6} L ${pHead.x + 1} ${pHead.y - 7.5}`,
+                stroke: '#dc2626', 'stroke-width': '0.8', fill: 'none'
+            });
+            g.appendChild(tongue);
+
+            svg.appendChild(g);
+        }
+
+        function createSvgElement(tag, attrs) {
+            const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            for (const [k, v] of Object.entries(attrs)) {
+                el.setAttribute(k, v);
+            }
+            return el;
+        }
+
+        // START GAME
+        function startGame() {
+            const inputs = document.querySelectorAll('.player-input');
+            const players = [];
+            inputs.forEach((input, i) => {
+                const name = input.value.trim() || `Pemain ${i+1}`;
+                players.push({
+                    id: i,
+                    name: name,
+                    color: PLAYER_COLORS[i].hex,
+                    pos: 1
+                });
+            });
+
+            if (players.length < 2) return;
+
+            const modeRadio = document.querySelector('input[name="gameMode"]:checked');
+            const qSourceRadio = document.querySelector('input[name="questionSource"]:checked');
+            const boardSizeRadio = document.querySelector('input[name="boardSize"]:checked');
+            
+            const selectedSize = boardSizeRadio ? parseInt(boardSizeRadio.value) : 36;
+
+            gameState.totalTiles = selectedSize;
+            gameState.boardSpec = generateBoardSpec(selectedSize);
+            gameState.mode = modeRadio ? modeRadio.value : 'SPOKEN';
+            gameState.questionSource = qSourceRadio ? qSourceRadio.value : 'ALL';
+            gameState.players = players;
+            gameState.currentTurnIndex = 0;
+            gameState.isMoving = false;
+
+            document.getElementById('lobbyScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('flex');
+
+            renderBoardGrid();
+            updateTurnUI();
+            renderPawns();
+            
+            let sourceLabel = 'Default + Custom';
+            if (gameState.questionSource === 'DEFAULT') sourceLabel = 'Hanya Default';
+            else if (gameState.questionSource === 'CUSTOM') sourceLabel = 'Hanya Custom';
+
+            addLog(`Game dimulai! Papan: ${selectedSize} Petak | Mode: ${gameState.mode === 'SPOKEN' ? 'Bicara Lisan' : 'Ketik Jawaban'} | Soal: ${sourceLabel}`);
+        }
+
+        // PAWN POSITION RENDERING
+        function renderPawns() {
+            // Clear existing pawns
+            for (let i = 1; i <= gameState.totalTiles; i++) {
+                const box = document.getElementById(`pawns-tile-${i}`);
+                if (box) box.innerHTML = '';
+            }
+
+            // Place players
+            gameState.players.forEach(p => {
+                const box = document.getElementById(`pawns-tile-${p.pos}`);
+                if (box) {
+                    const pawn = document.createElement('div');
+                    pawn.className = 'pawn';
+                    pawn.style.backgroundColor = p.color;
+                    pawn.title = `${p.name} (Petak ${p.pos})`;
+                    box.appendChild(pawn);
+                }
+            });
+
+            // Update status list
+            const list = document.getElementById('playerPositionsList');
+            list.innerHTML = gameState.players.map(p => `
+                <div class="flex items-center justify-between text-xs bg-slate-800/70 p-2 rounded-xl border border-slate-700/60">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background-color: ${p.color}"></span>
+                        <span class="font-bold text-slate-200">${p.name}</span>
+                    </div>
+                    <span class="font-extrabold text-pink-400">Petak ${p.pos} / ${gameState.totalTiles}</span>
+                </div>
+            `).join('');
+        }
+
+        // MOVE PLAYER STEP BY STEP
+        function movePlayer(player, steps) {
+            let current = player.pos;
+            let target = current + steps;
+
+            if (target > gameState.totalTiles) {
+                addLog(`${player.name} butuh angka pas untuk finis. Tetap di petak ${current}.`);
+                finishTurn();
+                return;
+            }
+
+            let stepCount = 0;
+            const interval = setInterval(() => {
+                stepCount++;
+                player.pos++;
+                renderPawns();
+
+                if (player.pos === target) {
+                    clearInterval(interval);
+                    
+                    // Check Special Tiles (Ladders / Snakes / Truth / Dare / Choice)
+                    setTimeout(() => {
+                        checkTileEvents(player);
+                    }, 300);
+                }
+            }, 300);
+        }
+
+        function checkTileEvents(player) {
+            const pos = player.pos;
+
+            // Check Win
+            if (pos === gameState.totalTiles) {
+                document.getElementById('winnerName').innerText = player.name;
+                openModal('winnerModal');
+                addLog(`🎉 **${player.name} MEMENANGKAN PERMAINAN!** 🎉`);
+                return;
+            }
+
+            // Check Ladder
+            if (gameState.boardSpec.ladders[pos]) {
+                const newPos = gameState.boardSpec.ladders[pos];
+                playSound('ladder');
+                addLog(`🚀 ${player.name} NAIK TANGGA dari petak ${pos} ke ${newPos}!`);
+                player.pos = newPos;
+                renderPawns();
+                setTimeout(() => checkTileEvents(player), 400);
+                return;
+            }
+
+            // Check Snake
+            if (gameState.boardSpec.snakes[pos]) {
+                const newPos = gameState.boardSpec.snakes[pos];
+                playSound('snake');
+                addLog(`🐍 ${player.name} DIGIGIT ULAR! Turun dari petak ${pos} ke ${newPos}.`);
+                player.pos = newPos;
+                renderPawns();
+                setTimeout(() => checkTileEvents(player), 400);
+                return;
+            }
+
+            // Check Truth
+            if (gameState.boardSpec.truthTiles.includes(pos)) {
+                triggerTodModal(player, 'TRUTH');
+                return;
+            }
+
+            // Check Dare
+            if (gameState.boardSpec.dareTiles.includes(pos)) {
+                triggerTodModal(player, 'DARE');
+                return;
+            }
+
+            // Check Choice
+            if (gameState.boardSpec.choiceTiles.includes(pos)) {
+                gameState.activeChoiceTile = player;
+                openModal('choiceModal');
+                return;
+            }
+
+            // Normal Tile -> Finish Turn
+            finishTurn();
+        }
+
+        function selectChoice(type) {
+            closeModal('choiceModal');
+            if (gameState.activeChoiceTile) {
+                triggerTodModal(gameState.activeChoiceTile, type);
+            }
+        }
+
+        // TRUTH OR DARE MODAL TRIGGER
+        function triggerTodModal(player, type) {
+            playSound('card');
+            
+            const badge = document.getElementById('todBadge');
+            badge.innerText = `${type} CARD`;
+            badge.className = `px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest ${
+                type === 'TRUTH' ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+            }`;
+
+            document.getElementById('todTargetPlayer').innerHTML = `Giliran: <span style="color:${player.color}">${player.name}</span>`;
+
+            // Select Question Pool based on Selected Source
+            let fullPool = [];
+            const customPool = gameState.customQuestions.filter(q => q.type === type);
+            const defaultPool = type === 'TRUTH' ? DEFAULT_TRUTH_BANK : DEFAULT_DARE_BANK;
+
+            if (gameState.questionSource === 'DEFAULT') {
+                fullPool = defaultPool;
+            } else if (gameState.questionSource === 'CUSTOM') {
+                fullPool = customPool.length > 0 ? customPool : defaultPool;
+                if (customPool.length === 0) {
+                    addLog(`⚠️ Soal custom ${type} belum ada, menggunakan soal default.`);
+                }
+            } else {
+                // ALL (Default + Custom)
+                fullPool = [...customPool, ...defaultPool];
+            }
+
+            const selected = fullPool[Math.floor(Math.random() * fullPool.length)];
+
+            document.getElementById('todQuestionText').innerText = `"${selected.text}"`;
+            document.getElementById('todAuthorText').innerText = `Oleh: ${selected.author}`;
+
+            // Configure Actions based on Game Mode
+            if (gameState.mode === 'SPOKEN') {
+                document.getElementById('todSpokenActions').classList.remove('hidden');
+                document.getElementById('todTextActions').classList.add('hidden');
+            } else {
+                document.getElementById('todSpokenActions').classList.add('hidden');
+                document.getElementById('todTextActions').classList.remove('hidden');
+                document.getElementById('todAnswerInput').value = '';
+            }
+
+            openModal('todCardModal');
+            addLog(`🎴 ${player.name} mendapat Kartu ${type}!`);
+        }
+
+        function finishTodAction() {
+            closeModal('todCardModal');
+            finishTurn();
+        }
+
+        function submitTodAnswerText() {
+            const answer = document.getElementById('todAnswerInput').value.trim();
+            const activePlayer = gameState.players[gameState.currentTurnIndex];
+
+            if (!answer) return;
+
+            addLog(`💬 **${activePlayer.name} Menjawab:** "${answer}"`);
+            
+            // Sync to Sheets API if URL is provided
+            if (gameState.sheetsUrl) {
+                syncAnswerToSheets(activePlayer.name, answer);
+            }
+
+            closeModal('todCardModal');
+            finishTurn();
+        }
+
+        function finishTurn() {
+            gameState.isMoving = false;
+            document.getElementById('rollDiceBtn').disabled = false;
+
+            // Advance turn
+            gameState.currentTurnIndex = (gameState.currentTurnIndex + 1) % gameState.players.length;
+            updateTurnUI();
+        }
+
+        function updateTurnUI() {
+            const activePlayer = gameState.players[gameState.currentTurnIndex];
+            document.getElementById('turnPawnDot').style.backgroundColor = activePlayer.color;
+            document.getElementById('activePlayerText').innerText = activePlayer.name;
+            document.getElementById('activePlayerText').style.color = activePlayer.color;
+        }
+
+        // UTILS: LOG & MODALS
+        function addLog(text) {
+            const box = document.getElementById('gameLogBox');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const item = document.createElement('div');
+            item.className = 'py-0.5 border-b border-slate-800/50';
+            item.innerHTML = `<span class="text-slate-500 font-mono text-[10px]">[${time}]</span> ${text}`;
+            box.prepend(item);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function saveSettings() {
+            const url = document.getElementById('sheetsApiUrlInput').value.trim();
+            gameState.sheetsUrl = url;
+            closeModal('settingsModal');
+            addLog(url ? 'URL Google Sheets tersimpan!' : 'Google Sheets dinonaktifkan.');
+        }
+
+        function syncAnswerToSheets(playerName, answer) {
+            fetch(gameState.sheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'addAnswer',
+                    player: playerName,
+                    answer: answer,
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(err => console.error('Sheets Sync Error:', err));
+        }
+
+        function resetToLobby() {
+            closeModal('winnerModal');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('flex');
+            document.getElementById('lobbyScreen').classList.remove('hidden');
+            initLobbyInputs();
+        }
+    </script>
+</body>
+</html>
