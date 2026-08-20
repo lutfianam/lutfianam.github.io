@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Truth or Dare Party Edition</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              pink: '#FF2A7A',
+              purple: '#8A2BE2',
+              cyan: '#00F0FF',
+              dark: '#0B0F19',
+              card: '#161F33'
+            }
+          },
+          animation: {
+            'bounce-slow': 'bounce 2s infinite',
+            'pulse-fast': 'pulse 1s infinite',
+            'spin-slow': 'spin 8s linear infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            glow: {
+              '0%': { boxShadow: '0 0 10px #FF2A7A, 0 0 20px #FF2A7A' },
+              '100%': { boxShadow: '0 0 20px #00F0FF, 0 0 35px #00F0FF' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #080C14;
+      color: #F3F4F6;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* 3D Card Flip Animation Styles */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+
+    /* Glassmorphism utility */
+    .glass {
+      background: rgba(22, 31, 51, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .glass-card {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(11, 15, 25, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #8A2BE2;
+      border-radius: 9999px;
+    }
+
+    /* Wheel Pointer Indicator */
+    .wheel-pointer {
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 32px solid #FF2A7A;
+      filter: drop-shadow(0 4px 6px rgba(255, 42, 122, 0.6));
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-brand-pink selection:text-white">
+
+  <!-- Header Banner -->
+  <header class="w-full glass sticky top-0 z-40 px-4 py-3 border-b border-white/10 shadow-lg">
+    <div class="max-w-md mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2" onclick="showSection('setupScreen')">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-pink to-brand-purple flex items-center justify-center text-white shadow-md cursor-pointer">
+          <i class="fa-solid font-black text-lg">T/D</i>
+        </div>
+        <span class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-pink via-purple-400 to-brand-cyan text-lg tracking-wider cursor-pointer">
+          TRUTH OR DARE
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="soundToggleBtn" class="w-9 h-9 rounded-xl glass flex items-center justify-center text-gray-300 hover:text-white transition active:scale-95" title="Toggle Sound">
+          <i class="fa-solid fa-volume-high text-sm"></i>
+        </button>
+        <button onclick="openManageModal()" class="w-9 h-9 rounded-xl glass flex items-center justify-center text-brand-cyan hover:text-white transition active:scale-95" title="Kelola Pertanyaan & Kategori">
+          <i class="fa-solid fa-list-check text-sm"></i>
+        </button>
+        <button onclick="openStatsModal()" class="w-9 h-9 rounded-xl glass flex items-center justify-center text-yellow-400 hover:text-white transition active:scale-95" title="Statistik & Skor">
+          <i class="fa-solid fa-trophy text-sm"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 w-full max-w-md mx-auto p-4 flex flex-col justify-center relative">
+
+    <!-- 1. SCREEN: PLAYER & MODE SETUP -->
+    <section id="setupScreen" class="w-full space-y-6 py-2 transition-all duration-300">
+      
+      <!-- Banner Title -->
+      <div class="text-center space-y-1">
+        <h1 class="text-3xl font-black text-white tracking-tight">Game Setup</h1>
+        <p class="text-xs text-gray-400">Tambahkan teman & pilih mode permainan untuk memulai</p>
+      </div>
+
+      <!-- Player Management Card -->
+      <div class="glass p-5 rounded-2xl shadow-xl space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-sm font-bold text-gray-200 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-users text-brand-pink"></i> Daftar Pemain (<span id="playerCount">0</span>)
+          </h2>
+          <span class="text-xs text-gray-400 font-medium">Min. 2 Pemain</span>
+        </div>
+
+        <!-- Add Player Form -->
+        <div class="flex gap-2">
+          <input type="text" id="playerNameInput" placeholder="Masukkan nama pemain..." maxlength="15" 
+            class="flex-1 bg-slate-900/80 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-pink transition">
+          <button id="addPlayerBtn" class="bg-gradient-to-r from-brand-pink to-brand-purple text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+
+        <!-- Player Tags List -->
+        <div id="playerList" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-1">
+          <!-- Dynamically populated tags -->
+        </div>
+      </div>
+
+      <!-- Category Selection Card -->
+      <div class="glass p-5 rounded-2xl shadow-xl space-y-3">
+        <div class="flex justify-between items-center">
+          <h2 class="text-sm font-bold text-gray-200 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-brand-cyan"></i> Mode Permainan
+          </h2>
+          <button onclick="openManageModal('categoryTab')" class="text-[11px] font-semibold text-brand-cyan hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-plus text-[10px]"></i> Kategori Baru
+          </button>
+        </div>
+
+        <!-- Dynamic Category Cards Container -->
+        <div id="categoryGrid" class="grid grid-cols-2 gap-2.5">
+          <!-- Dynamically generated via JS -->
+        </div>
+      </div>
+
+      <!-- Action Button Start -->
+      <button id="startGameBtn" class="w-full bg-gradient-to-r from-brand-pink via-brand-purple to-brand-cyan text-white py-3.5 rounded-2xl font-black text-base shadow-lg shadow-brand-pink/20 hover:brightness-110 active:scale-98 transition uppercase tracking-wider flex items-center justify-center gap-2">
+        <i class="fa-solid fa-play text-sm"></i> Mulai Permainan
+      </button>
+
+    </section>
+
+    <!-- 2. SCREEN: GAMEPLAY & WHEEL -->
+    <section id="gameplayScreen" class="w-full hidden space-y-5 py-2">
+      
+      <!-- Turn Info Badge -->
+      <div class="text-center space-y-1">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass border border-white/10 text-xs font-semibold text-brand-cyan">
+          <i class="fa-solid fa-rotate animate-spin-slow text-[10px]"></i> Turn #<span id="turnCounter">1</span>
+        </div>
+        <h2 id="turnAnnouncement" class="text-2xl font-black text-white tracking-tight">Putar Roda Keberuntungan!</h2>
+      </div>
+
+      <!-- Wheel Container -->
+      <div class="relative flex flex-col items-center justify-center my-2">
+        <!-- Pointer -->
+        <div class="wheel-pointer z-20 -mb-3"></div>
+
+        <!-- Wheel Canvas Wrapper -->
+        <div class="relative p-2 rounded-full glass border border-white/10 shadow-2xl">
+          <canvas id="wheelCanvas" width="300" height="300" class="rounded-full cursor-pointer transition-transform duration-100"></canvas>
+          
+          <!-- Spin Center Button -->
+          <button id="spinBtn" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-tr from-brand-pink to-brand-purple border-4 border-slate-900 text-white font-black text-xs uppercase shadow-xl hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center gap-0.5 z-10">
+            <i class="fa-solid fa-arrows-spin text-sm"></i>
+            <span>SPIN</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player Turn Indicator Box -->
+      <div id="selectedPlayerCard" class="glass p-4 rounded-2xl text-center space-y-2 border border-brand-pink/30 shadow-xl hidden animate-bounce-slow">
+        <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Giliranmu Hari Ini:</p>
+        <h3 id="currentPlayerName" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-pink via-purple-300 to-brand-cyan">
+          -
+        </h3>
+        <p class="text-xs text-gray-300">Pilih tantanganmu di bawah ini:</p>
+      </div>
+
+      <!-- Choice Buttons: TRUTH vs DARE -->
+      <div id="choiceContainer" class="grid grid-cols-2 gap-3 opacity-50 pointer-events-none transition-all duration-300">
+        <!-- Truth Button -->
+        <button id="chooseTruthBtn" class="glass-card hover:bg-cyan-950/40 border-2 border-brand-cyan/40 hover:border-brand-cyan text-white py-4 px-3 rounded-2xl font-black text-lg shadow-lg flex flex-col items-center gap-1 transition active:scale-95 group">
+          <i class="fa-solid fa-comment-dots text-2xl text-brand-cyan group-hover:scale-110 transition"></i>
+          <span class="tracking-wider text-brand-cyan">TRUTH</span>
+          <span class="text-[10px] text-gray-400 font-normal">Jawab Jujur</span>
+        </button>
+
+        <!-- Dare Button -->
+        <button id="chooseDareBtn" class="glass-card hover:bg-pink-950/40 border-2 border-brand-pink/40 hover:border-brand-pink text-white py-4 px-3 rounded-2xl font-black text-lg shadow-lg flex flex-col items-center gap-1 transition active:scale-95 group">
+          <i class="fa-solid fa-bolt text-2xl text-brand-pink group-hover:scale-110 transition"></i>
+          <span class="tracking-wider text-brand-pink">DARE</span>
+          <span class="text-[10px] text-gray-400 font-normal">Lakukan Tantangan</span>
+        </button>
+      </div>
+
+      <!-- Footer navigation -->
+      <div class="flex justify-between items-center text-xs text-gray-400 pt-2">
+        <button onclick="showSection('setupScreen')" class="hover:text-white flex items-center gap-1">
+          <i class="fa-solid fa-gear"></i> Ubah Pemain
+        </button>
+        <button onclick="skipTurn()" class="hover:text-white flex items-center gap-1">
+          Acak Ulang <i class="fa-solid fa-forward"></i>
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- 3. MODAL: TRUTH OR DARE FLIP CARD SCREEN -->
+  <div id="cardModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div class="w-full max-w-sm space-y-5">
+      
+      <!-- 3D Flip Card Container -->
+      <div class="perspective-1000 w-full h-80 cursor-pointer" id="flipCardWrapper">
+        <div id="flipCardInner" class="relative w-full h-full transform-style-3d transition-transform duration-700 rounded-3xl shadow-2xl">
+          
+          <!-- CARD FRONT -->
+          <div class="absolute inset-0 w-full h-full rounded-3xl glass p-6 border-2 border-white/20 flex flex-col justify-between items-center text-center backface-hidden bg-gradient-to-b from-slate-900 to-slate-950">
+            <div class="w-full flex justify-between items-center">
+              <span id="cardTypeBadge" class="text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider bg-brand-pink text-white">TRUTH</span>
+              <span id="cardPlayerBadge" class="text-xs font-bold text-gray-300 flex items-center gap-1">
+                <i class="fa-solid fa-user"></i> <span id="cardPlayerName">Pemain</span>
+              </span>
+            </div>
+
+            <div class="my-auto space-y-2">
+              <i class="fa-solid fa-hand-pointer text-4xl text-brand-cyan animate-bounce"></i>
+              <p class="text-base font-bold text-white">Ketuk Kartu Untuk Membuka Tantangan!</p>
+            </div>
+
+            <p class="text-[10px] text-gray-400">Siapkan mentalmu & bersiaplah!</p>
+          </div>
+
+          <!-- CARD BACK -->
+          <div id="cardBackSide" class="absolute inset-0 w-full h-full rounded-3xl glass p-6 border-2 border-brand-pink/50 flex flex-col justify-between items-center text-center backface-hidden rotate-y-180 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
+            <div class="w-full flex justify-between items-center">
+              <span id="cardBackType" class="text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider bg-brand-pink text-white">TRUTH</span>
+              <span class="text-xs font-bold text-gray-400" id="cardCategoryText">Chill Mode</span>
+            </div>
+
+            <!-- Question text -->
+            <div class="my-auto px-2">
+              <p id="questionContent" class="text-lg font-bold text-white leading-snug">
+                "Loading tantangan..."
+              </p>
+            </div>
+
+            <!-- Timer Bar / Controls -->
+            <div class="w-full space-y-2">
+              <div id="timerContainer" class="hidden space-y-1">
+                <div class="flex justify-between items-center text-xs font-bold">
+                  <span class="text-gray-400">Waktu Bertahan:</span>
+                  <span id="timerText" class="text-brand-cyan font-mono text-sm">30s</span>
+                </div>
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div id="timerProgress" class="h-full bg-gradient-to-r from-brand-cyan to-brand-pink transition-all duration-1000 w-full"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Action Controls after Card Reveal -->
+      <div id="cardActions" class="space-y-2.5 opacity-0 pointer-events-none transition-opacity duration-300">
+        
+        <div class="grid grid-cols-2 gap-2">
+          <!-- Timer Toggle Button -->
+          <button id="startTimerBtn" class="glass hover:bg-slate-800 text-white py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border border-white/10 active:scale-95 transition">
+            <i class="fa-solid fa-stopwatch text-brand-cyan"></i> <span id="timerBtnText">Mulai Timer (30s)</span>
+          </button>
+
+          <!-- Forfeit/Penalty Button -->
+          <button onclick="triggerPenalty()" class="glass hover:bg-red-950/40 text-red-400 hover:text-red-300 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border border-red-500/30 active:scale-95 transition">
+            <i class="fa-solid fa-skull"></i> menyerah / Hukuman
+          </button>
+        </div>
+
+        <!-- Complete / Next Turn Button -->
+        <button onclick="completeTurn()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg hover:brightness-110 active:scale-98 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-check"></i> Selesai & Lanjut
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4. MODAL: PENALTY / FORFEIT WHEEL -->
+  <div id="penaltyModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div class="glass p-6 rounded-3xl w-full max-w-xs text-center space-y-4 border border-red-500/40 shadow-2xl">
+      <div class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 mx-auto flex items-center justify-center text-2xl">
+        <i class="fa-solid fa-skull-crossbones animate-pulse"></i>
+      </div>
+      
+      <div>
+        <h3 class="text-xl font-black text-white">HUKUMAN / PENALTY</h3>
+        <p class="text-xs text-gray-400 mt-1">Karena menolak tantangan, kamu harus menjalankan penalti ini!</p>
+      </div>
+
+      <div class="bg-slate-900/90 p-4 rounded-2xl border border-red-500/30">
+        <p id="penaltyText" class="text-sm font-bold text-red-300">
+          "Acak hukuman..."
+        </p>
+      </div>
+
+      <button onclick="closePenaltyModal()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition">
+        Saya Mengaku Kalah & Siap Dihukum!
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. MODAL: QUESTION & CATEGORY MANAGEMENT -->
+  <div id="manageModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div class="glass p-5 rounded-3xl w-full max-w-md space-y-4 border border-white/10 max-h-[90vh] flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-brand-cyan"></i> Kelola Game & Pertanyaan
+        </h3>
+        <button onclick="closeManageModal()" class="text-gray-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Navigation Tabs -->
+      <div class="flex border-b border-white/10 text-xs font-bold">
+        <button id="tabQuestionsBtn" onclick="switchManageTab('questionsTab')" class="flex-1 py-2 text-center text-brand-cyan border-b-2 border-brand-cyan transition">
+          <i class="fa-solid fa-comments mr-1"></i> Daftar Pertanyaan
+        </button>
+        <button id="tabCategoryBtn" onclick="switchManageTab('categoryTab')" class="flex-1 py-2 text-center text-gray-400 border-b-2 border-transparent transition">
+          <i class="fa-solid fa-folder-plus mr-1"></i> Tambah Kategori
+        </button>
+      </div>
+
+      <!-- TAB 1: QUESTIONS MANAGER -->
+      <div id="questionsTab" class="space-y-3 flex-1 flex flex-col overflow-hidden">
+        <!-- Filters -->
+        <div class="grid grid-cols-2 gap-2">
+          <select id="filterCategory" onchange="renderManageQuestionsList()" class="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2.5 focus:outline-none">
+            <!-- Dynamic Category Options -->
+          </select>
+          <select id="filterType" onchange="renderManageQuestionsList()" class="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2.5 focus:outline-none">
+            <option value="all">Semua Jenis (Truth & Dare)</option>
+            <option value="truth">Hanya TRUTH</option>
+            <option value="dare">Hanya DARE</option>
+          </select>
+        </div>
+
+        <!-- Add Question Form -->
+        <div class="bg-slate-900/60 p-3 rounded-2xl border border-white/5 space-y-2">
+          <div class="text-[11px] font-bold text-gray-300">Tambah Pertanyaan Ke Kategori Ini:</div>
+          <div class="flex gap-2">
+            <select id="newQuestionType" class="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2 focus:outline-none">
+              <option value="truth">TRUTH</option>
+              <option value="dare">DARE</option>
+            </select>
+            <input type="text" id="newQuestionInput" placeholder="Tulis pertanyaan/tantangan..." 
+              class="flex-1 bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2 focus:outline-none">
+            <button onclick="addQuestionToCategory()" class="bg-brand-cyan text-slate-950 font-bold px-3 py-2 rounded-xl text-xs hover:brightness-110">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Questions List -->
+        <div id="manageQuestionsList" class="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[140px]">
+          <!-- Dynamically populated questions list -->
+        </div>
+
+        <div class="pt-2 border-t border-white/10 flex justify-between text-xs text-gray-400">
+          <span id="manageCountText">0 Pertanyaan</span>
+          <button onclick="resetCategoryQuestions()" class="text-yellow-400 hover:underline">Reset Kategori Ini</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: CATEGORY MANAGER -->
+      <div id="categoryTab" class="space-y-3 hidden">
+        <div class="text-xs text-gray-300">Buat kategori game kustom sesuai keinginan kelompokmu:</div>
+
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-gray-400 block mb-1">Nama Kategori</label>
+            <input type="text" id="newCatName" placeholder="Contoh: Horor, Romantis, Khusus Alumni" maxlength="20"
+              class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2.5 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-gray-400 block mb-1">Deskripsi Singkat</label>
+            <input type="text" id="newCatDesc" placeholder="Contoh: Tantangan seputar rahasia lama" maxlength="35"
+              class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2.5 focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] font-bold text-gray-400 block mb-1">Ikon (FontAwesome)</label>
+              <select id="newCatIcon" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2.5 focus:outline-none">
+                <option value="fa-fire">🔥 Api / HOT</option>
+                <option value="fa-ghost">👻 Horor / Seram</option>
+                <option value="fa-heart">❤️ Asmara / Pasangan</option>
+                <option value="fa-graduation-cap">🎓 Sekolah / Kampus</option>
+                <option value="fa-briefcase">💼 Pekerjaan / Kantor</option>
+                <option value="fa-face-laugh-squint">😆 Humor / Kocak</option>
+                <option value="fa-gamepad">🎮 Gamer / Pop Culture</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-gray-400 block mb-1">Warna Aksen</label>
+              <select id="newCatColor" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded-xl p-2.5 focus:outline-none">
+                <option value="brand-pink">Pink</option>
+                <option value="brand-cyan">Cyan</option>
+                <option value="purple-400">Ungu</option>
+                <option value="yellow-400">Kuning</option>
+                <option value="emerald-400">Hijau</option>
+                <option value="red-500">Merah</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="createNewCategory()" class="w-full bg-gradient-to-r from-brand-pink to-brand-purple text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:brightness-110 transition shadow-lg mt-2">
+            <i class="fa-solid fa-plus-circle mr-1"></i> Simpan Kategori Baru
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 6. MODAL: STATS & LEADERBOARD -->
+  <div id="statsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div class="glass p-5 rounded-3xl w-full max-w-sm space-y-4 border border-white/10">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-yellow-400"></i> Statistik Sesi Ini
+        </h3>
+        <button onclick="closeStatsModal()" class="text-gray-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="statsContainer" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+        <!-- Dynamically populated stats -->
+      </div>
+
+      <button onclick="closeStatsModal()" class="w-full glass hover:bg-slate-800 text-white py-2 rounded-xl text-xs font-bold transition">
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-3 text-[11px] text-gray-500 border-t border-white/5">
+    Made for Party Fun &bull; Local Pass & Play Mode
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // ... existing SoundEngine code ...
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+      }
+
+      playTick() {
+        if (this.muted) return;
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.04);
+      }
+
+      playWin() {
+        if (this.muted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [440, 554.37, 659.25, 880].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 0.3);
+        });
+      }
+
+      playAlarm() {
+        if (this.muted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.linearRampToValueAtTime(400, now + 0.2);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    // Default Categories Setup
+    const DEFAULT_CATEGORIES = {
+      chill: { id: 'chill', name: 'Santai & Chill', icon: 'fa-mug-hot', desc: 'Ringan, ramah teman baru', color: 'brand-cyan', isDefault: true },
+      party: { id: 'party', name: 'Party Seru', icon: 'fa-champagne-glasses', desc: 'Konyol, kocak & usil', color: 'brand-pink', isDefault: true },
+      deep: { id: 'deep', name: 'Deep & Spicy', icon: 'fa-heart-crack', desc: 'Rahasia & emosional', color: 'purple-400', isDefault: true }
+    };
+
+    // Default Questions Database
+    const DEFAULT_QUESTIONS = {
+      chill: {
+        truth: [
+          "Apa kebiasaan aneh yang sering kamu lakukan saat sendirian di kamar?",
+          "Siapa orang di ruangan ini yang pertama kali bikin kamu terkesan?",
+          "Apa aplikasi HP yang paling sering kamu buka tapi bikin malu kalau orang tahu?",
+          "Pernahkah kamu salah kirim chat ke orang yang salah? Ceritakan!",
+          "Apa makanan teraneh yang pernah kamu makan dan ternyata kamu suka?",
+          "Apa film favoritmu yang orang lain anggap jelek?",
+          "Berapa jam rekor terlamamu tidur tanpa bangun?",
+          "Apa hal terseru yang pernah kamu beli dengan uangmu sendiri?"
+        ],
+        dare: [
+          "Tirukan suara hewan favoritmu selama 15 detik tanpa tertawa!",
+          "Biarkan orang di sebelah kananmu mengganti foto profil WA-mu selama 5 menit!",
+          "Kirim pesan emotikon '❤️' ke kontak terakhir yang kamu chat!",
+          "Bicaralah menggunakan bahasa daerah atau logat asing selama 2 putaran!",
+          "Pegang hidungmu dengan kaki atau coba cium lututmu sekarang!",
+          "Nyanyikan lirik lagu anak-anak dengan nada lagu rock!",
+          "Jelaskan sesuatu yang acak di ruangan ini seolah-olah kamu sales profesional!"
+        ]
+      },
+      party: {
+        truth: [
+          "Apa kebohongan terbesar yang pernah kamu ucapkan ke orang tuamu?",
+          "Siapa di ruangan ini yang menurutmu paling jago bikin alasan?",
+          "Pernahkah kamu pura-pura sakit demi menghindari janji kumpul?",
+          "Apa momen paling memalukan yang pernah terjadi padamu saat di depan umum?",
+          "Siapa selebriti yang paling ingin kamu temui secara rahasia?",
+          "Pernahkah kamu menyukai pacar dari temanmu sendiri?",
+          "Apa hal konyol yang pernah kamu lakukan demi menarik perhatian crush?"
+        ],
+        dare: [
+          "Tunjukkan galeri foto HP-mu ke orang di sebelah kiri selama 10 detik!",
+          "Telepon teman acak dan katakan 'Aku tahu rahasiamu' lalu langsung matikan!",
+          "Izinkan orang di sebelahmu membuatkan postingan story IG/WA konyol!",
+          "Minum ramuan campuran 3 jenis minuman yang dibuat oleh teman-temanmu!",
+          "Lakukan joget TikTok populer tanpa musik selama 20 detik!",
+          "Biarkan semua orang melihat riwayat pencarian YouTube/Google-mu!",
+          "Tatap mata orang di depanmu selama 30 detik tanpa berkedip atau tertawa!"
+        ]
+      },
+      deep: {
+        truth: [
+          "Apa ketakutan terbesar dalam hidupmu yang jarang kamu ceritakan?",
+          "Apa keputusan terbesar dalam hidup yang pernah kamu sesali?",
+          "Siapa orang yang paling kamu rindukan saat ini tapi enggan kamu hubungi?",
+          "Apa hal yang paling ingin kamu ubah dari sifat dirimu sendiri?",
+          "Pernahkah kamu merasa sangat kesepian di tengah keramaian? Kapan itu?",
+          "Apa hal tersulit yang berhasil kamu lewati dalam 1 tahun terakhir?",
+          "Siapa orang di kelompok ini yang paling kamu percayai rahasiamu?"
+        ],
+        dare: [
+          "Kirim pesan apresiasi jujur dan tulus ke salah satu temanmu sekarang!",
+          "Ceritakan satu rahasia masa kecilmu yang belum pernah diketahui siapapun di sini!",
+          "Biarkan orang di sebelahmu memberikan pesan nasihat jujur untuk hidupmu!",
+          "Sebutkan 3 sifat positif dan 1 sifat negatif dari setiap orang di ruangan ini!",
+          "Minta maaf secara tulus ke salah satu orang di sini atas kesalahan kecil di masa lalu!"
+        ]
+      }
+    };
+
+    // Default Penalty List
+    const PENALTIES = [
+      "Minum 1 teguk jus pedas / air garam!",
+      "Bayar denda Rp 5.000 ke kas kelompok!",
+      "Lakukan push-up / squat 15 kali sekarang!",
+      "Pijat bahu pemain di sebelah kananmu selama 1 menit!",
+      "Jadilah pelayan kelompok (ambilkan minum/makanan) selama 3 putaran!"
+    ];
+
+    // State Variables Persistent Storage
+    let categories = JSON.parse(localStorage.getItem('tod_categories')) || DEFAULT_CATEGORIES;
+    let questionBank = JSON.parse(localStorage.getItem('tod_questions_bank')) || DEFAULT_QUESTIONS;
+    let players = JSON.parse(localStorage.getItem('tod_players')) || ['Andi', 'Budi', 'Cici'];
+    let playerStats = JSON.parse(localStorage.getItem('tod_stats')) || {};
+    
+    let currentTurnIndex = 0;
+    let turnCount = 1;
+    let selectedPlayer = '';
+    let selectedType = ''; // 'truth' or 'dare'
+    let isSpinning = false;
+    let timerInterval = null;
+    let timeLeft = 30;
+
+    // Helper & Navigation Functions
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 10);
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function showSection(sectionId) {
+      document.getElementById('setupScreen').classList.add('hidden');
+      document.getElementById('gameplayScreen').classList.add('hidden');
+      document.getElementById(sectionId).classList.remove('hidden');
+      if (sectionId === 'gameplayScreen') {
+        renderWheel();
+      }
+    }
+
+    function showToast(msg) {
+      let toast = document.getElementById('toastNotification');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toastNotification';
+        toast.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800/90 text-white border border-white/20 text-xs px-4 py-2 rounded-xl shadow-xl z-50 transition-all duration-300 opacity-0 pointer-events-none';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // Player Management
+    function renderPlayers() {
+      const container = document.getElementById('playerList');
+      const countSpan = document.getElementById('playerCount');
+      if (!container) return;
+      container.innerHTML = '';
+      countSpan.textContent = players.length;
+
+      players.forEach((player, idx) => {
+        if (!playerStats[player]) {
+          playerStats[player] = { truth: 0, dare: 0, forfeit: 0 };
+        }
+        const tag = document.createElement('div');
+        tag.className = 'flex items-center gap-1.5 bg-slate-900/90 border border-slate-700/80 text-xs text-white px-3 py-1.5 rounded-xl';
+        tag.innerHTML = `
+          <i class="fa-solid fa-user text-[10px] text-brand-pink"></i>
+          <span class="font-medium">${player}</span>
+          <button onclick="removePlayer(${idx})" class="text-gray-400 hover:text-red-400 ml-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        `;
+        container.appendChild(tag);
+      });
+      localStorage.setItem('tod_players', JSON.stringify(players));
+      localStorage.setItem('tod_stats', JSON.stringify(playerStats));
+    }
+
+    function addPlayer() {
+      const input = document.getElementById('playerNameInput');
+      const name = input.value.trim();
+      if (!name) return;
+      if (players.includes(name)) {
+        showToast('Nama pemain sudah ada!');
+        return;
+      }
+      players.push(name);
+      if (!playerStats[name]) {
+        playerStats[name] = { truth: 0, dare: 0, forfeit: 0 };
+      }
+      input.value = '';
+      renderPlayers();
+      renderWheel();
+    }
+
+    function removePlayer(index) {
+      if (players.length <= 2) {
+        showToast('Minimal harus ada 2 pemain!');
+        return;
+      }
+      players.splice(index, 1);
+      renderPlayers();
+      renderWheel();
+    }
+
+    // Wheel Spinning Mechanics
+    let wheelRotation = 0;
+    function renderWheel() {
+      const canvas = document.getElementById('wheelCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = width / 2 - 10;
+
+      ctx.clearRect(0, 0, width, height);
+      if (players.length === 0) return;
+
+      const sliceAngle = (Math.PI * 2) / players.length;
+      const colors = ['#FF2A7A', '#8A2BE2', '#00F0FF', '#3B82F6', '#10B981', '#F59E0B', '#EC4899'];
+
+      players.forEach((player, i) => {
+        const startAngle = wheelRotation + i * sliceAngle;
+        const endAngle = startAngle + sliceAngle;
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+        ctx.strokeStyle = '#0B0F19';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(startAngle + sliceAngle / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 13px Inter, sans-serif';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 4;
+        ctx.fillText(player, radius - 20, 5);
+        ctx.restore();
+      });
+    }
+
+    function spinWheel() {
+      if (isSpinning || players.length === 0) return;
+      isSpinning = true;
+
+      const choiceContainer = document.getElementById('choiceContainer');
+      const selectedPlayerCard = document.getElementById('selectedPlayerCard');
+      choiceContainer.classList.add('opacity-50', 'pointer-events-none');
+      selectedPlayerCard.classList.add('hidden');
+
+      const spinRounds = 5 + Math.random() * 5;
+      const extraAngle = Math.random() * Math.PI * 2;
+      const totalAngleChange = spinRounds * Math.PI * 2 + extraAngle;
+
+      const duration = 4000;
+      const startTime = performance.now();
+      const startRotation = wheelRotation;
+      let lastTickAngle = startRotation;
+
+      function animateSpin(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 4);
+
+        wheelRotation = startRotation + totalAngleChange * easeOut;
+        renderWheel();
+
+        if (Math.abs(wheelRotation - lastTickAngle) > (Math.PI * 2) / players.length) {
+          sound.playTick();
+          lastTickAngle = wheelRotation;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(animateSpin);
+        } else {
+          isSpinning = false;
+          sound.playWin();
+
+          const normalizedRotation = (wheelRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+          const sliceAngle = (Math.PI * 2) / players.length;
+          const pointerAngle = (Math.PI * 1.5 - normalizedRotation + Math.PI * 2) % (Math.PI * 2);
+          const winningIndex = Math.floor(pointerAngle / sliceAngle) % players.length;
+
+          selectedPlayer = players[winningIndex];
+          currentTurnIndex = winningIndex;
+
+          document.getElementById('currentPlayerName').textContent = selectedPlayer;
+          selectedPlayerCard.classList.remove('hidden');
+          choiceContainer.classList.remove('opacity-50', 'pointer-events-none');
+          document.getElementById('turnAnnouncement').textContent = `Giliran ${selectedPlayer}!`;
+        }
+      }
+
+      requestAnimationFrame(animateSpin);
+    }
+
+    // Card & Timer Controls
+    function flipCard() {
+      const cardInner = document.getElementById('flipCardInner');
+      const cardActions = document.getElementById('cardActions');
+      cardInner.classList.toggle('rotate-y-180');
+      
+      if (cardInner.classList.contains('rotate-y-180')) {
+        sound.playWin();
+        cardActions.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        cardActions.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timeLeft = 30;
+      document.getElementById('timerText').textContent = '30s';
+      document.getElementById('timerProgress').style.width = '100%';
+      document.getElementById('timerBtnText').textContent = 'Mulai Timer (30s)';
+    }
+
+    function toggleTimer() {
+      const timerContainer = document.getElementById('timerContainer');
+      timerContainer.classList.remove('hidden');
+
+      if (timerInterval) {
+        resetTimer();
+      } else {
+        document.getElementById('timerBtnText').textContent = 'Reset Timer';
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          document.getElementById('timerText').textContent = timeLeft + 's';
+          document.getElementById('timerProgress').style.width = ((timeLeft / 30) * 100) + '%';
+
+          if (timeLeft <= 5 && timeLeft > 0) {
+            sound.playAlarm();
+          }
+
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            sound.playAlarm();
+            showToast('Waktu habis!');
+          }
+        }, 1000);
+      }
+    }
+
+    // Penalty & Turn Actions
+    function triggerPenalty() {
+      closeModal('cardModal');
+      const penalty = PENALTIES[Math.floor(Math.random() * PENALTIES.length)];
+      document.getElementById('penaltyText').textContent = `"${penalty}"`;
+      
+      if (playerStats[selectedPlayer]) {
+        playerStats[selectedPlayer].forfeit++;
+        localStorage.setItem('tod_stats', JSON.stringify(playerStats));
+      }
+      
+      openModal('penaltyModal');
+    }
+
+    function closePenaltyModal() {
+      closeModal('penaltyModal');
+      completeTurn();
+    }
+
+    function completeTurn() {
+      closeModal('cardModal');
+      
+      if (selectedType && playerStats[selectedPlayer]) {
+        playerStats[selectedPlayer][selectedType]++;
+        localStorage.setItem('tod_stats', JSON.stringify(playerStats));
+      }
+
+      turnCount++;
+      document.getElementById('turnCounter').textContent = turnCount;
+      document.getElementById('turnAnnouncement').textContent = 'Putar Roda Keberuntungan!';
+      document.getElementById('selectedPlayerCard').classList.add('hidden');
+      document.getElementById('choiceContainer').classList.add('opacity-50', 'pointer-events-none');
+    }
+
+    function skipTurn() {
+      spinWheel();
+    }
+
+    // Leaderboard & Statistics
+    function openStatsModal() {
+      const container = document.getElementById('statsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      players.forEach(p => {
+        const s = playerStats[p] || { truth: 0, dare: 0, forfeit: 0 };
+        const item = document.createElement('div');
+        item.className = 'glass p-3 rounded-2xl flex justify-between items-center text-xs';
+        item.innerHTML = `
+          <div class="font-bold text-white flex items-center gap-1.5">
+            <i class="fa-solid fa-user text-brand-pink"></i> ${p}
+          </div>
+          <div class="flex gap-2 text-[11px]">
+            <span class="text-brand-cyan font-semibold">T: ${s.truth}</span>
+            <span class="text-brand-pink font-semibold">D: ${s.dare}</span>
+            <span class="text-red-400 font-semibold">F: ${s.forfeit}</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      openModal('statsModal');
+    }
+
+    function closeStatsModal() {
+      closeModal('statsModal');
+    }
+
+    function renderCategoryGrid() {
+      const container = document.getElementById('categoryGrid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Render each category card
+      Object.keys(categories).forEach((catKey, idx) => {
+        const cat = categories[catKey];
+        const isChecked = idx === 0 ? 'checked' : '';
+        const colorClass = cat.color || 'brand-cyan';
+
+        const label = document.createElement('label');
+        label.className = `mode-card relative glass-card p-3 rounded-xl border border-white/10 cursor-pointer transition hover:border-${colorClass} flex flex-col justify-between min-h-[100px]`;
+        label.innerHTML = `
+          <input type="radio" name="gameMode" value="${cat.id}" ${isChecked} class="hidden peer">
+          <div class="peer-checked:text-${colorClass} flex justify-between items-center w-full mb-1">
+            <i class="fa-solid ${cat.icon} text-lg"></i>
+            <i class="fa-solid fa-circle-check opacity-0 peer-checked:opacity-100 text-${colorClass} text-sm transition"></i>
+          </div>
+          <div>
+            <div class="font-bold text-sm text-white truncate">${cat.name}</div>
+            <div class="text-[10px] text-gray-400 leading-tight mt-0.5 line-clamp-2">${cat.desc}</div>
+          </div>
+          <div class="absolute inset-0 rounded-xl border-2 border-${colorClass} opacity-0 peer-checked:opacity-100 pointer-events-none transition"></div>
+        `;
+        container.appendChild(label);
+      });
+
+      // Render Mixed Mode Card
+      const mixedLabel = document.createElement('label');
+      mixedLabel.className = `mode-card relative glass-card p-3 rounded-xl border border-white/10 cursor-pointer transition hover:border-yellow-400 flex flex-col justify-between min-h-[100px]`;
+      mixedLabel.innerHTML = `
+        <input type="radio" name="gameMode" value="mixed" class="hidden peer">
+        <div class="peer-checked:text-yellow-400 flex justify-between items-center w-full mb-1">
+          <i class="fa-solid fa-shuffle text-lg"></i>
+          <i class="fa-solid fa-circle-check opacity-0 peer-checked:opacity-100 text-yellow-400 text-sm transition"></i>
+        </div>
+        <div>
+          <div class="font-bold text-sm text-white">Campur Aduk</div>
+          <div class="text-[10px] text-gray-400 leading-tight mt-0.5">Semua kategori gabung</div>
+        </div>
+        <div class="absolute inset-0 rounded-xl border-2 border-yellow-400 opacity-0 peer-checked:opacity-100 pointer-events-none transition"></div>
+      `;
+      container.appendChild(mixedLabel);
+    }
+
+    function getRandomQuestion(type) {
+      const modeRadio = document.querySelector('input[name="gameMode"]:checked');
+      const mode = modeRadio ? modeRadio.value : 'chill';
+      let pool = [];
+
+      if (mode === 'mixed') {
+        Object.keys(questionBank).forEach(catId => {
+          if (questionBank[catId] && questionBank[catId][type]) {
+            pool = pool.concat(questionBank[catId][type]);
+          }
+        });
+      } else {
+        if (questionBank[mode] && questionBank[mode][type]) {
+          pool = pool.concat(questionBank[mode][type]);
+        }
+      }
+
+      if (pool.length === 0) {
+        return type === 'truth' 
+          ? "Apa hal paling menyenangkan yang pernah kamu alami minggu ini?" 
+          : "Lakukan tarian singkat selama 10 detik tanpa musik!";
+      }
+
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function openManageModal(defaultTab = 'questionsTab') {
+      populateCategoryDropdowns();
+      switchManageTab(defaultTab);
+      renderManageQuestionsList();
+      openModal('manageModal');
+    }
+
+    function closeManageModal() {
+      closeModal('manageModal');
+    }
+
+    function switchManageTab(tabId) {
+      document.getElementById('questionsTab').classList.add('hidden');
+      document.getElementById('categoryTab').classList.add('hidden');
+      document.getElementById('tabQuestionsBtn').className = "flex-1 py-2 text-center text-gray-400 border-b-2 border-transparent transition";
+      document.getElementById('tabCategoryBtn').className = "flex-1 py-2 text-center text-gray-400 border-b-2 border-transparent transition";
+
+      document.getElementById(tabId).classList.remove('hidden');
+      if (tabId === 'questionsTab') {
+        document.getElementById('tabQuestionsBtn').className = "flex-1 py-2 text-center text-brand-cyan border-b-2 border-brand-cyan transition";
+      } else {
+        document.getElementById('tabCategoryBtn').className = "flex-1 py-2 text-center text-brand-cyan border-b-2 border-brand-cyan transition";
+      }
+    }
+
+    function populateCategoryDropdowns() {
+      const filterSelect = document.getElementById('filterCategory');
+      if (!filterSelect) return;
+
+      filterSelect.innerHTML = '';
+      Object.keys(categories).forEach(catId => {
+        const option = document.createElement('option');
+        option.value = catId;
+        option.textContent = categories[catId].name;
+        filterSelect.appendChild(option);
+      });
+    }
+
+    function renderManageQuestionsList() {
+      const catId = document.getElementById('filterCategory').value;
+      const filterType = document.getElementById('filterType').value;
+      const container = document.getElementById('manageQuestionsList');
+      container.innerHTML = '';
+
+      if (!catId || !questionBank[catId]) {
+        container.innerHTML = `<p class="text-center text-xs text-gray-500 py-6">Belum ada pertanyaan di kategori ini.</p>`;
+        document.getElementById('manageCountText').textContent = '0 Pertanyaan';
+        return;
+      }
+
+      let items = [];
+      const catData = questionBank[catId];
+
+      if (filterType === 'all' || filterType === 'truth') {
+        (catData.truth || []).forEach((t, i) => items.push({ type: 'truth', text: t, index: i }));
+      }
+      if (filterType === 'all' || filterType === 'dare') {
+        (catData.dare || []).forEach((d, i) => items.push({ type: 'dare', text: d, index: i }));
+      }
+
+      if (items.length === 0) {
+        container.innerHTML = `<p class="text-center text-xs text-gray-500 py-6">Belum ada pertanyaan yang cocok.</p>`;
+      } else {
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = "flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-white/5 text-xs";
+          div.innerHTML = `
+            <div class="space-y-0.5 max-w-[82%]">
+              <span class="font-bold uppercase ${item.type==='truth'?'text-brand-cyan':'text-brand-pink'} text-[10px]">${item.type}</span>
+              <p class="text-gray-200 leading-tight">${item.text}</p>
+            </div>
+            <button onclick="removeQuestionFromCategory('${catId}', '${item.type}', ${item.index})" class="text-gray-500 hover:text-red-400 p-1">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      document.getElementById('manageCountText').textContent = `${items.length} Pertanyaan`;
+    }
+
+    function addQuestionToCategory() {
+      const catId = document.getElementById('filterCategory').value;
+      const type = document.getElementById('newQuestionType').value;
+      const input = document.getElementById('newQuestionInput');
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      if (!questionBank[catId]) {
+        questionBank[catId] = { truth: [], dare: [] };
+      }
+      if (!questionBank[catId][type]) {
+        questionBank[catId][type] = [];
+      }
+
+      questionBank[catId][type].push(text);
+      localStorage.setItem('tod_questions_bank', JSON.stringify(questionBank));
+      input.value = '';
+      renderManageQuestionsList();
+      showToast("Pertanyaan berhasil ditambahkan!");
+    }
+
+    function removeQuestionFromCategory(catId, type, index) {
+      if (questionBank[catId] && questionBank[catId][type]) {
+        questionBank[catId][type].splice(index, 1);
+        localStorage.setItem('tod_questions_bank', JSON.stringify(questionBank));
+        renderManageQuestionsList();
+      }
+    }
+
+    function resetCategoryQuestions() {
+      const catId = document.getElementById('filterCategory').value;
+      if (DEFAULT_QUESTIONS[catId]) {
+        questionBank[catId] = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS[catId]));
+        localStorage.setItem('tod_questions_bank', JSON.stringify(questionBank));
+        renderManageQuestionsList();
+        showToast("Kategori berhasil direset ke pertanyaan awal!");
+      } else {
+        questionBank[catId] = { truth: [], dare: [] };
+        localStorage.setItem('tod_questions_bank', JSON.stringify(questionBank));
+        renderManageQuestionsList();
+        showToast("Pertanyaan dalam kategori dikosongkan.");
+      }
+    }
+
+    function createNewCategory() {
+      const name = document.getElementById('newCatName').value.trim();
+      const desc = document.getElementById('newCatDesc').value.trim();
+      const icon = document.getElementById('newCatIcon').value;
+      const color = document.getElementById('newCatColor').value;
+
+      if (!name) {
+        showToast("Masukkan nama kategori!");
+        return;
+      }
+
+      const id = 'cat_' + Date.now();
+      categories[id] = { id, name, desc: desc || 'Kategori buatan sendiri', icon, color, isDefault: false };
+      questionBank[id] = { truth: [], dare: [] };
+
+      localStorage.setItem('tod_categories', JSON.stringify(categories));
+      localStorage.setItem('tod_questions_bank', JSON.stringify(questionBank));
+
+      document.getElementById('newCatName').value = '';
+      document.getElementById('newCatDesc').value = '';
+
+      renderCategoryGrid();
+      populateCategoryDropdowns();
+      switchManageTab('questionsTab');
+      document.getElementById('filterCategory').value = id;
+      renderManageQuestionsList();
+
+      showToast(`Kategori "${name}" berhasil dibuat!`);
+    }
+
+    // ... existing gameplay function code ...
+    function selectChoice(type) {
+      selectedType = type;
+      
+      const cardTypeBadge = document.getElementById('cardTypeBadge');
+      const cardBackType = document.getElementById('cardBackType');
+      const cardPlayerBadge = document.getElementById('cardPlayerName');
+
+      cardTypeBadge.textContent = type.toUpperCase();
+      cardBackType.textContent = type.toUpperCase();
+      cardPlayerBadge.textContent = selectedPlayer;
+
+      if (type === 'truth') {
+        cardTypeBadge.className = "text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider bg-brand-cyan text-slate-950";
+        cardBackType.className = "text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider bg-brand-cyan text-slate-950";
+      } else {
+        cardTypeBadge.className = "text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider bg-brand-pink text-white";
+        cardBackType.className = "text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider bg-brand-pink text-white";
+      }
+
+      const question = getRandomQuestion(type);
+      document.getElementById('questionContent').textContent = `"${question}"`;
+
+      document.getElementById('flipCardInner').classList.remove('rotate-y-180');
+      document.getElementById('cardActions').classList.add('opacity-0', 'pointer-events-none');
+      document.getElementById('timerContainer').classList.add('hidden');
+      resetTimer();
+
+      openModal('cardModal');
+    }
+
+    // ... existing event listeners initialization ...
+    window.onload = function() {
+      renderCategoryGrid();
+      renderPlayers();
+
+      // Sound Toggle
+      const soundBtn = document.getElementById('soundToggleBtn');
+      soundBtn.onclick = function() {
+        sound.muted = !sound.muted;
+        soundBtn.innerHTML = sound.muted ? `<i class="fa-solid fa-volume-xmark text-sm text-red-400"></i>` : `<i class="fa-solid fa-volume-high text-sm"></i>`;
+      };
+
+      // Player Input
+      document.getElementById('addPlayerBtn').onclick = addPlayer;
+      document.getElementById('playerNameInput').onkeydown = function(e) {
+        if (e.key === 'Enter') addPlayer();
+      };
+
+      // Start Game Button
+      document.getElementById('startGameBtn').onclick = function() {
+        if (players.length < 2) {
+          showToast("Tambahkan minimal 2 pemain terlebih dahulu!");
+          return;
+        }
+        showSection('gameplayScreen');
+        renderWheel();
+      };
+
+      // Spin Wheel Button
+      document.getElementById('spinBtn').onclick = spinWheel;
+
+      // Choice buttons
+      document.getElementById('chooseTruthBtn').onclick = () => selectChoice('truth');
+      document.getElementById('chooseDareBtn').onclick = () => selectChoice('dare');
+
+      // Card Flip Action
+      document.getElementById('flipCardWrapper').onclick = flipCard;
+
+      // Timer Button
+      document.getElementById('startTimerBtn').onclick = toggleTimer;
+
+      // Resize event for wheel responsive drawing
+      window.onresize = renderWheel;
+    };
+  </script>
+</body>
+</html>
