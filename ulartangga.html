@@ -29,9 +29,6 @@
         .backface-hidden {
             backface-visibility: hidden;
         }
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-        }
 
         /* Dice 3D Animation */
         .dice-box {
@@ -96,18 +93,45 @@
 
         /* Pawn Markers */
         .pawn {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             border: 2px solid #ffffff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: absolute;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            line-height: 1;
             z-index: 20;
+        }
+
+        /* Pulse glow for active player pawn */
+        .pawn-active {
+            animation: pawnGlow 1.2s infinite alternate;
+        }
+        @keyframes pawnGlow {
+            0% { transform: scale(1); box-shadow: 0 0 4px #ec4899; }
+            100% { transform: scale(1.2); box-shadow: 0 0 12px #ec4899; }
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
         }
     </style>
 </head>
 <body class="p-2 md:p-6 flex flex-col items-center justify-between">
+
+    <!-- CANVAS EFEK KONFETI -->
+    <canvas id="confettiCanvas"></canvas>
 
     <!-- HEADER BAR -->
     <header class="w-full max-w-5xl flex flex-wrap items-center justify-between gap-4 mb-4 glass-panel p-4 rounded-2xl shadow-xl">
@@ -124,6 +148,11 @@
         </div>
 
         <div class="flex items-center space-x-2">
+            <!-- Audio Mute/Unmute Toggle -->
+            <button id="soundToggleBtn" onclick="toggleSound()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5" title="Atur Suara Game">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-emerald-400"></i>
+                <span id="soundText" class="hidden sm:inline">Suara</span>
+            </button>
             <button onclick="openModal('howToPlayModal')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2">
                 <i class="fa-solid fa-circle-question text-pink-400"></i> Cara Bermain
             </button>
@@ -144,7 +173,7 @@
             <div class="text-center mb-6">
                 <span class="px-3 py-1 bg-pink-500/20 text-pink-300 text-xs font-semibold rounded-full border border-pink-500/30">Pengaturan Ruang Main</span>
                 <h2 class="text-2xl font-bold mt-2">Siapkan Permainan Baru</h2>
-                <p class="text-sm text-slate-400">Atur pemain, mode jawaban, dan pertanyaan custom sebelum mulai.</p>
+                <p class="text-sm text-slate-400">Atur pemain, avatar, mode jawaban, dan pertanyaan custom sebelum mulai.</p>
             </div>
 
             <!-- Player List Setup -->
@@ -299,9 +328,10 @@
             <div class="w-full lg:w-80 flex flex-col gap-4">
 
                 <!-- Turn Banner Card -->
-                <div class="glass-panel p-4 rounded-2xl border border-slate-700/60 shadow-xl text-center">
+                <div class="glass-panel p-4 rounded-2xl border border-slate-700/60 shadow-xl text-center relative overflow-hidden">
                     <div class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Giliran Bermain</div>
                     <div id="turnPlayerName" class="text-xl font-extrabold text-pink-400 flex items-center justify-center gap-2">
+                        <span id="turnPawnIcon" class="text-lg">🚀</span>
                         <span id="turnPawnDot" class="w-4 h-4 rounded-full bg-pink-500 inline-block shadow"></span>
                         <span id="activePlayerText">Player 1</span>
                     </div>
@@ -330,7 +360,7 @@
 
                 <!-- Players Status List -->
                 <div class="glass-panel p-4 rounded-2xl border border-slate-700/60 shadow-xl">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Posisi Pemain</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Posisi & Status Pemain</h3>
                     <div id="playerPositionsList" class="space-y-2">
                         <!-- Dynamically filled -->
                     </div>
@@ -339,8 +369,11 @@
                 <!-- Live Game Log -->
                 <div class="glass-panel p-4 rounded-2xl border border-slate-700/60 shadow-xl">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                        <span>Catatan Aktivitas</span>
-                        <i class="fa-solid fa-list-ul"></i>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-list-ul"></i> Catatan Aktivitas</span>
+                        <button id="copyLogBtn" onclick="copyGameLog()" class="text-[11px] px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition flex items-center gap-1.5" title="Salin Catatan Aktivitas">
+                            <i class="fa-solid fa-copy"></i>
+                            <span id="copyLogText">Salin</span>
+                        </button>
                     </h3>
                     <div id="gameLogBox" class="h-28 overflow-y-auto space-y-1 text-xs text-slate-300 pr-1">
                         <div class="text-slate-500 italic">Game dimulai. Selamat bermain!</div>
@@ -372,7 +405,7 @@
             <div class="space-y-4 text-sm text-slate-300">
                 <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700">
                     <h3 class="font-bold text-pink-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-flag"></i> 1. Tujuan Utama</h3>
-                    <p class="text-xs leading-relaxed">Berlomba mencapai **Petak 36 (FINISH)** paling pertama dengan melempar dadu secara bergantian.</p>
+                    <p class="text-xs leading-relaxed">Berlomba mencapai **Petak Terakhir (FINISH)** paling pertama dengan melempar dadu secara bergantian.</p>
                 </div>
 
                 <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700">
@@ -384,11 +417,12 @@
                 </div>
 
                 <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-purple-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-masks-theater"></i> 3. Petak Truth or Dare</h3>
+                    <h3 class="font-bold text-purple-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-masks-theater"></i> 3. Petak Truth or Dare & Pass Token</h3>
                     <ul class="text-xs space-y-1 list-disc list-inside">
                         <li><strong class="text-sky-300">Petak Truth:</strong> Wajib menjawab 1 pertanyaan jujur secara terbuka.</li>
-                        <li><strong class="text-amber-300">Petak Dare:</strong> Wajib melakukan 1 aksi/tantangan seru.</li>
+                        <li><strong class="text-amber-300">Petak Dare:</strong> Wajib melakukan 1 aksi/tantangan seru dalam batas waktu.</li>
                         <li><strong class="text-purple-300">Petak Choice:</strong> Bebas memilih antara mengambil kartu *Truth* atau *Dare*.</li>
+                        <li><strong class="text-pink-300">Pass / Reroll Token:</strong> Setiap pemain memiliki **1 Token Lewati** per permainan untuk menukar tantangan jika enggan menjawab!</li>
                     </ul>
                 </div>
 
@@ -415,7 +449,7 @@
             </button>
 
             <h2 class="text-xl font-bold text-white mb-1"><i class="fa-solid fa-pen-to-square text-purple-400 mr-2"></i> Tambah Soal Custom</h2>
-            <p class="text-xs text-slate-400 mb-4">Buat pertanyaan atau tantangan rahasia buatanmu sendiri sebelum game dimulai.</p>
+            <p class="text-xs text-slate-400 mb-4">Buat pertanyaan atau tantangan rahasia buatanmu sendiri (Tersimpan otomatis di browser!).</p>
 
             <!-- Form -->
             <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-3 mb-6">
@@ -443,7 +477,12 @@
             </div>
 
             <!-- List of Custom Questions -->
-            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Daftar Soal Custom Saat Ini:</h3>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Daftar Soal Custom Saat Ini:</h3>
+                <button onclick="clearAllCustomQuestions()" class="text-[10px] text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Semua
+                </button>
+            </div>
             <div id="customQuestionsList" class="space-y-2 max-h-48 overflow-y-auto text-xs pr-1">
                 <div class="text-slate-500 italic">Belum ada soal custom yang dibuat.</div>
             </div>
@@ -456,7 +495,7 @@
             <div id="cardFlipper" class="transform-style-3d glass-panel bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative">
 
                 <!-- CARD HEADER -->
-                <div class="text-center mb-4">
+                <div class="text-center mb-3">
                     <span id="todBadge" class="px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest bg-sky-500/20 text-sky-400 border border-sky-500/30">
                         TRUTH CARD
                     </span>
@@ -465,8 +504,19 @@
                     </h3>
                 </div>
 
+                <!-- COUNTDOWN TIMER BAR (FOR DARE / TRUTH) -->
+                <div id="todTimerBox" class="mb-3 hidden">
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-400 mb-1">
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-stopwatch text-amber-400"></i> Sisa Waktu Tantangan:</span>
+                        <span id="timerText" class="text-amber-400 font-mono font-bold text-sm">30s</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                        <div id="timerBar" class="bg-gradient-to-r from-amber-500 to-rose-500 h-full w-full transition-all linear duration-1000"></div>
+                    </div>
+                </div>
+
                 <!-- CARD BODY -->
-                <div id="todCardBox" class="bg-gradient-to-b from-slate-800/90 to-slate-900 p-5 rounded-2xl border border-slate-700/80 my-4 text-center min-h-[140px] flex flex-col items-center justify-center">
+                <div id="todCardBox" class="bg-gradient-to-b from-slate-800/90 to-slate-900 p-5 rounded-2xl border border-slate-700/80 my-3 text-center min-h-[130px] flex flex-col items-center justify-center relative">
                     <p id="todQuestionText" class="text-sm md:text-base font-semibold text-slate-100 leading-relaxed">
                         "Loading pertanyaan..."
                     </p>
@@ -475,10 +525,21 @@
                     </span>
                 </div>
 
+                <!-- PASS TOKEN / REROLL OPTION -->
+                <div id="passTokenSection" class="mb-3 flex items-center justify-between bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/60">
+                    <div class="text-xs text-slate-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-ticket text-pink-400"></i>
+                        <span>Sisa Token Lewati: <strong id="currentPassTokenCount" class="text-pink-400">1</strong></span>
+                    </div>
+                    <button id="usePassTokenBtn" onclick="usePassToken()" class="px-3 py-1 bg-pink-600/30 hover:bg-pink-600/50 border border-pink-500/40 text-pink-300 text-xs font-bold rounded-lg transition disabled:opacity-40">
+                        Ganti Soal
+                    </button>
+                </div>
+
                 <!-- CARD ACTIONS (SPOKEN MODE) -->
                 <div id="todSpokenActions" class="space-y-2">
                     <button onclick="finishTodAction()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 font-extrabold text-white rounded-xl shadow-lg text-sm transition">
-                        <i class="fa-solid fa-circle-check mr-2"></i> Sudah Dijawab / Dilakukan
+                        <i class="fa-solid fa-circle-check mr-2"></i> Sudah Selesai / Dilakukan
                     </button>
                 </div>
 
@@ -547,8 +608,14 @@
                 <i class="fa-solid fa-trophy"></i>
             </div>
             <h2 class="text-2xl font-extrabold text-white mb-1">PEMENANG!</h2>
-            <p id="winnerName" class="text-xl font-extrabold text-amber-400 mb-4">Player 1</p>
-            <p class="text-xs text-slate-400 mb-6">Selamat! Kamu berhasil mencapai Petak 36 terlebih dahulu!</p>
+            <p id="winnerName" class="text-xl font-extrabold text-amber-400 mb-2">Player 1</p>
+            
+            <!-- Game Stats Summary -->
+            <div id="winnerStatsBox" class="bg-slate-800/70 p-3 rounded-2xl border border-slate-700 text-xs text-slate-300 space-y-1 mb-6">
+                <div>Total Putaran Dadu: <strong id="statTotalRolls" class="text-pink-400">0</strong></div>
+                <div>Tangga Dinaiki: <strong id="statLadders" class="text-emerald-400">0</strong></div>
+                <div>Ular Digigit: <strong id="statSnakes" class="text-rose-400">0</strong></div>
+            </div>
 
             <button onclick="resetToLobby()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-pink-600 hover:from-amber-600 hover:to-pink-700 font-extrabold text-white rounded-xl shadow-lg text-sm transition">
                 Main Lagi
@@ -605,6 +672,8 @@
             { name: 'Hijau', hex: '#10b981', bg: 'bg-emerald-500' },
             { name: 'Kuning', hex: '#f59e0b', bg: 'bg-amber-500' }
         ];
+
+        const AVATAR_OPTIONS = ['🚀', '👑', '🦄', '⚡', '🐱', '🦊', '🎭', '💎'];
 
         // Dynamic Board Spec Generator based on Total Tiles (36, 64, or 100)
         function generateBoardSpec(totalTiles) {
@@ -679,85 +748,168 @@
         let gameState = {
             totalTiles: 36,
             boardSpec: generateBoardSpec(36),
-            players: [], // [{ id: 0, name: 'Budi', color: '#ef4444', pos: 1 }]
+            players: [], // [{ id: 0, name: 'Budi', avatar: '🚀', color: '#ef4444', pos: 1, passTokens: 1 }]
             currentTurnIndex: 0,
             mode: 'SPOKEN', // 'SPOKEN' or 'TEXT'
             questionSource: 'ALL', // 'ALL', 'DEFAULT', 'CUSTOM'
             customQuestions: [],
             sheetsUrl: '',
+            soundEnabled: true,
             isMoving: false,
-            activeChoiceTile: null
+            activeChoiceTile: null,
+            currentCardType: null,
+            stats: {
+                totalRolls: 0,
+                laddersHit: 0,
+                snakesHit: 0
+            }
         };
+
+        // COUNTDOWN TIMER VARIABLE
+        let cardTimerInterval = null;
 
         // WEB AUDIO SYNTHESIZER FOR SOUND EFFECTS
         let audioCtx;
         function playSound(type) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!gameState.soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                const now = audioCtx.currentTime;
+                
+                if (type === 'roll') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'ladder') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.linearRampToValueAtTime(800, now + 0.3);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'snake') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(100, now + 0.4);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'card') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.setValueAtTime(800, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'win') {
+                    // Win Fanfare
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const winOsc = audioCtx.createOscillator();
+                        const winGain = audioCtx.createGain();
+                        winOsc.connect(winGain);
+                        winGain.connect(audioCtx.destination);
+                        winOsc.type = 'triangle';
+                        winOsc.frequency.setValueAtTime(freq, now + idx * 0.12);
+                        winGain.gain.setValueAtTime(0.3, now + idx * 0.12);
+                        winGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.25);
+                        winOsc.start(now + idx * 0.12);
+                        winOsc.stop(now + idx * 0.12 + 0.25);
+                    });
+                } else if (type === 'tick') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(900, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                }
+            } catch (err) {
+                console.error("Audio error:", err);
+            }
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            const text = document.getElementById('soundText');
             
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            const now = audioCtx.currentTime;
-            
-            if (type === 'roll') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
-            } else if (type === 'ladder') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.linearRampToValueAtTime(800, now + 0.3);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } else if (type === 'snake') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.linearRampToValueAtTime(100, now + 0.4);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'card') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.setValueAtTime(800, now + 0.1);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
+            if (gameState.soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-emerald-400';
+                text.innerText = 'Suara';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+                text.innerText = 'Mute';
+            }
+        }
+
+        // LOCAL STORAGE PERSISTENCE
+        function loadSavedCustomQuestions() {
+            try {
+                const saved = localStorage.getItem('ut_custom_questions');
+                if (saved) {
+                    gameState.customQuestions = JSON.parse(saved);
+                }
+                const savedUrl = localStorage.getItem('ut_sheets_url');
+                if (savedUrl) {
+                    gameState.sheetsUrl = savedUrl;
+                    const input = document.getElementById('sheetsApiUrlInput');
+                    if (input) input.value = savedUrl;
+                }
+            } catch (err) {
+                console.error("Failed to load local storage:", err);
+            }
+        }
+
+        function persistCustomQuestions() {
+            try {
+                localStorage.setItem('ut_custom_questions', JSON.stringify(gameState.customQuestions));
+            } catch (err) {
+                console.error("Failed to save local storage:", err);
             }
         }
 
         // INIT SETUP FUNCTIONS
         window.onload = () => {
+            loadSavedCustomQuestions();
             initLobbyInputs();
             renderDefaultBank();
+            updateCustomQuestionsUI();
+
+            // Auto Recalculate Board SVG on Window Resize
+            window.addEventListener('resize', () => {
+                if (!document.getElementById('gameScreen').classList.contains('hidden')) {
+                    drawSnakesAndLaddersSvg();
+                }
+            });
         };
 
         function initLobbyInputs() {
             const container = document.getElementById('playerInputsContainer');
             if (container) container.innerHTML = '';
-            addPlayerInput('Player 1');
-            addPlayerInput('Player 2');
+            addPlayerInput('Player 1', '🚀');
+            addPlayerInput('Player 2', '👑');
         }
 
-        function addPlayerInput(defaultName = '') {
+        function addPlayerInput(defaultName = '', defaultAvatar = '') {
             const container = document.getElementById('playerInputsContainer');
             const currentCount = container.children.length;
-            if (currentCount >= 4) {
-                // Maksimal 4 pemain
-                return;
-            }
+            if (currentCount >= 4) return;
 
             const playerId = Date.now() + Math.random().toString(36).substring(2, 7);
             const div = document.createElement('div');
@@ -766,10 +918,18 @@
             
             const num = currentCount + 1;
             const fallbackName = typeof defaultName === 'string' && defaultName ? defaultName : `Player ${num}`;
+            const avatar = defaultAvatar || AVATAR_OPTIONS[currentCount % AVATAR_OPTIONS.length];
             const color = PLAYER_COLORS[currentCount % 4];
+
+            let avatarOptionsHtml = AVATAR_OPTIONS.map(opt => 
+                `<option value="${opt}" ${opt === avatar ? 'selected' : ''}>${opt}</option>`
+            ).join('');
 
             div.innerHTML = `
                 <div class="w-8 h-8 rounded-full shadow border-2 border-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-xs" style="background-color: ${color.hex}">${num}</div>
+                <select class="player-avatar bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm text-white focus:outline-none">
+                    ${avatarOptionsHtml}
+                </select>
                 <input type="text" class="player-input flex-1 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-pink-500" placeholder="${fallbackName}" value="${defaultName === fallbackName ? '' : defaultName}">
                 ${currentCount >= 2 ? `<button onclick="removePlayerInput('${playerId}')" class="text-red-400 hover:text-red-300 p-2.5 transition transform hover:scale-110"><i class="fa-solid fa-trash"></i></button>` : '<div class="w-[44px]"></div>'}
             `;
@@ -829,6 +989,8 @@
             if (!text) return;
 
             gameState.customQuestions.push({ type, text, author });
+            persistCustomQuestions();
+
             document.getElementById('customTextInput').value = '';
             document.getElementById('customAuthorInput').value = '';
             
@@ -860,7 +1022,16 @@
 
         function removeCustomQuestion(index) {
             gameState.customQuestions.splice(index, 1);
+            persistCustomQuestions();
             updateCustomQuestionsUI();
+        }
+
+        function clearAllCustomQuestions() {
+            if (confirm("Apakah Anda yakin ingin menghapus seluruh soal custom?")) {
+                gameState.customQuestions = [];
+                persistCustomQuestions();
+                updateCustomQuestionsUI();
+            }
         }
 
         function rollDice() {
@@ -870,15 +1041,14 @@
 
             const diceBox = document.getElementById('diceBox');
             const result = Math.floor(Math.random() * 6) + 1;
-            
-            // Random rotations for animation (multiple spins)
+            gameState.stats.totalRolls++;
+
             const rotX = Math.floor(Math.random() * 4) * 360 + 720;
             const rotY = Math.floor(Math.random() * 4) * 360 + 720;
             
             let finalRotX = rotX;
             let finalRotY = rotY;
 
-            // Target face calculation based on layout of .dice-face
             switch (result) {
                 case 1: finalRotX += 0; finalRotY += 0; break;
                 case 2: finalRotX += 0; finalRotY += 180; break;
@@ -893,12 +1063,12 @@
 
             setTimeout(() => {
                 const activePlayer = gameState.players[gameState.currentTurnIndex];
-                addLog(`🎲 ${activePlayer.name} melempar dadu: dapat angka <span class="text-pink-400 font-bold">${result}</span>`);
+                addLog(`🎲 ${activePlayer.avatar} ${activePlayer.name} melempar dadu: dapat angka <span class="text-pink-400 font-bold">${result}</span>`);
                 movePlayer(activePlayer, result);
-            }, 1000); // Wait for dice animation to complete
+            }, 1000);
         }
 
-        // BOARD GRID RENDER (Zig-zag Grid)
+        // BOARD GRID RENDER
         function renderBoardGrid() {
             const board = document.getElementById('boardGrid');
             board.innerHTML = '';
@@ -909,7 +1079,6 @@
             board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
-            // Rows from rows-1 down to 0
             for (let r = rows - 1; r >= 0; r--) {
                 const isEvenRowFromBottom = (r % 2 === 0);
                 for (let c = 0; c < cols; c++) {
@@ -935,13 +1104,13 @@
                             <span class="opacity-60 text-slate-300 ${isSmall ? 'text-[9px]' : 'text-xs'}">${tileNum}</span>
                             ${badge}
                         </div>
-                        <div id="pawns-tile-${tileNum}" class="flex flex-wrap gap-0.5 items-center justify-center min-h-[18px] w-full"></div>
+                        <div id="pawns-tile-${tileNum}" class="flex flex-wrap gap-0.5 items-center justify-center min-h-[22px] w-full"></div>
                     `;
                     board.appendChild(tile);
                 }
             }
 
-            setTimeout(drawSnakesAndLaddersSvg, 100);
+            setTimeout(drawSnakesAndLaddersSvg, 120);
         }
 
         function getTileBgClass(num) {
@@ -952,7 +1121,7 @@
             return 'bg-slate-800/50 border border-slate-700/40';
         }
 
-        // SVG CONNECTIONS FOR SNAKES & LADDERS WITH DETAILED GRAPHICS
+        // SVG CONNECTIONS FOR SNAKES & LADDERS
         function drawSnakesAndLaddersSvg() {
             const svg = document.getElementById('boardSvg');
             if (!svg) return;
@@ -962,7 +1131,6 @@
             if (!boardGrid) return;
             const boardRect = boardGrid.getBoundingClientRect();
 
-            // Helper to get center of a tile in % relative to board
             function getTileCenter(tileNum) {
                 const tileEl = document.getElementById(`tile-${tileNum}`);
                 if (!tileEl) return { x: 0, y: 0 };
@@ -972,22 +1140,19 @@
                 return { x, y };
             }
 
-            // Draw Graphic Ladders (Side Rails + Rungs)
             for (const [start, end] of Object.entries(gameState.boardSpec.ladders)) {
-                const p1 = getTileCenter(start); // bottom tile
-                const p2 = getTileCenter(end);   // top tile
+                const p1 = getTileCenter(start);
+                const p2 = getTileCenter(end);
                 drawGraphicLadder(p1, p2, svg);
             }
 
-            // Draw Graphic Snakes (Wavy Body + Patterns + Cobra Head + Eyes + Tongue)
             for (const [head, tail] of Object.entries(gameState.boardSpec.snakes)) {
-                const pHead = getTileCenter(head); // top head tile
-                const pTail = getTileCenter(tail); // bottom tail tile
+                const pHead = getTileCenter(head);
+                const pTail = getTileCenter(tail);
                 drawGraphicSnake(pHead, pTail, svg);
             }
         }
 
-        // Draw Stylized Ladder
         function drawGraphicLadder(p1, p2, svg) {
             const dx = p2.x - p1.x;
             const dy = p2.y - p1.y;
@@ -996,20 +1161,18 @@
 
             const ux = dx / len;
             const uy = dy / len;
-            const offset = 1.8; // Perpendicular offset in %
+            const offset = 1.8;
             const nx = -uy * offset;
             const ny = ux * offset;
 
             const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
-            // Side Rail 1
             const rail1 = createSvgElement('line', {
                 x1: p1.x + nx, y1: p1.y + ny,
                 x2: p2.x + nx, y2: p2.y + ny,
                 stroke: '#f59e0b', 'stroke-width': '2.8', 'stroke-linecap': 'round'
             });
 
-            // Side Rail 2
             const rail2 = createSvgElement('line', {
                 x1: p1.x - nx, y1: p1.y - ny,
                 x2: p2.x - nx, y2: p2.y - ny,
@@ -1019,7 +1182,6 @@
             g.appendChild(rail1);
             g.appendChild(rail2);
 
-            // Rungs (Cross steps)
             const numRungs = Math.max(3, Math.floor(len / 7));
             for (let i = 1; i <= numRungs; i++) {
                 const t = i / (numRungs + 1);
@@ -1038,16 +1200,12 @@
             svg.appendChild(g);
         }
 
-        // Draw Stylized Wavy Snake
         function drawGraphicSnake(pHead, pTail, svg) {
             const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
             const dx = pTail.x - pHead.x;
             const dy = pTail.y - pHead.y;
-            const midX = (pHead.x + pTail.x) / 2;
-            const midY = (pHead.y + pTail.y) / 2;
 
-            // Offset control points to create S-curve snake wiggle
             const cp1x = pHead.x + dx * 0.25 + 12;
             const cp1y = pHead.y + dy * 0.25;
             const cp2x = pHead.x + dx * 0.75 - 12;
@@ -1055,17 +1213,14 @@
 
             const pathD = `M ${pHead.x} ${pHead.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pTail.x} ${pTail.y}`;
 
-            // Snake Outer Shadow / Thickness
             const bodyShadow = createSvgElement('path', {
                 d: pathD, stroke: '#881337', 'stroke-width': '7', fill: 'none', 'stroke-linecap': 'round'
             });
 
-            // Snake Main Body (Vibrant Red/Rose)
             const bodyMain = createSvgElement('path', {
                 d: pathD, stroke: '#f43f5e', 'stroke-width': '5', fill: 'none', 'stroke-linecap': 'round'
             });
 
-            // Snake Body Pattern (Yellow Dots/Stripes)
             const bodyPattern = createSvgElement('path', {
                 d: pathD, stroke: '#fef08a', 'stroke-width': '2', 'stroke-dasharray': '3 4', fill: 'none'
             });
@@ -1074,19 +1229,16 @@
             g.appendChild(bodyMain);
             g.appendChild(bodyPattern);
 
-            // Snake Head
             const headCircle = createSvgElement('circle', {
                 cx: pHead.x, cy: pHead.y, r: '3.5', fill: '#e11d48', stroke: '#881337', 'stroke-width': '0.8'
             });
             g.appendChild(headCircle);
 
-            // Snake Eyes
             const eye1 = createSvgElement('circle', { cx: pHead.x - 1, cy: pHead.y - 1, r: '0.8', fill: '#ffffff' });
             const eye2 = createSvgElement('circle', { cx: pHead.x + 1, cy: pHead.y - 1, r: '0.8', fill: '#ffffff' });
             g.appendChild(eye1);
             g.appendChild(eye2);
 
-            // Snake Forked Tongue
             const tongue = createSvgElement('path', {
                 d: `M ${pHead.x} ${pHead.y - 3.5} L ${pHead.x} ${pHead.y - 6} M ${pHead.x} ${pHead.y - 6} L ${pHead.x - 1} ${pHead.y - 7.5} M ${pHead.x} ${pHead.y - 6} L ${pHead.x + 1} ${pHead.y - 7.5}`,
                 stroke: '#dc2626', 'stroke-width': '0.8', fill: 'none'
@@ -1106,15 +1258,23 @@
 
         // START GAME
         function startGame() {
-            const inputs = document.querySelectorAll('.player-input');
+            const rows = document.querySelectorAll('#playerInputsContainer > div');
             const players = [];
-            inputs.forEach((input, i) => {
-                const name = input.value.trim() || `Pemain ${i+1}`;
+
+            rows.forEach((row, i) => {
+                const nameInput = row.querySelector('.player-input');
+                const avatarSelect = row.querySelector('.player-avatar');
+                
+                const name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : `Pemain ${i+1}`;
+                const avatar = avatarSelect ? avatarSelect.value : AVATAR_OPTIONS[i % AVATAR_OPTIONS.length];
+
                 players.push({
                     id: i,
                     name: name,
+                    avatar: avatar,
                     color: PLAYER_COLORS[i].hex,
-                    pos: 1
+                    pos: 1,
+                    passTokens: 1
                 });
             });
 
@@ -1133,6 +1293,7 @@
             gameState.players = players;
             gameState.currentTurnIndex = 0;
             gameState.isMoving = false;
+            gameState.stats = { totalRolls: 0, laddersHit: 0, snakesHit: 0 };
 
             document.getElementById('lobbyScreen').classList.add('hidden');
             document.getElementById('gameScreen').classList.remove('hidden');
@@ -1151,33 +1312,37 @@
 
         // PAWN POSITION RENDERING
         function renderPawns() {
-            // Clear existing pawns
             for (let i = 1; i <= gameState.totalTiles; i++) {
                 const box = document.getElementById(`pawns-tile-${i}`);
                 if (box) box.innerHTML = '';
             }
 
-            // Place players
+            const activePlayer = gameState.players[gameState.currentTurnIndex];
+
             gameState.players.forEach(p => {
                 const box = document.getElementById(`pawns-tile-${p.pos}`);
                 if (box) {
                     const pawn = document.createElement('div');
-                    pawn.className = 'pawn';
+                    pawn.className = `pawn ${activePlayer && activePlayer.id === p.id ? 'pawn-active' : ''}`;
                     pawn.style.backgroundColor = p.color;
+                    pawn.innerHTML = p.avatar;
                     pawn.title = `${p.name} (Petak ${p.pos})`;
                     box.appendChild(pawn);
                 }
             });
 
-            // Update status list
             const list = document.getElementById('playerPositionsList');
             list.innerHTML = gameState.players.map(p => `
                 <div class="flex items-center justify-between text-xs bg-slate-800/70 p-2 rounded-xl border border-slate-700/60">
                     <div class="flex items-center gap-2">
                         <span class="w-3 h-3 rounded-full" style="background-color: ${p.color}"></span>
+                        <span class="text-sm">${p.avatar}</span>
                         <span class="font-bold text-slate-200">${p.name}</span>
                     </div>
-                    <span class="font-extrabold text-pink-400">Petak ${p.pos} / ${gameState.totalTiles}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-pink-300" title="Sisa Token Lewati">🎫 ${p.passTokens}</span>
+                        <span class="font-extrabold text-pink-400">Petak ${p.pos} / ${gameState.totalTiles}</span>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1188,82 +1353,83 @@
             let target = current + steps;
 
             if (target > gameState.totalTiles) {
-                addLog(`${player.name} butuh angka pas untuk finis. Tetap di petak ${current}.`);
+                addLog(`${player.avatar} ${player.name} butuh angka pas untuk finis. Tetap di petak ${current}.`);
                 finishTurn();
                 return;
             }
 
-            let stepCount = 0;
             const interval = setInterval(() => {
-                stepCount++;
                 player.pos++;
                 renderPawns();
 
                 if (player.pos === target) {
                     clearInterval(interval);
-                    
-                    // Check Special Tiles (Ladders / Snakes / Truth / Dare / Choice)
                     setTimeout(() => {
                         checkTileEvents(player);
                     }, 300);
                 }
-            }, 300);
+            }, 280);
         }
 
         function checkTileEvents(player) {
             const pos = player.pos;
 
-            // Check Win
             if (pos === gameState.totalTiles) {
-                document.getElementById('winnerName').innerText = player.name;
-                openModal('winnerModal');
-                addLog(`🎉 **${player.name} MEMENANGKAN PERMAINAN!** 🎉`);
+                triggerWin(player);
                 return;
             }
 
-            // Check Ladder
             if (gameState.boardSpec.ladders[pos]) {
                 const newPos = gameState.boardSpec.ladders[pos];
+                gameState.stats.laddersHit++;
                 playSound('ladder');
-                addLog(`🚀 ${player.name} NAIK TANGGA dari petak ${pos} ke ${newPos}!`);
+                addLog(`🚀 ${player.avatar} ${player.name} NAIK TANGGA dari petak ${pos} ke ${newPos}!`);
                 player.pos = newPos;
                 renderPawns();
                 setTimeout(() => checkTileEvents(player), 400);
                 return;
             }
 
-            // Check Snake
             if (gameState.boardSpec.snakes[pos]) {
                 const newPos = gameState.boardSpec.snakes[pos];
+                gameState.stats.snakesHit++;
                 playSound('snake');
-                addLog(`🐍 ${player.name} DIGIGIT ULAR! Turun dari petak ${pos} ke ${newPos}.`);
+                addLog(`🐍 ${player.avatar} ${player.name} DIGIGIT ULAR! Turun dari petak ${pos} ke ${newPos}.`);
                 player.pos = newPos;
                 renderPawns();
                 setTimeout(() => checkTileEvents(player), 400);
                 return;
             }
 
-            // Check Truth
             if (gameState.boardSpec.truthTiles.includes(pos)) {
                 triggerTodModal(player, 'TRUTH');
                 return;
             }
 
-            // Check Dare
             if (gameState.boardSpec.dareTiles.includes(pos)) {
                 triggerTodModal(player, 'DARE');
                 return;
             }
 
-            // Check Choice
             if (gameState.boardSpec.choiceTiles.includes(pos)) {
                 gameState.activeChoiceTile = player;
                 openModal('choiceModal');
                 return;
             }
 
-            // Normal Tile -> Finish Turn
             finishTurn();
+        }
+
+        function triggerWin(player) {
+            playSound('win');
+            triggerConfetti();
+            document.getElementById('winnerName').innerText = `${player.avatar} ${player.name}`;
+            document.getElementById('statTotalRolls').innerText = gameState.stats.totalRolls;
+            document.getElementById('statLadders').innerText = gameState.stats.laddersHit;
+            document.getElementById('statSnakes').innerText = gameState.stats.snakesHit;
+
+            openModal('winnerModal');
+            addLog(`🎉 **${player.avatar} ${player.name} MEMENANGKAN PERMAINAN!** 🎉`);
         }
 
         function selectChoice(type) {
@@ -1276,6 +1442,7 @@
         // TRUTH OR DARE MODAL TRIGGER
         function triggerTodModal(player, type) {
             playSound('card');
+            gameState.currentCardType = type;
             
             const badge = document.getElementById('todBadge');
             badge.innerText = `${type} CARD`;
@@ -1283,29 +1450,14 @@
                 type === 'TRUTH' ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
             }`;
 
-            document.getElementById('todTargetPlayer').innerHTML = `Giliran: <span style="color:${player.color}">${player.name}</span>`;
+            document.getElementById('todTargetPlayer').innerHTML = `Giliran: ${player.avatar} <span style="color:${player.color}">${player.name}</span>`;
 
-            // Select Question Pool based on Selected Source
-            let fullPool = [];
-            const customPool = gameState.customQuestions.filter(q => q.type === type);
-            const defaultPool = type === 'TRUTH' ? DEFAULT_TRUTH_BANK : DEFAULT_DARE_BANK;
+            // Setup Pass Token Button
+            document.getElementById('currentPassTokenCount').innerText = player.passTokens;
+            const useTokenBtn = document.getElementById('usePassTokenBtn');
+            useTokenBtn.disabled = player.passTokens <= 0;
 
-            if (gameState.questionSource === 'DEFAULT') {
-                fullPool = defaultPool;
-            } else if (gameState.questionSource === 'CUSTOM') {
-                fullPool = customPool.length > 0 ? customPool : defaultPool;
-                if (customPool.length === 0) {
-                    addLog(`⚠️ Soal custom ${type} belum ada, menggunakan soal default.`);
-                }
-            } else {
-                // ALL (Default + Custom)
-                fullPool = [...customPool, ...defaultPool];
-            }
-
-            const selected = fullPool[Math.floor(Math.random() * fullPool.length)];
-
-            document.getElementById('todQuestionText').innerText = `"${selected.text}"`;
-            document.getElementById('todAuthorText').innerText = `Oleh: ${selected.author}`;
+            fetchAndDisplayQuestion(type);
 
             // Configure Actions based on Game Mode
             if (gameState.mode === 'SPOKEN') {
@@ -1317,11 +1469,82 @@
                 document.getElementById('todAnswerInput').value = '';
             }
 
+            // Start Countdown Timer
+            startCardTimer(30);
+
             openModal('todCardModal');
-            addLog(`🎴 ${player.name} mendapat Kartu ${type}!`);
+            addLog(`🎴 ${player.avatar} ${player.name} mendapat Kartu ${type}!`);
+        }
+
+        function fetchAndDisplayQuestion(type) {
+            let fullPool = [];
+            const customPool = gameState.customQuestions.filter(q => q.type === type);
+            const defaultPool = type === 'TRUTH' ? DEFAULT_TRUTH_BANK : DEFAULT_DARE_BANK;
+
+            if (gameState.questionSource === 'DEFAULT') {
+                fullPool = defaultPool;
+            } else if (gameState.questionSource === 'CUSTOM') {
+                fullPool = customPool.length > 0 ? customPool : defaultPool;
+            } else {
+                fullPool = [...customPool, ...defaultPool];
+            }
+
+            const selected = fullPool[Math.floor(Math.random() * fullPool.length)];
+            document.getElementById('todQuestionText').innerText = `"${selected.text}"`;
+            document.getElementById('todAuthorText').innerText = `Oleh: ${selected.author}`;
+        }
+
+        function usePassToken() {
+            const activePlayer = gameState.players[gameState.currentTurnIndex];
+            if (activePlayer.passTokens > 0) {
+                activePlayer.passTokens--;
+                document.getElementById('currentPassTokenCount').innerText = activePlayer.passTokens;
+                document.getElementById('usePassTokenBtn').disabled = true;
+
+                addLog(`🎫 ${activePlayer.avatar} ${activePlayer.name} menggunakan Token Lewati untuk mengganti soal!`);
+                fetchAndDisplayQuestion(gameState.currentCardType);
+                startCardTimer(30);
+                renderPawns();
+            }
+        }
+
+        // TIMER FUNCTIONS
+        function startCardTimer(seconds) {
+            stopCardTimer();
+            const timerBox = document.getElementById('todTimerBox');
+            const timerText = document.getElementById('timerText');
+            const timerBar = document.getElementById('timerBar');
+
+            timerBox.classList.remove('hidden');
+            let timeLeft = seconds;
+            timerText.innerText = `${timeLeft}s`;
+            timerBar.style.width = '100%';
+
+            cardTimerInterval = setInterval(() => {
+                timeLeft--;
+                timerText.innerText = `${timeLeft}s`;
+                timerBar.style.width = `${(timeLeft / seconds) * 100}%`;
+
+                if (timeLeft <= 5 && timeLeft > 0) {
+                    playSound('tick');
+                }
+
+                if (timeLeft <= 0) {
+                    stopCardTimer();
+                    timerText.innerText = 'Waktu Habis!';
+                }
+            }, 1000);
+        }
+
+        function stopCardTimer() {
+            if (cardTimerInterval) {
+                clearInterval(cardTimerInterval);
+                cardTimerInterval = null;
+            }
         }
 
         function finishTodAction() {
+            stopCardTimer();
             closeModal('todCardModal');
             finishTurn();
         }
@@ -1332,13 +1555,13 @@
 
             if (!answer) return;
 
-            addLog(`💬 **${activePlayer.name} Menjawab:** "${answer}"`);
+            addLog(`💬 **${activePlayer.avatar} ${activePlayer.name} Menjawab:** "${answer}"`);
             
-            // Sync to Sheets API if URL is provided
             if (gameState.sheetsUrl) {
                 syncAnswerToSheets(activePlayer.name, answer);
             }
 
+            stopCardTimer();
             closeModal('todCardModal');
             finishTurn();
         }
@@ -1347,13 +1570,14 @@
             gameState.isMoving = false;
             document.getElementById('rollDiceBtn').disabled = false;
 
-            // Advance turn
             gameState.currentTurnIndex = (gameState.currentTurnIndex + 1) % gameState.players.length;
             updateTurnUI();
+            renderPawns();
         }
 
         function updateTurnUI() {
             const activePlayer = gameState.players[gameState.currentTurnIndex];
+            document.getElementById('turnPawnIcon').innerText = activePlayer.avatar;
             document.getElementById('turnPawnDot').style.backgroundColor = activePlayer.color;
             document.getElementById('activePlayerText').innerText = activePlayer.name;
             document.getElementById('activePlayerText').style.color = activePlayer.color;
@@ -1369,12 +1593,62 @@
             box.prepend(item);
         }
 
+        function copyGameLog() {
+            const logBox = document.getElementById('gameLogBox');
+            if (!logBox) return;
+
+            const logItems = Array.from(logBox.children);
+            if (logItems.length === 0) return;
+
+            const textLines = logItems
+                .map(item => (item.innerText || item.textContent).trim())
+                .filter(line => line.length > 0)
+                .reverse();
+
+            const fullText = textLines.join('\n');
+
+            const tempArea = document.createElement('textarea');
+            tempArea.value = fullText;
+            tempArea.style.position = 'fixed';
+            tempArea.style.left = '-9999px';
+            tempArea.style.top = '-9999px';
+            document.body.appendChild(tempArea);
+            tempArea.focus();
+            tempArea.select();
+
+            try {
+                document.execCommand('copy');
+
+                const btnText = document.getElementById('copyLogText');
+                const btnIcon = document.querySelector('#copyLogBtn i');
+
+                if (btnIcon) btnIcon.className = 'fa-solid fa-check text-emerald-400';
+                if (btnText) {
+                    btnText.innerText = 'Tersalin!';
+                    btnText.classList.add('text-emerald-400');
+                }
+
+                setTimeout(() => {
+                    if (btnIcon) btnIcon.className = 'fa-solid fa-copy';
+                    if (btnText) {
+                        btnText.innerText = 'Salin';
+                        btnText.classList.remove('text-emerald-400');
+                    }
+                }, 2000);
+            } catch (err) {
+                console.error('Gagal menyalin log:', err);
+            } finally {
+                document.body.removeChild(tempArea);
+            }
+        }
+
         function openModal(id) {
             document.getElementById(id).classList.remove('hidden');
             document.getElementById(id).classList.add('flex');
         }
 
         function closeModal(id) {
+            stopCardTimer();
             document.getElementById(id).classList.add('hidden');
             document.getElementById(id).classList.remove('flex');
         }
@@ -1382,6 +1656,10 @@
         function saveSettings() {
             const url = document.getElementById('sheetsApiUrlInput').value.trim();
             gameState.sheetsUrl = url;
+            try {
+                localStorage.setItem('ut_sheets_url', url);
+            } catch (err) { console.error(err); }
+
             closeModal('settingsModal');
             addLog(url ? 'URL Google Sheets tersimpan!' : 'Google Sheets dinonaktifkan.');
         }
@@ -1406,6 +1684,59 @@
             document.getElementById('gameScreen').classList.remove('flex');
             document.getElementById('lobbyScreen').classList.remove('hidden');
             initLobbyInputs();
+        }
+
+        // CONFETTI ANIMATION ENGINE
+        function triggerConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f43f5e', '#ec4899', '#a855f7', '#3b82f6', '#10b981', '#f59e0b'];
+
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vy: Math.random() * 3 + 2,
+                    vx: Math.random() * 2 - 1,
+                    rot: Math.random() * 360,
+                    vRot: Math.random() * 6 - 3
+                });
+            }
+
+            let animationFrame;
+            let startTime = Date.now();
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(p => {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    p.rot += p.vRot;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (Date.now() - startTime < 4000) {
+                    animationFrame = requestAnimationFrame(render);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            render();
         }
     </script>
 </body>
