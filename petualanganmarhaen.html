@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Marhaen: Game Penyadaran Ideologi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            user-select: none;
+            overflow-x: hidden;
+        }
+        .font-pixel {
+            font-family: 'Press Start 2P', monospace;
+        }
+        canvas {
+            image-rendering: pixelated;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+        .retro-border {
+            border: 4px solid #b45309;
+            box-shadow: inset 0 0 0 4px #78350f, 0 10px 15px -3px rgba(0, 0, 0, 0.7);
+        }
+        .retro-box {
+            background: #1e293b;
+            border: 3px solid #334155;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-2 md:p-6 bg-slate-950">
+
+    <!-- Header -->
+    <header class="w-full max-w-5xl mb-4 flex flex-wrap justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center text-amber-100 font-bold text-xl shadow">
+                <i class="fa-solid fa-wheat-awn"></i>
+            </div>
+            <div>
+                <h1 class="text-lg md:text-xl font-bold tracking-wide text-amber-400 font-pixel">PETUALANGAN MARHAEN</h1>
+                <p class="text-xs text-slate-400">Penyadaran Ideologi, Perjuangan Rakyat & Anti-Imperialisme</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3 mt-2 sm:mt-0">
+            <button id="btn-inventory" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-2 transition">
+                <i class="fa-solid fa-box-archive"></i>
+                <span id="inv-count">Barang (0)</span>
+            </button>
+            <button id="btn-codex" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-2 transition">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>Jurnal Ideologi</span>
+            </button>
+            <button id="btn-audio" class="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center border border-slate-700 transition">
+                <i id="audio-icon" class="fa-solid fa-volume-high"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl flex flex-col items-center gap-4 relative">
+        <!-- Status Bar -->
+        <div class="w-full bg-slate-900/90 border border-slate-800 rounded-xl p-3 grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800 col-span-2 md:col-span-1">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Bab Perjuangan</span>
+                <span id="current-chapter-title" class="font-bold text-amber-400">Bab 1: Sawah Bandung</span>
+            </div>
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Kesadaran Ideologi</span>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full mt-1 overflow-hidden">
+                    <div id="meter-kesadaran" class="bg-amber-500 h-full w-[10%] transition-all duration-500"></div>
+                </div>
+            </div>
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Semangat Massa Aksi</span>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full mt-1 overflow-hidden">
+                    <div id="meter-massa" class="bg-rose-500 h-full w-[0%] transition-all duration-500"></div>
+                </div>
+            </div>
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Keberanian Retorika</span>
+                <span id="stat-retorika" class="font-bold text-cyan-400">Lv. 1 (Kader)</span>
+            </div>
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[10px] uppercase font-semibold">Rakyat Teruji</span>
+                <span id="stat-people-count" class="font-bold text-emerald-400">0 Golongan</span>
+            </div>
+        </div>
+
+        <!-- Quest Objective Banner -->
+        <div id="quest-tracker" class="w-full bg-amber-950/40 border border-amber-500/40 rounded-xl px-4 py-2.5 flex items-center justify-between text-xs text-amber-200">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-bullseye text-amber-400 animate-pulse"></i>
+                <span class="font-pixel text-[10px] text-amber-400">MISI TUGAS:</span>
+                <span id="quest-desc-text">Temui Pak Marhaen di pematang sawah dan gali kesadarannya!</span>
+            </div>
+            <span id="quest-item-hint" class="text-[11px] text-slate-400 hidden md:inline">💡 Cari item raksasa 📦 di peta untuk bonus!</span>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="relative w-full aspect-[4/3] max-h-[500px] bg-black rounded-xl overflow-hidden border-2 border-slate-800 shadow-2xl">
+            <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+
+            <!-- Dialogue Overlay -->
+            <div id="dialogue-box" class="hidden absolute bottom-4 left-4 right-4 bg-slate-900/95 border-2 border-amber-500/80 rounded-xl p-4 shadow-2xl backdrop-blur-md">
+                <div class="flex items-start gap-3">
+                    <div id="dialogue-portrait" class="w-12 h-12 bg-amber-900/50 border border-amber-500 rounded-lg flex-shrink-0 flex items-center justify-center text-2xl text-amber-300">
+                        👨‍🌾
+                    </div>
+                    <div class="flex-grow">
+                        <h4 id="dialogue-speaker" class="font-pixel text-xs text-amber-400 mb-1">Pak Marhaen</h4>
+                        <p id="dialogue-text" class="text-sm text-slate-200 leading-relaxed font-sans mb-3 min-h-[40px]"></p>
+                        <div id="dialogue-choices" class="flex flex-col gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini-Game Orasi / Propaganda Overlay -->
+            <div id="orasi-box" class="hidden absolute inset-4 bg-slate-950/95 border-2 border-amber-500/80 rounded-xl p-5 flex flex-col justify-between backdrop-blur-md overflow-y-auto">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="px-2.5 py-1 bg-amber-950 text-amber-400 border border-amber-700 rounded font-pixel text-[10px]">PANGGUNG ORASI MASSA</span>
+                        <span class="text-xs text-slate-400 font-semibold">Gelorakan Semangat Perjuangan!</span>
+                    </div>
+                    <p id="orasi-prompt" class="text-sm text-slate-200 mb-3 font-semibold bg-slate-900 p-3 rounded-lg border border-slate-800"></p>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-amber-300 mb-1">
+                            <span>Dukungan Sorak Massa:</span>
+                            <span id="orasi-massa-val">50%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                            <div id="orasi-massa-bar" class="bg-gradient-to-r from-amber-500 to-rose-500 h-full w-[50%] transition-all duration-300"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="orasi-options" class="flex flex-col gap-2"></div>
+            </div>
+
+            <!-- Quiz / Debate Overlay -->
+            <div id="quiz-box" class="hidden absolute inset-4 bg-slate-950/95 border-2 border-rose-500/80 rounded-xl p-6 flex flex-col justify-between backdrop-blur-md overflow-y-auto">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="px-2.5 py-1 bg-rose-950 text-rose-400 border border-rose-800 rounded font-pixel text-[10px]">DEBAT IDEOLOGI</span>
+                        <span id="quiz-chapter-tag" class="text-xs text-slate-400 font-semibold">Ujian Penyadaran</span>
+                    </div>
+                    <h3 id="quiz-question" class="text-base md:text-lg font-bold text-slate-100 mb-4"></h3>
+                    <p id="quiz-context" class="text-xs text-slate-400 mb-4 italic leading-relaxed bg-slate-900 p-3 rounded-lg border border-slate-800"></p>
+                </div>
+                <div id="quiz-options" class="flex flex-col gap-2.5"></div>
+            </div>
+
+            <!-- Chapter Clear Modal Overlay -->
+            <div id="chapter-clear-box" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center backdrop-blur-lg">
+                <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-3xl mb-3 border border-amber-500/50">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h2 id="chapter-clear-title" class="font-pixel text-lg text-amber-400 mb-2">BAB SELESAI!</h2>
+                <p id="chapter-clear-desc" class="text-sm text-slate-300 max-w-md mb-6 leading-relaxed"></p>
+                <button id="btn-next-chapter" class="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold rounded-xl font-pixel text-xs shadow-lg transition">
+                    LANJUTKAN PERJUANGAN <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="w-full max-w-5xl flex flex-wrap items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-4 rounded-xl">
+            <!-- D-Pad Buttons for Mobile & Touch -->
+            <div class="grid grid-cols-3 gap-2 w-36 h-36">
+                <div></div>
+                <button id="btn-up" class="bg-slate-800 hover:bg-slate-700 active:bg-amber-600 text-slate-200 border border-slate-700 rounded-lg flex items-center justify-center font-bold text-lg shadow">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <div></div>
+                <button id="btn-left" class="bg-slate-800 hover:bg-slate-700 active:bg-amber-600 text-slate-200 border border-slate-700 rounded-lg flex items-center justify-center font-bold text-lg shadow">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="flex items-center justify-center text-slate-500 font-pixel text-[9px]">MOVE</div>
+                <button id="btn-right" class="bg-slate-800 hover:bg-slate-700 active:bg-amber-600 text-slate-200 border border-slate-700 rounded-lg flex items-center justify-center font-bold text-lg shadow">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <div></div>
+                <button id="btn-down" class="bg-slate-800 hover:bg-slate-700 active:bg-amber-600 text-slate-200 border border-slate-700 rounded-lg flex items-center justify-center font-bold text-lg shadow">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div></div>
+            </div>
+
+            <!-- Keyboard Hint & Action Button -->
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="text-xs text-slate-400 hidden sm:block">
+                    <p class="font-semibold text-slate-300 mb-1">Kontrol Keyboard:</p>
+                    <p><kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-amber-400 font-mono">W A S D</kbd> / <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-amber-400 font-mono">Panah</kbd> Gerak</p>
+                    <p class="mt-0.5"><kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-amber-400 font-mono">Space</kbd> / <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-amber-400 font-mono">Enter</kbd> Interaksi</p>
+                </div>
+                <button id="btn-action" class="px-5 py-3.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 active:scale-95 text-slate-950 font-bold rounded-xl font-pixel text-xs shadow-lg flex items-center gap-2 transition">
+                    <i class="fa-solid fa-comments text-base"></i> INTERAKSI
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification Toast Alert -->
+    <div id="custom-alert" class="hidden fixed top-5 right-5 z-50 max-w-sm bg-slate-900 border-2 border-amber-500 text-slate-100 p-4 rounded-xl shadow-2xl flex items-start gap-3 transition-all duration-300">
+        <i id="alert-icon" class="fa-solid fa-circle-info text-amber-400 text-xl mt-0.5"></i>
+        <div>
+            <h4 id="alert-title" class="font-bold text-amber-400 text-xs font-pixel mb-1"></h4>
+            <p id="alert-msg" class="text-xs text-slate-300 leading-relaxed"></p>
+        </div>
+    </div>
+
+    <!-- Codex / Journal Modal -->
+    <div id="codex-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl max-h-[85vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+                <h3 class="font-pixel text-xs text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-sm"></i> JURNAL MARHAENISME & KAMUS PERJUANGAN
+                </h3>
+                <button id="btn-close-codex" class="text-slate-400 hover:text-white text-lg px-2">&times;</button>
+            </div>
+            <div id="codex-content" class="p-6 overflow-y-auto space-y-4 text-sm text-slate-300">
+                <!-- Codex Content populated dynamically -->
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-slate-950 text-right">
+                <button id="btn-close-codex-2" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold">Tutup Jurnal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="inventory-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+                <h3 class="font-pixel text-xs text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-box-open text-sm"></i> INVENTARIS PERALATAN & DOKUMEN
+                </h3>
+                <button id="btn-close-inv" class="text-slate-400 hover:text-white text-lg px-2">&times;</button>
+            </div>
+            <div id="inventory-list" class="p-4 overflow-y-auto max-h-[60vh] space-y-3">
+                <!-- Inventory Items -->
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-slate-950 text-right">
+                <button id="btn-close-inv-2" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold">Kembali ke Petualangan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Audio Synthesizer using Web Audio API
+        const AudioSys = {
+            ctx: null,
+            enabled: true,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playBeep(freq = 440, type = 'sine', duration = 0.1) {
+                if (!this.enabled) return;
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e){}
+            },
+            playSuccess() {
+                this.playBeep(523.25, 'triangle', 0.1);
+                setTimeout(() => this.playBeep(659.25, 'triangle', 0.1), 100);
+                setTimeout(() => this.playBeep(783.99, 'triangle', 0.2), 200);
+            },
+            playError() {
+                this.playBeep(220, 'sawtooth', 0.15);
+                setTimeout(() => this.playBeep(180, 'sawtooth', 0.25), 150);
+            },
+            playCheer() {
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => this.playBeep(400 + Math.random() * 400, 'triangle', 0.12), i * 80);
+                }
+            }
+        };
+
+        // Expanded 6 Chapter Story Data
+        const STORY_DATA = [
+            {
+                id: 1,
+                title: "Bab 1: Dialektika Sawah Bandung (1927)",
+                desc: "Soekarno berjalan di pematang sawah dan bertemu seorang petani bernama Pak Marhaen. Di sinilah akar pemikiran Marhaenisme lahir dari pemahaman kondisi objektif rakyat kecil.",
+                objective: "Temui Pak Marhaen & Bi Asnah, lalu temukan 'Pacul Tua' di dekat sawah!",
+                mapType: 'ricefield',
+                playerStart: { x: 2, y: 6 },
+                items: [
+                    { id: 'pacul', x: 10, y: 8, name: "Pacul Tua Marhaen", sprite: "⛏️", desc: "Simbol kepemilikan alat produksi milik sendiri yang tetap dimelaratkan oleh struktur kapitalisme kolonial." }
+                ],
+                npcs: [
+                    {
+                        id: 'marhaen',
+                        x: 8, y: 6,
+                        name: "Pak Marhaen",
+                        role: "Petani Miskin",
+                        sprite: "👨‍🌾",
+                        dialogue: [
+                            "Sampurasun, pemuda... Saya sedang mencangkul tanah sawah ini.",
+                            "Tanah ini milik saya sendiri! Pacul ini milik saya! Hasil cangkulan ini untuk keluarga saya sendiri!",
+                            "Tapi anehnya... walau punya modal dan alat produksi sendiri, hidup saya tetap sengsara dan miskin.",
+                            "Sistem imperialisme dan kapitalisme kolonial membuat hasil kami terserap habis oleh pasar yang tidak adil."
+                        ],
+                        quiz: {
+                            question: "Apa kesimpulan utama Bung Karno dari dialog bersama Pak Marhaen?",
+                            context: "Pak Marhaen memiliki alat (pacul) dan tanah sendiri, bukan milik orang lain, tetapi ia tetap miskin.",
+                            options: [
+                                { text: "Marhaen berbeda dengan Proletar Barat. Marhaen mencakup kaum melarat yang punya alat sendiri tapi tetap dimelaratkan sistem.", correct: true, insight: "Tepat! Marhaenisme mengacu pada kaum tani kecil, pedagang kecil, nelayan kecil yang dimelaratkan oleh kapitalisme & kolonialisme." },
+                                { text: "Pak Marhaen miskin karena malas bekerja dan kurang menabung.", correct: false, insight: "Salah! Bung Karno menegaskan bahwa struktur imperialisme dan kapitalismelah yang memiskinkan rakyat." },
+                                { text: "Pak Marhaen adalah seorang buruh pabrik industri kota.", correct: false, insight: "Salah! Pak Marhaen adalah petani pemilik alat sendiri di pedesaan." }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'pedagang',
+                        x: 13, y: 3,
+                        name: "Bi Asnah",
+                        role: "Pedagang Kecil Pasar",
+                        sprite: "🧺",
+                        dialogue: [
+                            "Saya jualan hasil kebun kecil-kecilan di pasar kota Bandung.",
+                            "Semua modal milik saya sendiri, tapi keuntungan tergerus tuan tanah dan tengkulak besar.",
+                            "Apakah perjuangan anak muda bisa membebaskan kami dari jeratan tengkulak?"
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Bab 2: Suluh Politik & Propaganda PNI (1928)",
+                desc: "Bung Karno mendirikan Partai Nasional Indonesia (PNI) untuk menggembleng massa aksi Marhaen melalui kursus politik dan distribusi pamplet propaganda.",
+                objective: "Ambil 'Pamflet PNI' lalu lakukan Orasi Aksi untuk membakar semangat pemuda!",
+                mapType: 'urban',
+                playerStart: { x: 2, y: 7 },
+                items: [
+                    { id: 'pamflet', x: 5, y: 2, name: "Pamflet Banteng PNI", sprite: "📜", desc: "Selebaran propaganda berisi ajakan persatuan nasional kaum Marhaen menentang Belanda." }
+                ],
+                npcs: [
+                    {
+                        id: 'orasi_stage',
+                        x: 8, y: 4,
+                        name: "Panggung Aksi Massa",
+                        role: "Mimbar Propaganda",
+                        sprite: "📢",
+                        dialogue: [
+                            "Massa rakyat berkumpul menantikan pidato membakar semangat dari kader Marhaenis!",
+                            "Mari serukan pesan persatuan nasional di atas panggung aksi ini!"
+                        ],
+                        orasi: {
+                            prompt: "Pilih seruan orasi yang paling tepat untuk membakar kesadaran massa Marhaen!",
+                            lines: [
+                                { text: "Rakyat Indonesia! Kita bukan bangsa tempe! Kita harus bersatu padu menghancurkan kapitalisme kolonial!", impact: 35, insight: "Massa bersorak gemuruh! Semangat persatuan meningkat!" },
+                                { text: "Mari kita pasrah saja menunggu bantuan dari pemerintah Hindia Belanda.", impact: -20, insight: "Massa kecewa! Sikap kompromis meruntuhkan semangat perjuangan." },
+                                { text: "Kaum Tani, Buruh, Nelayan! Kalian adalah pilar kekuatan Sosio-Demokrasi Indonesia!", impact: 30, insight: "Rakyat kecil merasa diakui dan siap berjuang bersama!" }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'kader_muda',
+                        x: 13, y: 7,
+                        name: "Bambang",
+                        role: "Kader Pemuda PNI",
+                        sprite: "🧢",
+                        dialogue: [
+                            "Bung! Kursus politik kita dihadiri ratusan pemuda dan buruh kereta api!",
+                            "Mereka sudah tidak mau lagi tunduk pada hukum kolonial yang berat sebelah."
+                        ],
+                        quiz: {
+                            question: "Apa asas perjuangan utama yang diusung PNI dalam menggalang kaum Marhaen?",
+                            context: "PNI menolak bekerja sama dalam dewan buatan kolonial (Volksraad).",
+                            options: [
+                                { text: "Self-Reliance (Mencapai kemerdekaan atas kekuatan sendiri) & Non-Koperasi.", correct: true, insight: "Benar! Marhaenisme menolak pengabdian pada sistem kolonial dan percaya penuh pada kekuatan massa mandiri." },
+                                { text: "Meminta belas kasihan dan reformasi bertahap dari Ratu Belanda.", correct: false, insight: "Salah! Marhaenisme bersifat radikal non-koperatif terhadap penjajah." },
+                                { text: "Mengabaikan rakyat miskin dan fokus berkoalisi dengan tuan tanah.", correct: false, insight: "Salah! Marhaenisme memprioritaskan penyadaran rakyat melarat." }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Bab 3: Indonesia Menggugat di Landraad (1930)",
+                desc: "Soekarno diadili di Pengadilan Kolonial Bandung. Pembelaan 'Indonesia Menggugat' membedakan secara tegas konsep Marhaen dengan Proletar Barat.",
+                objective: "Dapatkan 'Naskah Menggugat' dan hadapi Hakim Kolonial dalam Debat Ideologi!",
+                mapType: 'court',
+                playerStart: { x: 2, y: 7 },
+                items: [
+                    { id: 'naskah_menggugat', x: 12, y: 2, name: "Naskah Indonesia Menggugat", sprite: "📕", desc: "Dokumen pledoi bersejarah yang membongkar kebusukan imperialisme dan kejahatan hukum kolonial Belanda." }
+                ],
+                npcs: [
+                    {
+                        id: 'hakim_kolonial',
+                        x: 8, y: 3,
+                        name: "Hakim Siegenbeek",
+                        role: "Penguasa Landraad",
+                        sprite: "👨‍⚖️",
+                        dialogue: [
+                            "Saudara Soekarno! Ajaran Marhaenisme Anda dituduh menghasut dan merusak ketertiban Hindia Belanda!",
+                            "Mengapa Anda tidak memakai istilah Proletar sebagaimana ajaran sosialis Barat?"
+                        ],
+                        quiz: {
+                            question: "Bagaimana 'Indonesia Menggugat' membedakan Marhaen dan Proletar Barat?",
+                            context: "Masyarakat Indonesia saat itu mayoritas adalah petani kecil, bukan buruh industri pabrik.",
+                            options: [
+                                { text: "Indonesia belum terindustrialisasi; Marhaen mencakup 95% rakyat melarat (tani, buruh, nelayan, pedagang kecil).", correct: true, insight: "Luar biasa! Marhaenisme mencakup spektrum rakyat miskin yang jauh lebih luas dari sekadar buruh pabrik industri." },
+                                { text: "Marhaenisme hanya memperjuangkan kaum borjuis nasional.", correct: false, insight: "Salah! Marhaenisme memihak wong cilik yang tersingkir." },
+                                { text: "Proletar dan Marhaen adalah istilah yang persis sama tanpa perbedaan.", correct: false, insight: "Kurang tepat! Bung Karno membedakannya secara tajam sesuai kondisi objektif Indonesia." }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'nelayan',
+                        x: 13, y: 7,
+                        name: "Mang Ujang",
+                        role: "Pelayar & Nelayan Kecil",
+                        sprite: "🚣",
+                        dialogue: [
+                            "Perahu saya kecil, dayung punya sendiri. Tapi laut dikuasai kapal raksasa asing.",
+                            "Kami siap bersatu mendukung pembelaan Bung Karno demi kemerdekaan nasional!"
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Bab 4: Jembatan Emas & Perumusan Pancasila (1945)",
+                desc: "Di sidang BPUPKI 1 Juni 1945, Pancasila dirumuskan. Kemerdekaan adalah 'Jembatan Emas' untuk membangun keadilan sosial bagi kaum Marhaen.",
+                objective: "Cari 'Pena Emas BPUPKI' dan buktikan pemahaman Trisila & Ekasila!",
+                mapType: 'bpupki',
+                playerStart: { x: 3, y: 6 },
+                items: [
+                    { id: 'pena_bpupki', x: 6, y: 2, name: "Pena Emas BPUPKI", sprite: "🖋️", desc: "Pena simbolis perumusan falsafah dasar negara Pancasila 1 Juni 1945." }
+                ],
+                npcs: [
+                    {
+                        id: 'bpupki_member',
+                        x: 9, y: 4,
+                        name: "Anggota BPUPKI",
+                        role: "Tokoh Perumus Dasar Negara",
+                        sprite: "🏛️",
+                        dialogue: [
+                            "Kemerdekaan adalah pintu gerbang menuju masyarakat adil dan makmur.",
+                            "Bung Karno menyebut kemerdekaan ini sebagai 'Jembatan Emas' menuju Sosio-Demokrasi."
+                        ],
+                        quiz: {
+                            question: "Apabila Pancasila diperas menjadi Trisila, apa saja pilar utamanya?",
+                            context: "Dokumen Pidato 1 Juni 1945 mencatat pemerasan Pancasila menjadi Trisila dan Ekasila.",
+                            options: [
+                                { text: "Sosio-Nasionalisme, Sosio-Demokrasi, dan Ketuhanan yang Berkebudayaan.", correct: true, insight: "Benar! Sosio-Nasionalisme menggabungkan kebangsaan & perikemanusiaan; Sosio-Demokrasi menggabungkan demokrasi politik & ekonomi." },
+                                { text: "Kapitalisme, Feodalisme, dan Imperialisme.", correct: false, insight: "Salah! Itu adalah tiga musuh yang ingin dihancurkan oleh Marhaenisme." },
+                                { text: "Monarki, Oligarki, dan Diktatur.", correct: false, insight: "Salah! Marhaenisme menentang segala bentuk kediktatoran." }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Bab 5: Dekrit & Demokrasi Terpimpin (1959)",
+                desc: "Menghadapi kemacetan sistem liberal, Bung Karno menyerukan 'Shaping and Re-shaping' dengan melibatkan golongan fungsional (buruh & tani) dalam Dewan Nasional.",
+                objective: "Lakukan Orasi di Dewan Nasional dan uji pemahaman Demokrasi Ekonomi!",
+                mapType: 'palace',
+                playerStart: { x: 2, y: 6 },
+                items: [
+                    { id: 'dekrit_doc', x: 13, y: 8, name: "Dokumen Dekrit Presiden 1959", sprite: "📜", desc: "Keputusan kembali ke UUD 1945 demi menyelamatkan revolusi dari ancaman liberalisme politik." }
+                ],
+                npcs: [
+                    {
+                        id: 'orasi_dewan',
+                        x: 7, y: 3,
+                        name: "Mimbar Dewan Nasional",
+                        role: "Representasi Golongan Fungsional",
+                        sprite: "🏛️",
+                        dialogue: [
+                            "Di hadapan perwakilan buruh, tani, pemuda, dan ulama, tegaskan arah Demokrasi Ekonomi!"
+                        ],
+                        orasi: {
+                            prompt: "Apa pesan utama politik ekonomi Marhaenis di hadapan Dewan Nasional?",
+                            lines: [
+                                { text: "Demokrasi Politik tanpa Demokrasi Ekonomi adalah kebohongan! Perut rakyat tidak bisa diisi dengan suara pemilu saja!", impact: 40, insight: "Sorak riuh perwakilan tani dan buruh memenuhi ruangan!" },
+                                { text: "Serahkan semua aset strategis bangsa kepada korporasi swasta asing.", impact: -30, insight: "Gedung menjadi gempar! Ide tersebut bertentangan dengan pasal 33 UUD 1945." }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'elit_penentang',
+                        x: 12, y: 5,
+                        name: "Politisi Liberal",
+                        role: "Tokoh Penentang Re-Shaping",
+                        sprite: "🎩",
+                        dialogue: [
+                            "Mengapa harus menyertakan golongan fungsional tani dan buruh secara langsung dalam pemerintahan?"
+                        ],
+                        quiz: {
+                            question: "Mengapa Bung Karno mengkritik keras Demokrasi Liberal/Parlementer?",
+                            context: "Sistem liberal hanya memberi kebebasan politik prosedural tetapi membiarkan rakyat miskin tertindas secara ekonomi.",
+                            options: [
+                                { text: "Karena demokrasi liberal hanya melayani kaum kapitalis; Marhaen butuh Demokrasi Ekonomi (Sama Rasa Sama Rata).", correct: true, insight: "Hebat! Bung Karno menegaskan Demokrasi Marhaenis harus menyatu antara kebebasan politik dan kesejahteraan perut rakyat." },
+                                { text: "Karena beliau ingin mendirikan kerajaan feodal baru.", correct: false, insight: "Salah! Marhaenisme sangat anti-feodalisme." },
+                                { text: "Karena petani tidak membutuhkan hak bersuara.", correct: false, insight: "Salah! Marhaenisme justru memperjuangkan hak suara penuh rakyat kecil." }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Bab 6: Gelora Nefos & Anti-Imperialisme (1963)",
+                desc: "Marhaenisme berkembang dari skala nasional menuju perjuangan internasional: Menggalang New Emerging Forces (Nefos) menumbangkan Old Established Forces (Oldefos).",
+                objective: "Selesaikan Orasi Puncak KAA & kuasai Pemikiran Marhaenis Global!",
+                mapType: 'kaa',
+                playerStart: { x: 2, y: 6 },
+                items: [
+                    { id: 'peta_kaa', x: 14, y: 2, name: "Peta Bandung Spirit 1955", sprite: "🗺️", desc: "Peta solidaritas bangsa-bangsa Asia-Afrika dan Amerika Latin melawan neo-kolonialisme." }
+                ],
+                npcs: [
+                    {
+                        id: 'orasi_kaa',
+                        x: 8, y: 4,
+                        name: "Podium Konferensi Nefos",
+                        role: "Mimbar Anti-Imperialisme World",
+                        sprite: "🌍",
+                        dialogue: [
+                            "Delegasi dari seluruh dunia berkembang berkumpul mendengarkan pidato Marhaenisme Global!"
+                        ],
+                        orasi: {
+                            prompt: "Suarakan seruan penutup bagi tatanan dunia baru yang adil!",
+                            lines: [
+                                { text: "To Build the World Anew! Hapuskan Neo-kolonialisme dan Imperialisme dari muka bumi!", impact: 50, insight: "Seluruh delegasi Asia-Afrika berdiri memberikan standing ovation!" },
+                                { text: "Biarkan negara-negara miskin terus dijajah dan dieksploitasi sumber dayanya.", impact: -40, insight: "Delegasi tercengang tidak percaya." }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'delegasi_afrika',
+                        x: 12, y: 7,
+                        name: "Kader Perjuangan Afrika",
+                        role: "Delegasi Sahabat",
+                        sprite: "🤝",
+                        dialogue: [
+                            "Ajaran Marhaenisme Bung Karno memberi inspirasi bagi kemerdekaan bangsa kami di Afrika!"
+                        ],
+                        quiz: {
+                            question: "Apa kontribusi terbesar Marhaenisme bagi perjuangan bangsa-bangsa terjajah di dunia?",
+                            context: "Semangat Dasasila Bandung dan pembentukan wadah NEFOS (New Emerging Forces).",
+                            options: [
+                                { text: "Menjadikan Bandung sebagai ibu kota solidaritas anti-kolonialisme & neo-imperialisme di dunia.", correct: true, insight: "Sempurna! Marhaenisme terbukti menjadi doktrin pembebasan tidak hanya untuk Indonesia tetapi untuk seluruh bangsa terjajah." },
+                                { text: "Mendukung penjarahan negara-negara berkembang oleh kekuatan asing.", correct: false, insight: "Salah! Marhaenisme berdiri di garis paling depan menentang penindasan asing." },
+                                { text: "Menyarankan negara berkembang untuk tunduk pada kekuatan Oldefos.", correct: false, insight: "Salah! Marhaenisme menentang Oldefos (Old Established Forces)." }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let currentChapterIndex = 0;
+        let player = { x: 2, y: 6, sprite: "🚩", inventory: [] };
+        let gameState = 'EXPLORE'; // 'EXPLORE', 'DIALOGUE', 'QUIZ', 'ORASI', 'CLEAR'
+        let currentNPC = null;
+        let dialogueIndex = 0;
+
+        // Stats
+        let kesadaranScore = 10;
+        let massaScore = 0;
+        let retorikaLevel = 1;
+        let testedNPCs = new Set();
+
+        const TILE_SIZE = 40;
+        const MAP_WIDTH = 16;
+        const MAP_HEIGHT = 10;
+
+        function initCanvas() {
+            canvas.width = MAP_WIDTH * TILE_SIZE;
+            canvas.height = MAP_HEIGHT * TILE_SIZE;
+        }
+
+        function drawMap() {
+            const ch = STORY_DATA[currentChapterIndex];
+            
+            // Draw Ground & Decor Tiles
+            for (let r = 0; r < MAP_HEIGHT; r++) {
+                for (let c = 0; c < MAP_WIDTH; c++) {
+                    if (ch.mapType === 'ricefield') {
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#15803d' : '#166534';
+                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                        if ((c + r * 3) % 5 === 0) {
+                            ctx.fillStyle = '#84cc16';
+                            ctx.fillText('🌾', c * TILE_SIZE + 10, r * TILE_SIZE + 28);
+                        }
+                    } else if (ch.mapType === 'urban') {
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#334155' : '#475569';
+                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    } else if (ch.mapType === 'court') {
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#1e293b' : '#0f172a';
+                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    } else if (ch.mapType === 'bpupki') {
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#78350f' : '#451a03';
+                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    } else if (ch.mapType === 'palace') {
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#0284c7' : '#0369a1';
+                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    } else { // KAA
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#b45309' : '#854d0e';
+                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    }
+
+                    // Borders / Walls
+                    if (r === 0 || r === MAP_HEIGHT - 1 || c === 0 || c === MAP_WIDTH - 1) {
+                        ctx.fillStyle = '#090d16';
+                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    }
+                }
+            }
+
+            // Draw Road/Path
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(0, 6 * TILE_SIZE, MAP_WIDTH * TILE_SIZE, TILE_SIZE);
+
+            // Draw Collectible Items
+            if (ch.items) {
+                ch.items.forEach(item => {
+                    if (!player.inventory.some(i => i.id === item.id)) {
+                        ctx.font = '22px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(item.sprite, item.x * TILE_SIZE + TILE_SIZE / 2, item.y * TILE_SIZE + TILE_SIZE / 2);
+                        
+                        // Glow ring around items
+                        ctx.strokeStyle = '#f59e0b';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.arc(item.x * TILE_SIZE + TILE_SIZE / 2, item.y * TILE_SIZE + TILE_SIZE / 2, 16, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                });
+            }
+
+            // Draw NPCs
+            ch.npcs.forEach(npc => {
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(npc.sprite, npc.x * TILE_SIZE + TILE_SIZE / 2, npc.y * TILE_SIZE + TILE_SIZE / 2);
+                
+                // Name Tag
+                ctx.font = '10px "Plus Jakarta Sans"';
+                ctx.fillStyle = '#fef08a';
+                ctx.fillText(npc.name, npc.x * TILE_SIZE + TILE_SIZE / 2, npc.y * TILE_SIZE - 6);
+            });
+
+            // Draw Player
+            ctx.font = '26px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(player.sprite, player.x * TILE_SIZE + TILE_SIZE / 2, player.y * TILE_SIZE + TILE_SIZE / 2);
+        }
+
+        function movePlayer(dx, dy) {
+            if (gameState !== 'EXPLORE') return;
+
+            const newX = player.x + dx;
+            const newY = player.y + dy;
+
+            // Collision check with map borders
+            if (newX <= 0 || newX >= MAP_WIDTH - 1 || newY <= 0 || newY >= MAP_HEIGHT - 1) return;
+
+            // Item pickup check
+            const ch = STORY_DATA[currentChapterIndex];
+            if (ch.items) {
+                const itemIdx = ch.items.findIndex(i => i.x === newX && i.y === newY && !player.inventory.some(inv => inv.id === i.id));
+                if (itemIdx !== -1) {
+                    const foundItem = ch.items[itemIdx];
+                    player.inventory.push(foundItem);
+                    AudioSys.playSuccess();
+                    showAlert("ITEM DITEMUKAN!", `${foundItem.name}: ${foundItem.desc}`, "fa-box-open text-emerald-400");
+                    updateInventoryUI();
+                }
+            }
+
+            // Collision check with NPCs
+            const hitNPC = ch.npcs.find(n => n.x === newX && n.y === newY);
+            if (hitNPC) {
+                triggerNPCInteraction(hitNPC);
+                return;
+            }
+
+            player.x = newX;
+            player.y = newY;
+            AudioSys.playBeep(300, 'sine', 0.05);
+            drawMap();
+        }
+
+        function triggerNPCInteraction(npc) {
+            currentNPC = npc;
+            gameState = 'DIALOGUE';
+            dialogueIndex = 0;
+            showDialogueBox();
+        }
+
+        function showDialogueBox() {
+            const dialogueBox = document.getElementById('dialogue-box');
+            const speakerEl = document.getElementById('dialogue-speaker');
+            const portraitEl = document.getElementById('dialogue-portrait');
+            const textEl = document.getElementById('dialogue-text');
+            const choicesEl = document.getElementById('dialogue-choices');
+
+            dialogueBox.classList.remove('hidden');
+            speakerEl.innerText = `${currentNPC.name} (${currentNPC.role})`;
+            portraitEl.innerText = currentNPC.sprite;
+            textEl.innerText = currentNPC.dialogue[dialogueIndex];
+
+            choicesEl.innerHTML = '';
+
+            if (dialogueIndex < currentNPC.dialogue.length - 1) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = "w-full py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs font-pixel transition";
+                nextBtn.innerHTML = 'LANJUT DIALOG <i class="fa-solid fa-chevron-right ml-1"></i>';
+                nextBtn.onclick = () => {
+                    dialogueIndex++;
+                    showDialogueBox();
+                    AudioSys.playBeep(500, 'sine', 0.05);
+                };
+                choicesEl.appendChild(nextBtn);
+            } else {
+                // End of dialogue options
+                if (currentNPC.orasi && !testedNPCs.has(currentNPC.id + '_orasi')) {
+                    const orasiBtn = document.createElement('button');
+                    orasiBtn.className = "w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs font-pixel shadow transition flex items-center justify-center gap-2";
+                    orasiBtn.innerHTML = '<i class="fa-solid fa-bullhorn"></i> MULAI ORASI PROPAGANDA';
+                    orasiBtn.onclick = () => {
+                        dialogueBox.classList.add('hidden');
+                        startOrasiMiniGame(currentNPC.orasi);
+                    };
+                    choicesEl.appendChild(orasiBtn);
+                } else if (currentNPC.quiz && !testedNPCs.has(currentNPC.id)) {
+                    const quizBtn = document.createElement('button');
+                    quizBtn.className = "w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs font-pixel shadow transition flex items-center justify-center gap-2";
+                    quizBtn.innerHTML = '<i class="fa-solid fa-brain"></i> UJI PENYADARAN IDEOLOGI';
+                    quizBtn.onclick = () => {
+                        dialogueBox.classList.add('hidden');
+                        startQuiz(currentNPC.quiz);
+                    };
+                    choicesEl.appendChild(quizBtn);
+                } else {
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = "w-full py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-semibold transition";
+                    closeBtn.innerText = 'Tutup Dialog';
+                    closeBtn.onclick = closeDialogue;
+                    choicesEl.appendChild(closeBtn);
+                }
+            }
+        }
+
+        function closeDialogue() {
+            document.getElementById('dialogue-box').classList.add('hidden');
+            gameState = 'EXPLORE';
+            drawMap();
+        }
+
+        function startOrasiMiniGame(orasi) {
+            gameState = 'ORASI';
+            const orasiBox = document.getElementById('orasi-box');
+            const promptEl = document.getElementById('orasi-prompt');
+            const optionsEl = document.getElementById('orasi-options');
+
+            orasiBox.classList.remove('hidden');
+            promptEl.innerText = orasi.prompt;
+            optionsEl.innerHTML = '';
+
+            let localMassa = 50;
+            document.getElementById('orasi-massa-val').innerText = `${localMassa}%`;
+            document.getElementById('orasi-massa-bar').style.width = `${localMassa}%`;
+
+            orasi.lines.forEach((line, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-500 rounded-xl text-left text-xs text-slate-200 leading-relaxed transition flex items-start gap-2";
+                btn.innerHTML = `<span class="px-2 py-0.5 bg-amber-950 text-amber-400 rounded font-pixel text-[10px]">${idx + 1}</span> <span>${line.text}</span>`;
+                btn.onclick = () => {
+                    localMassa = Math.min(100, Math.max(0, localMassa + line.impact));
+                    document.getElementById('orasi-massa-val').innerText = `${localMassa}%`;
+                    document.getElementById('orasi-massa-bar').style.width = `${localMassa}%`;
+
+                    if (line.impact > 0) {
+                        AudioSys.playCheer();
+                        showAlert("ORASI MEMBAKAR!", line.insight, "fa-fire text-amber-400");
+                    } else {
+                        AudioSys.playError();
+                        showAlert("MASSA KECEWA", line.insight, "fa-heart-crack text-rose-400");
+                    }
+
+                    setTimeout(() => {
+                        orasiBox.classList.add('hidden');
+                        if (localMassa >= 60) {
+                            massaScore = Math.min(100, massaScore + 30);
+                            retorikaLevel++;
+                            testedNPCs.add(currentNPC.id + '_orasi');
+                            updateStats();
+                            checkChapterCompletion();
+                        } else {
+                            gameState = 'EXPLORE';
+                        }
+                    }, 1200);
+                };
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function startQuiz(quiz) {
+            gameState = 'QUIZ';
+            const quizBox = document.getElementById('quiz-box');
+            const qQuestion = document.getElementById('quiz-question');
+            const qContext = document.getElementById('quiz-context');
+            const qOptions = document.getElementById('quiz-options');
+            const qTag = document.getElementById('quiz-chapter-tag');
+
+            quizBox.classList.remove('hidden');
+            qTag.innerText = STORY_DATA[currentChapterIndex].title;
+            qQuestion.innerText = quiz.question;
+            qContext.innerText = `Konteks Sejarah: "${quiz.context}"`;
+
+            qOptions.innerHTML = '';
+
+            quiz.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-500 rounded-xl text-left text-xs md:text-sm text-slate-200 leading-relaxed transition flex items-start gap-3";
+                btn.innerHTML = `<span class="w-5 h-5 bg-amber-950 text-amber-400 border border-amber-800 rounded flex-shrink-0 flex items-center justify-center font-pixel text-[10px]">${String.fromCharCode(65 + idx)}</span> <span>${opt.text}</span>`;
+                btn.onclick = () => handleQuizAnswer(opt, quiz);
+                qOptions.appendChild(btn);
+            });
+        }
+
+        function handleQuizAnswer(selectedOption, quiz) {
+            const quizBox = document.getElementById('quiz-box');
+            quizBox.classList.add('hidden');
+
+            if (selectedOption.correct) {
+                AudioSys.playSuccess();
+                kesadaranScore = Math.min(100, kesadaranScore + 20);
+                massaScore = Math.min(100, massaScore + 20);
+                testedNPCs.add(currentNPC.id);
+
+                showAlert("PEMAHAMAN TEPAT!", selectedOption.insight, "fa-circle-check text-emerald-400");
+                updateStats();
+
+                setTimeout(() => {
+                    checkChapterCompletion();
+                }, 1200);
+            } else {
+                AudioSys.playError();
+                showAlert("PENAFSIRAN KURANG TEPAT", selectedOption.insight, "fa-triangle-exclamation text-rose-400");
+                gameState = 'EXPLORE';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('meter-kesadaran').style.width = `${kesadaranScore}%`;
+            document.getElementById('meter-massa').style.width = `${massaScore}%`;
+            document.getElementById('stat-retorika').innerText = `Lv. ${retorikaLevel} (${retorikaLevel > 3 ? 'Orator' : 'Kader'})`;
+            document.getElementById('stat-people-count').innerText = `${testedNPCs.size} Selesai`;
+        }
+
+        function updateInventoryUI() {
+            document.getElementById('inv-count').innerText = `Barang (${player.inventory.length})`;
+            const invList = document.getElementById('inventory-list');
+            if (player.inventory.length === 0) {
+                invList.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-4">Belum ada barang koleksi ditemukannya. Jelajahi peta!</p>`;
+            } else {
+                invList.innerHTML = player.inventory.map(item => `
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-start gap-3">
+                        <span class="text-2xl">${item.sprite}</span>
+                        <div>
+                            <h5 class="font-bold text-emerald-400 text-xs font-pixel">${item.name}</h5>
+                            <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">${item.desc}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function checkChapterCompletion() {
+            const ch = STORY_DATA[currentChapterIndex];
+            if (kesadaranScore >= (currentChapterIndex + 1) * 15 || testedNPCs.size >= (currentChapterIndex + 1)) {
+                gameState = 'CLEAR';
+                const clearBox = document.getElementById('chapter-clear-box');
+                const clearTitle = document.getElementById('chapter-clear-title');
+                const clearDesc = document.getElementById('chapter-clear-desc');
+
+                clearTitle.innerText = `BAB ${currentChapterIndex + 1} SELESAI!`;
+                clearDesc.innerText = ch.desc;
+                clearBox.classList.remove('hidden');
+            } else {
+                gameState = 'EXPLORE';
+            }
+        }
+
+        function nextChapter() {
+            document.getElementById('chapter-clear-box').classList.add('hidden');
+            if (currentChapterIndex < STORY_DATA.length - 1) {
+                currentChapterIndex++;
+                const ch = STORY_DATA[currentChapterIndex];
+                player.x = ch.playerStart.x;
+                player.y = ch.playerStart.y;
+                document.getElementById('current-chapter-title').innerText = ch.title;
+                document.getElementById('quest-desc-text').innerText = ch.objective;
+                gameState = 'EXPLORE';
+                drawMap();
+                showAlert("BAB BARU TERBUKA!", ch.title, "fa-flag text-amber-400");
+            } else {
+                // Game Fully Completed!
+                showAlert("GELORA PERJUANGAN PARIPURNA!", "Anda telah menuntaskan seluruh petualangan dan menguasai Marhaenisme dari Sawah Bandung hingga Pentas Dunia!", "fa-trophy text-amber-400");
+                gameState = 'EXPLORE';
+            }
+        }
+
+        const CODEX_DATA = [
+            {
+                title: "Siapakah Marhaen?",
+                content: "Istilah Marhaen dicetuskan Bung Karno dari hasil dialog dengan petani bernama Pak Marhaen di Bandung (1927). Marhaen adalah setiap rakyat Indonesia yang dimelaratkan oleh kapitalisme, imperialisme, dan kolonialisme. Mencakup petani kecil, buruh kecil, pedagang kecil, dan nelayan kecil (95% rakyat Indonesia)."
+            },
+            {
+                title: "Perbedaan Marhaenisme & Proletariat Barat",
+                content: "Proletar dalam konsep Barat adalah kaum buruh yang tidak memiliki alat produksi sama sekali. Sedangkan Marhaen memiliki alat produksinya sendiri (seperti pacul, perahu, jala), namun tetap hidup sengsara karena pemisahan hasil akibat struktur ekonomi yang eksploitatif."
+            },
+            {
+                title: "Sosio-Nasionalisme & Sosio-Demokrasi",
+                content: "Sosio-Nasionalisme adalah nasionalisme yang berperikemanusiaan (menolak chauvinisme). Sosio-Demokrasi adalah demokrasi yang menyatukan Demokrasi Politik dan Demokrasi Ekonomi (pemerataan rezeki dan keadilan sosial)."
+            },
+            {
+                title: "Dasasila Bandung & Nefos (1955-1963)",
+                content: "Marhaenisme bertransformasi menjadi doktrin pembebasan dunia: menggalang kekuatan New Emerging Forces (Nefos) untuk menghentikan dominasi imperialisme kuno dan baru (Oldefos)."
+            }
+        ];
+
+        function renderCodex() {
+            const container = document.getElementById('codex-content');
+            container.innerHTML = CODEX_DATA.map(item => `
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-amber-400 text-sm mb-2 font-pixel">${item.title}</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">${item.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function showAlert(title, msg, iconClass = "fa-circle-info text-amber-400") {
+            const el = document.getElementById('custom-alert');
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-msg').innerText = msg;
+            document.getElementById('alert-icon').className = `fa-solid ${iconClass} text-xl mt-0.5`;
+
+            el.classList.remove('hidden');
+            setTimeout(() => {
+                el.classList.add('hidden');
+            }, 4000);
+        }
+
+        window.onload = function() {
+            initCanvas();
+            drawMap();
+            renderCodex();
+            updateInventoryUI();
+
+            // Keyboard Listeners
+            window.addEventListener('keydown', (e) => {
+                if (gameState !== 'EXPLORE') return;
+                switch (e.key) {
+                    case 'ArrowUp': case 'w': case 'W': movePlayer(0, -1); break;
+                    case 'ArrowDown': case 's': case 'S': movePlayer(0, 1); break;
+                    case 'ArrowLeft': case 'a': case 'A': movePlayer(-1, 0); break;
+                    case 'ArrowRight': case 'd': case 'D': movePlayer(1, 0); break;
+                    case ' ': case 'Enter':
+                        const ch = STORY_DATA[currentChapterIndex];
+                        const adjacent = ch.npcs.find(n => 
+                            (Math.abs(n.x - player.x) <= 1 && n.y === player.y) || 
+                            (Math.abs(n.y - player.y) <= 1 && n.x === player.x)
+                        );
+                        if (adjacent) triggerNPCInteraction(adjacent);
+                        break;
+                }
+            });
+
+            // Touch / On-screen Controls
+            document.getElementById('btn-up').onclick = () => movePlayer(0, -1);
+            document.getElementById('btn-down').onclick = () => movePlayer(0, 1);
+            document.getElementById('btn-left').onclick = () => movePlayer(-1, 0);
+            document.getElementById('btn-right').onclick = () => movePlayer(1, 0);
+            document.getElementById('btn-action').onclick = () => {
+                const ch = STORY_DATA[currentChapterIndex];
+                const adjacent = ch.npcs.find(n => 
+                    (Math.abs(n.x - player.x) <= 1 && n.y === player.y) || 
+                    (Math.abs(n.y - player.y) <= 1 && n.x === player.x)
+                );
+                if (adjacent) triggerNPCInteraction(adjacent);
+            };
+
+            // Inventory Modal
+            document.getElementById('btn-inventory').onclick = () => {
+                document.getElementById('inventory-modal').classList.remove('hidden');
+            };
+            document.getElementById('btn-close-inv').onclick = () => {
+                document.getElementById('inventory-modal').classList.add('hidden');
+            };
+            document.getElementById('btn-close-inv-2').onclick = () => {
+                document.getElementById('inventory-modal').classList.add('hidden');
+            };
+
+            // Codex Modal Listeners
+            document.getElementById('btn-codex').onclick = () => {
+                document.getElementById('codex-modal').classList.remove('hidden');
+            };
+            document.getElementById('btn-close-codex').onclick = () => {
+                document.getElementById('codex-modal').classList.add('hidden');
+            };
+            document.getElementById('btn-close-codex-2').onclick = () => {
+                document.getElementById('codex-modal').classList.add('hidden');
+            };
+
+            // Audio Toggle
+            document.getElementById('btn-audio').onclick = () => {
+                AudioSys.enabled = !AudioSys.enabled;
+                document.getElementById('audio-icon').className = AudioSys.enabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark text-rose-400";
+            };
+
+            // Next Chapter Button
+            document.getElementById('btn-next-chapter').onclick = nextChapter;
+        };
+    </script>
+</body>
+</html>
