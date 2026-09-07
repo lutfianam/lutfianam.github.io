@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rencana Lamaran Lutfi & Ainun - Anggaran Rp10 Juta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Family -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emeraldCustom: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        amberCustom: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        .tab-active {
+            border-bottom: 3px solid #16a34a;
+            color: #15803d;
+            font-weight: 700;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navigasi Utama -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-lg shadow-inner">
+                    <i data-lucide="heart" class="w-5 h-5 fill-emerald-600"></i>
+                </div>
+                <div>
+                    <h1 class="font-serif font-bold text-xl sm:text-2xl text-slate-900 tracking-tight">
+                        Lutfi Anam <span class="text-emerald-600 font-normal">&amp;</span> Nur Ainun Yakin
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">Dasbor Lamaran &amp; Peningset (Integrasi Google Sheets &amp; Makna Adat)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 text-xs font-semibold text-emerald-800">
+                <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i>
+                <span>Kapasitas Rombongan: 25–40 Orang</span>
+            </div>
+        </div>
+
+        <!-- Menu Tab Navigasi -->
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 border-t border-slate-100 text-sm font-medium text-slate-600 overflow-x-auto">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-3 px-1 tab-active flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Ringkasan Dasbor
+            </button>
+            <button onclick="switchTab('checklist')" id="tab-checklist" class="py-3 px-1 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="package-check" class="w-4 h-4"></i> Pos Anggaran &amp; Makna
+            </button>
+            <button onclick="switchTab('timeline')" id="tab-timeline" class="py-3 px-1 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="calendar-range" class="w-4 h-4"></i> Timeline 12 Bulan
+            </button>
+            <button onclick="switchTab('calculator')" id="tab-calculator" class="py-3 px-1 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="calculator" class="w-4 h-4"></i> Simulasi Tabungan
+            </button>
+        </div>
+    </header>
+
+    <!-- Area Konten Utama -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- TAB 1: DASBOR RINGKASAN -->
+        <section id="sec-dashboard" class="space-y-6">
+            <!-- Banner Selamat Datang -->
+            <div class="bg-gradient-to-r from-emerald-800 to-emerald-900 rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+                    <i data-lucide="heart" class="w-64 h-64 text-white"></i>
+                </div>
+                <div class="relative z-10 max-w-2xl">
+                    <span class="bg-emerald-700/60 text-emerald-100 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-500/30">
+                        Skala Menengah Elegan (Sedengan)
+                    </span>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold mt-3 leading-tight">
+                        Rencana Anggaran Lamaran Rp10.000.000
+                    </h2>
+                    <p class="text-emerald-100 text-sm mt-2 font-light leading-relaxed">
+                        Dengan dana Rp10 Juta, Lutfi dapat menyiapkan 7 kotak hantaran berkualitas premium, emas kadar bagus, uang peningset memadai, serta menanggung konsumsi/transportasi rombongan 25–40 orang.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Kartu Statistik Utama -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Target Total Biaya</span>
+                        <div class="p-2 bg-slate-100 rounded-lg text-slate-600"><i data-lucide="target" class="w-5 h-5"></i></div>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 mt-2" id="stat-target">Rp10.000.000</p>
+                    <p class="text-xs text-slate-500 mt-1">Hantaran + Peningset + Operasional</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Terbeli / Tersimpan</span>
+                        <div class="p-2 bg-emerald-100 rounded-lg text-emerald-600"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+                    </div>
+                    <p class="text-2xl font-bold text-emerald-700 mt-2" id="stat-terbeli">Rp0</p>
+                    <p class="text-xs text-emerald-600 mt-1" id="stat-persen-terbeli">0% dari total anggaran</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sisa Anggaran</span>
+                        <div class="p-2 bg-amber-100 rounded-lg text-amber-600"><i data-lucide="coins" class="w-5 h-5"></i></div>
+                    </div>
+                    <p class="text-2xl font-bold text-amber-700 mt-2" id="stat-sisa">Rp10.000.000</p>
+                    <p class="text-xs text-slate-500 mt-1">Sisa target tabungan</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kapasitas Rombongan</span>
+                        <div class="p-2 bg-blue-100 rounded-lg text-blue-600"><i data-lucide="users" class="w-5 h-5"></i></div>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 mt-2">25 - 40 Orang</p>
+                    <p class="text-xs text-slate-500 mt-1">Keluarga besar &amp; kerabat dekat</p>
+                </div>
+            </div>
+
+            <!-- Batang Progres Kesiapan Total -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex justify-between items-center text-sm font-semibold">
+                    <span class="text-slate-700">Persentase Kesiapan Dana Rp10 Juta</span>
+                    <span class="text-emerald-700 font-bold" id="bar-percentage-text">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden">
+                    <div id="main-progress-bar" class="bg-emerald-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Kartu Petunjuk Tambahan -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-emerald-600"></i> Alokasi Dana Rp10 Juta
+                    </h3>
+                    <ul class="text-sm text-slate-600 space-y-2 list-disc list-inside leading-relaxed">
+                        <li><strong>7 Kotak Hantaran Premium:</strong> Rp4,85 Juta (Emas 2g+, skincare branded, batik halus, mukena tebal).</li>
+                        <li><strong>Sewa Kotak &amp; Jasa Hias Akrilik:</strong> Rp500 Ribu.</li>
+                        <li><strong>Uang Peningset / Nambahi:</strong> Rp2,5 Juta.</li>
+                        <li><strong>Operasional Rombongan (25-40 Orang):</strong> Rp2,15 Juta (Transportasi armada &amp; konsumsi transit/oleh-oleh).</li>
+                    </ul>
+                </div>
+
+                <div class="bg-emerald-50/50 border border-emerald-200 p-6 rounded-xl shadow-sm space-y-3">
+                    <h3 class="font-bold text-emerald-900 flex items-center gap-2">
+                        <i data-lucide="file-spreadsheet" class="w-5 h-5 text-emerald-700"></i> Sinkronisasi Google Sheets
+                    </h3>
+                    <p class="text-sm text-emerald-800 leading-relaxed">
+                        Aplikasi ini terhubung langsung dengan file Google Sheets melalui URL CSV yang ada pada kode JavaScript. Setiap kali Anda mengubah spreadsheet, aplikasi akan memperbarui pos anggaran secara otomatis.
+                    </p>
+                    <div class="pt-2 text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                        <i data-lucide="check-circle2" class="w-4 h-4"></i> Dilengkapi dropdown alasan &amp; makna filosofis adat Jawa di tiap item
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: CHECKLIST DENGAN ANGGARAN 10 JUTA -->
+        <section id="sec-checklist" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-xl border border-slate-200">
+                <div>
+                    <h2 class="font-bold text-lg text-slate-900">Rincian Pos Anggaran &amp; Makna Hantaran</h2>
+                    <p class="text-xs text-slate-500">Data pos anggaran dapat diperbarui melalui tautan Google Sheets pada kode script.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="fetchSpreadsheetData()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5 border border-emerald-200">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Muat Ulang dari Sheet
+                    </button>
+                    <button onclick="resetItemsToDefault()" class="text-xs text-slate-500 hover:text-red-600 underline px-2 py-1 flex items-center gap-1">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Default
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabel Pos Anggaran -->
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold uppercase text-xs">
+                            <tr>
+                                <th class="p-4">Pos Anggaran / Item</th>
+                                <th class="p-4">Spesifikasi &amp; Detail</th>
+                                <th class="p-4">Alokasi Biaya</th>
+                                <th class="p-4">Alasan &amp; Makna Adat</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="checklist-table-body" class="divide-y divide-slate-100">
+                            <!-- Baris tabel diinjeksi lewat JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: TIMELINE 12 - 16 BULAN -->
+        <section id="sec-timeline" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl border border-slate-200">
+                <h2 class="font-bold text-lg text-slate-900">Rencana Tahapan Menabung (Target Rp10 Juta)</h2>
+                <p class="text-xs text-slate-500">Tahapan menyisihkan Rp500.000 - Rp600.000 per bulan secara bertahap.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="timeline-cards-container">
+                <!-- Kartu Timeline diinjeksi lewat JavaScript -->
+            </div>
+        </section>
+
+        <!-- TAB 4: KALKULATOR SIMULASI -->
+        <section id="sec-calculator" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-2xl mx-auto space-y-6">
+                <div>
+                    <h2 class="font-bold text-xl text-slate-900 flex items-center gap-2">
+                        <i data-lucide="calculator" class="w-6 h-6 text-emerald-600"></i> Hitung Simulasi Tabungan Lutfi
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Uji waktu yang dibutuhkan jika setoran bulanan Anda berubah.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Target Total Dana (Rp)</label>
+                        <input type="number" id="calc-target" value="10000000" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Setoran Tabungan Per Bulan (Rp)</label>
+                        <input type="number" id="calc-monthly" value="600000" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+                    </div>
+
+                    <button onclick="calculateSimulation()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3 rounded-lg text-sm transition-colors shadow-md flex justify-center items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> Hitung Ulang Waktu
+                    </button>
+                </div>
+
+                <!-- Hasil Simulasi Box -->
+                <div id="calc-result" class="bg-emerald-50 border border-emerald-200 p-5 rounded-xl space-y-3">
+                    <h4 class="font-bold text-emerald-900 text-sm">Hasil Estimasi Waktu:</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs text-slate-500">Estimasi Waktu Menabung:</p>
+                            <p class="text-xl font-bold text-emerald-700" id="res-months">17 Bulan</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500">Total Akhir Terkumpul:</p>
+                            <p class="text-xl font-bold text-emerald-700" id="res-total">Rp10.200.000</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-emerald-800 border-t border-emerald-200/60 pt-2" id="res-note">
+                        Dengan Rp600rb/bulan, dana terkumpul dalam 17 bulan. Jika ditambah rezeki/THR, bisa tercapai lebih cepat di usia 25 tahun!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center space-y-2">
+            <p class="text-xs text-slate-500 font-medium">
+                Dibuat khusus untuk <span class="font-semibold text-slate-700">Lutfi Anam</span> &amp; <span class="font-semibold text-slate-700">Nur Ainun Yakin</span>
+            </p>
+            <p class="text-[11px] text-slate-400">
+                Anggaran Rp10.000.000 | Rombongan 25–40 Orang | Terhubung dengan Google Sheets.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Logika JavaScript -->
+    <script>
+        // =========================================================================
+        // URL SPREADSHEET CSV
+        // Silakan ganti nilai variabel googleSheetCsvUrl di bawah ini dengan URL
+        // publikasi CSV dari Google Sheets milik Anda.
+        // Caranya di Google Sheets: File > Bagikan > Publikasikan ke web > Pilih CSV.
+        // =========================================================================
+        const googleSheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-2mqSd32J2qK4CVmDHVMd3wVCxwpoV7OXK2LVbitlcsYA-8iPlnMLLrXrzvVhi3i75TV6kkxgA30e/pub?output=csv"; 
+
+        // Data bawaan (fallback) jika URL Spreadsheet belum diisi atau gagal diambil
+        const defaultItems = [
+            { 
+                id: 1, 
+                name: "Kotak 1: Cincin / Perhiasan Emas", 
+                detail: "Cincin Emas Muda/Tua kualitas bagus (±2 gram)", 
+                price: 2200000, 
+                reason: "Simbol ikatan komitmen utama yang bernilai tinggi, bersinar, dan menandakan calon pengantin wanita telah dipinang secara resmi.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 2, 
+                name: "Kotak 2: Perlengkapan Ibadah", 
+                detail: "Mukena kain katun premium/sutra, sajadah tebal, Al-Qur'an hias", 
+                price: 500000, 
+                reason: "Simbol bahwa hubungan pernikahan dibangun di atas fondasi agama islam dan komitmen beribadah bersama.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 3, 
+                name: "Kotak 3: Busana & Kain Batik", 
+                detail: "Bahan kebaya eksklusif + 2 kain jarik batik tulis/halus", 
+                price: 650000, 
+                reason: "Simbol pemenuhan kebutuhan sandang serta komitmen calon suami untuk menjaga kehormatan dan keanggunan istrinya.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 4, 
+                name: "Kotak 4: Sepatu Heels & Tas", 
+                detail: "1 pasang heels bermerek + 1 tas pesta/kerja wanita", 
+                price: 700000, 
+                reason: "Simbol kesiapan dan keselarasan kedua pasangan untuk melangkah bersama dalam menjalani roda kehidupan rumah tangga.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 5, 
+                name: "Kotak 5: Skincare & Bodycare Set", 
+                detail: "Set skincare lengkap + parfum + handuk & perlengkapan mandi", 
+                price: 450000, 
+                reason: "Bentuk perhatian agar calon istri senantiasa merawat kecantikan, kesegaran, dan kebersihan diri untuk pasangan.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 6, 
+                name: "Kotak 6: Pisang Sanggan & Buah", 
+                detail: "Pisang Raja Super 1 tangkep + parsel buah segar impor", 
+                price: 350000, 
+                reason: "Penghormatan tertinggi pihak laki-laki kepada orang tua calon pengantin wanita serta simbol permohonan izin meminang.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 7, 
+                name: "Kotak 7: Makanan Adat Ketan", 
+                detail: "Jadah, jenang, wajik hias porsi besar", 
+                price: 300000, 
+                reason: "Tekstur ketan yang lengket melambangkan harapan agar silaturahmi kedua keluarga selalu erat, manis, dan tidak mudah terputus.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 8, 
+                name: "Sewa Kotak & Jasa Hias Akrilik", 
+                detail: "Sewa 7 tray akrilik + hias bunga mawar/melati sintetis", 
+                price: 500000, 
+                reason: "Memperindah dan memberikan kesan rapi, elegan, serta menghormati pihak keluarga wanita saat penyerahan hantaran.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 9, 
+                name: "Uang Peningset / Nambahi", 
+                detail: "Uang tunai serah-serahan tanda komitmen keluarga", 
+                price: 2500000, 
+                reason: "Bantuan kesiapan finansial dari pihak pria untuk mempererat persaudaraan dan membantu persiapan acara.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 10, 
+                name: "Transportasi Rombongan (25-40 Orang)", 
+                detail: "Sewa 1 Elf Long / 3-4 Mobil pribadi (Bensin & Tol)", 
+                price: 1100000, 
+                reason: "Memastikan rombongan keluarga besar Lutfi tiba di kediaman Ainun dengan nyaman dan tepat waktu.",
+                status: "Belum Dibeli" 
+            },
+            { 
+                id: 11, 
+                name: "Snack/Konsumsi Rombongan & Oleh-oleh", 
+                detail: "Snack box perjalanan + buah tangan kembali untuk tuan rumah", 
+                price: 750000, 
+                reason: "Menjaga kenyamanan rombongan selama perjalanan serta sebagai bentuk kehangatan tata krama tamu.",
+                status: "Belum Dibeli" 
+            }
+        ];
+
+        // Data Timeline
+        const timelineData = [
+            { phase: "Bulan 1 - 5", title: "Pembelian Emas", target: "Rp2.500.000 - Rp3.000.000", action: "Tabung & beli Cincin Emas (±2 gram) lebih awal agar bebas inflasi." },
+            { phase: "Bulan 6 - 9", title: "Barang Peningset Tahan Lama", target: "Rp2.000.000 - Rp2.400.000", action: "Beli Perlengkapan Ibadah, Tas & Heels, Kebaya, & Skincare Set." },
+            { phase: "Bulan 10 - 13", title: "Uang Peningset / Cash", target: "Rp2.500.000", action: "Kumpulkan dana tunai khusus untuk Uang Peningset / Nambahi." },
+            { phase: "Bulan 14 - 17", title: "Operasional & Acara", target: "Rp2.350.000", action: "Dana Sewa Kotak Hias, Transportasi Rombongan, Snack, & Makanan Adat H-1." }
+        ];
+
+        let hantaranItems = [];
+
+        window.onload = function() {
+            loadData();
+            if (googleSheetCsvUrl) {
+                fetchSpreadsheetData();
+            } else {
+                renderAll();
+            }
+            lucide.createIcons();
+            calculateSimulation();
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('lutfi_ainun_sheet_data');
+            if (saved) {
+                try {
+                    hantaranItems = JSON.parse(saved);
+                } catch(e) {
+                    hantaranItems = [...defaultItems];
+                }
+            } else {
+                hantaranItems = [...defaultItems];
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('lutfi_ainun_sheet_data', JSON.stringify(hantaranItems));
+            renderAll();
+        }
+
+        // Fungsi Ambil Data dari Google Sheets via URL CSV
+        function fetchSpreadsheetData() {
+            if (!googleSheetCsvUrl) return;
+
+            fetch(googleSheetCsvUrl)
+                .then(response => response.text())
+                .then(csvText => {
+                    const lines = csvText.trim().split('\n');
+                    const parsedItems = [];
+                    
+                    lines.forEach((line, index) => {
+                        // Salip baris header jika ada
+                        if (index === 0 && (line.toLowerCase().includes('nama') || line.toLowerCase().includes('item'))) return;
+
+                        const cols = line.split(',');
+                        if (cols.length >= 3) {
+                            parsedItems.push({
+                                id: Date.now() + index,
+                                name: cols[0] ? cols[0].trim() : `Pos ${index}`,
+                                detail: cols[1] ? cols[1].trim() : "-",
+                                price: parseFloat(cols[2].replace(/[^0-9]/g, '')) || 0,
+                                reason: cols[3] ? cols[3].trim() : "Diambil dari Google Sheets.",
+                                status: cols[4] ? cols[4].trim() : "Belum Dibeli"
+                            });
+                        }
+                    });
+
+                    if (parsedItems.length > 0) {
+                        hantaranItems = parsedItems;
+                        saveData();
+                    }
+                })
+                .catch(err => {
+                    console.error("Gagal mengambil data dari Google Sheets:", err);
+                    renderAll();
+                });
+        }
+
+        function resetItemsToDefault() {
+            if (confirm("Reset data ke rancangan anggaran awal?")) {
+                hantaranItems = JSON.parse(JSON.stringify(defaultItems));
+                saveData();
+            }
+        }
+
+        function renderAll() {
+            renderDashboardStats();
+            renderChecklistTable();
+            renderTimeline();
+        }
+
+        function renderDashboardStats() {
+            const totalTarget = hantaranItems.reduce((acc, curr) => acc + curr.price, 0);
+            const totalTerbeli = hantaranItems
+                .filter(item => item.status === 'Sudah Dibeli')
+                .reduce((acc, curr) => acc + curr.price, 0);
+            
+            const sisa = totalTarget - totalTerbeli;
+            const percentage = totalTarget > 0 ? Math.round((totalTerbeli / totalTarget) * 100) : 0;
+
+            document.getElementById('stat-target').innerText = formatRupiah(totalTarget);
+            document.getElementById('stat-terbeli').innerText = formatRupiah(totalTerbeli);
+            document.getElementById('stat-persen-terbeli').innerText = `${percentage}% dari total anggaran`;
+            document.getElementById('stat-sisa').innerText = formatRupiah(sisa);
+
+            document.getElementById('bar-percentage-text').innerText = `${percentage}%`;
+            document.getElementById('main-progress-bar').style.width = `${percentage}%`;
+        }
+
+        function renderChecklistTable() {
+            const tbody = document.getElementById('checklist-table-body');
+            tbody.innerHTML = '';
+
+            hantaranItems.forEach((item) => {
+                const tr = document.createElement('tr');
+                tr.className = item.status === 'Sudah Dibeli' ? 'bg-emerald-50/40' : 'hover:bg-slate-50/80';
+
+                let statusBadge = '';
+                if(item.status === 'Sudah Dibeli') {
+                    statusBadge = `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Lunas/Siap</span>`;
+                } else if(item.status === 'Direncanakan') {
+                    statusBadge = `<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-semibold"><i data-lucide="clock" class="w-3.5 h-3.5"></i> Direncanakan</span>`;
+                } else {
+                    statusBadge = `<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-full font-semibold"><i data-lucide="circle" class="w-3.5 h-3.5"></i> Belum Siap</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-4 font-semibold text-slate-800">${item.name}</td>
+                    <td class="p-4 text-slate-600 text-xs max-w-xs">${item.detail}</td>
+                    <td class="p-4 font-bold text-slate-700">${formatRupiah(item.price)}</td>
+                    <td class="p-4">
+                        <details class="cursor-pointer group">
+                            <summary class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 select-none">
+                                <i data-lucide="info" class="w-3.5 h-3.5"></i> Lihat Alasan
+                            </summary>
+                            <p class="text-[11px] text-slate-600 mt-2 p-2 bg-slate-50 border border-slate-200 rounded-lg leading-relaxed">
+                                ${item.reason || "Alasan disesuaikan dengan kebutuhan lamaran."}
+                            </p>
+                        </details>
+                    </td>
+                    <td class="p-4">${statusBadge}</td>
+                    <td class="p-4 text-center">
+                        <select onchange="updateStatus(${item.id}, this.value)" class="text-xs bg-white border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-medium">
+                            <option value="Belum Dibeli" ${item.status === 'Belum Dibeli' ? 'selected' : ''}>Belum Siap</option>
+                            <option value="Direncanakan" ${item.status === 'Direncanakan' ? 'selected' : ''}>Direncanakan</option>
+                            <option value="Sudah Dibeli" ${item.status === 'Sudah Dibeli' ? 'selected' : ''}>Lunas/Siap</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function updateStatus(id, newStatus) {
+            const item = hantaranItems.find(i => i.id === id);
+            if (item) {
+                item.status = newStatus;
+                saveData();
+            }
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline-cards-container');
+            container.innerHTML = '';
+
+            timelineData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-md inline-block">
+                            ${item.phase}
+                        </span>
+                        <h3 class="font-bold text-slate-800 text-sm">${item.title}</h3>
+                        <p class="text-xs text-slate-500 font-medium">Target: ${item.target}</p>
+                        <p class="text-xs text-slate-600 leading-relaxed pt-1">${item.action}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function calculateSimulation() {
+            const target = parseFloat(document.getElementById('calc-target').value) || 0;
+            const monthly = parseFloat(document.getElementById('calc-monthly').value) || 0;
+
+            if (monthly <= 0) return;
+
+            const months = Math.ceil(target / monthly);
+            const totalAcc = months * monthly;
+
+            document.getElementById('res-months').innerText = `${months} Bulan`;
+            document.getElementById('res-total').innerText = formatRupiah(totalAcc);
+            document.getElementById('res-note').innerText = `Dengan menyisihkan ${formatRupiah(monthly)} per bulan, dana Rp10 Juta terkumpul dalam ${months} bulan!`;
+        }
+
+        function switchTab(tabName) {
+            const tabs = ['dashboard', 'checklist', 'timeline', 'calculator'];
+            tabs.forEach(t => {
+                document.getElementById(`sec-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('tab-active');
+            });
+
+            document.getElementById(`sec-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+        }
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+        }
+    </script>
+</body>
+</html>
