@@ -106,6 +106,12 @@
                 <span id="sheetStatusText">Spreadsheet Off</span>
             </button>
 
+            <!-- Question Management Button -->
+            <button onclick="openModal('manageModal')" class="p-2.5 rounded-full glass-panel text-slate-300 hover:text-indigo-400 hover:border-indigo-500/40 transition relative" title="Manajemen Pertanyaan">
+                <i class="fa-solid fa-list-check"></i>
+                <span id="manageCountBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            </button>
+
             <!-- Guide / Help Button -->
             <button onclick="openModal('guideModal')" class="p-2.5 rounded-full glass-panel text-slate-300 hover:text-amber-400 hover:border-amber-500/40 transition" title="Panduan Cara Penggunaan">
                 <i class="fa-solid fa-circle-question"></i>
@@ -293,6 +299,159 @@
     </footer>
 
     
+    <!-- Modal: MANAJEMEN PERTANYAAN (Question Management) -->
+    <div id="manageModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 md:p-4">
+        <div class="glass-card w-full max-w-3xl rounded-3xl p-5 md:p-6 relative border border-slate-700/80 space-y-4 max-h-[90vh] flex flex-col">
+            <button onclick="closeModal('manageModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Header Panel Manajemen -->
+            <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-3 pr-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-white">Manajemen Pertanyaan</h2>
+                        <p class="text-xs text-slate-400" id="manageSubtitle">Kelola, edit, hapus, dan atur seluruh topik</p>
+                    </div>
+                </div>
+
+                <!-- Quick Action Header Buttons -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="openModal('customModal')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                        <span>Tambah Pertanyaan</span>
+                    </button>
+                    <button onclick="exportQuestionsJSON()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-2.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1" title="Ekspor JSON">
+                        <i class="fa-solid fa-download text-indigo-400 text-[10px]"></i>
+                        <span>Ekspor</span>
+                    </button>
+                    <label class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-2.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1 cursor-pointer" title="Impor JSON">
+                        <i class="fa-solid fa-upload text-emerald-400 text-[10px]"></i>
+                        <span>Impor</span>
+                        <input type="file" accept=".json" onchange="importQuestionsJSON(event)" class="hidden">
+                    </label>
+                    <button onclick="confirmResetQuestions()" class="bg-slate-800 hover:bg-rose-950 hover:text-rose-300 text-slate-400 border border-slate-700 font-semibold px-2.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1" title="Reset Ke Setelan Awal">
+                        <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Bar & Filters inside Management -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
+                <!-- Search Input -->
+                <div class="relative md:col-span-2">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500"></i>
+                    <input type="text" id="manageSearchInput" oninput="renderManageList()" placeholder="Cari teks pertanyaan / kata kunci..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <!-- Category Filter Dropdown -->
+                <div>
+                    <select id="manageCategoryFilter" onchange="renderManageList()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
+                        <option value="Semua">Semua Kategori</option>
+                        <option value="Sekolah">Sekolah</option>
+                        <option value="Buku">Buku & Filosofi</option>
+                        <option value="Desain">Desain</option>
+                        <option value="Komputer">Komputer</option>
+                        <option value="Organisasi">Organisasi</option>
+                        <option value="Kehidupan">Kehidupan</option>
+                        <option value="Deep Talk">Deep Talk</option>
+                    </select>
+                </div>
+
+                <!-- Mode Filter Dropdown -->
+                <div>
+                    <select id="manageModeFilter" onchange="renderManageList()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
+                        <option value="Semua">Semua Suasana</option>
+                        <option value="Santai">🍵 Santai</option>
+                        <option value="Debat">🔥 Debat</option>
+                        <option value="Deep">💬 Deep Talk</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- List Container -->
+            <div id="manageListContainer" class="flex-1 overflow-y-auto space-y-2 pr-1 my-1">
+                <!-- Dynamic questions list -->
+            </div>
+
+            <!-- Management Footer Stats -->
+            <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-3">
+                <span id="manageStatsText">Total: 0 Pertanyaan</span>
+                <span class="text-[11px] text-slate-500 italic">Perubahan tersimpan otomatis di perangkat</span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal: Edit Pertanyaan -->
+    <div id="editModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-lg rounded-3xl p-6 relative border border-slate-700/80 space-y-4">
+            <button onclick="closeModal('editModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-white">Edit Pertanyaan</h2>
+                    <p class="text-xs text-slate-400">Perbarui isi atau detail pemicu obrolan ini</p>
+                </div>
+            </div>
+
+            <form onsubmit="saveEditedTopic(event)" class="space-y-3">
+                <input type="hidden" id="editTopicId">
+
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Pertanyaan Utama:*</label>
+                    <textarea id="editQuestionInput" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-300 block mb-1">Kategori:</label>
+                        <select id="editCategoryInput" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <option value="Sekolah">Sekolah (TU & Guru MI)</option>
+                            <option value="Buku">Buku & Filosofi</option>
+                            <option value="Desain">Desain & Visual</option>
+                            <option value="Komputer">Komputer & Tekno</option>
+                            <option value="Organisasi">Organisasi</option>
+                            <option value="Kehidupan">Kehidupan & Masa Lalu</option>
+                            <option value="Deep Talk">Deep Talk</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-300 block mb-1">Suasana/Mode:</label>
+                        <select id="editModeInput" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <option value="Santai">🍵 Santai</option>
+                            <option value="Debat">🔥 Debat</option>
+                            <option value="Deep">💬 Deep Talk</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Pertanyaan Lanjutan / Pemicu (Opsional):</label>
+                    <input type="text" id="editSubtextInput" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition">
+                        Simpan Perubahan
+                    </button>
+                    <button type="button" onclick="closeModal('editModal')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <!-- Modal: Google Sheets Configuration -->
     <div id="sheetModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-lg rounded-3xl p-6 relative border border-slate-700/80 space-y-4">
@@ -365,8 +524,8 @@
                         <li><b>Kocok Topik:</b> Ketuk di mana saja pada kartu utama atau tekan tombol <b>[Spacebar]</b> di laptop/HP untuk mengocok pertanyaan.</li>
                         <li><b>Efek Randomizer:</b> Saat dikocok, teks akan berganti secara acak dengan cepat sebelum menampilkan pertanyaan terpilih.</li>
                         <li><b>Pilih Filter:</b> Sesuaikan kategori (Sekolah, Buku, Desain, Komputer, Organisasi) dan suasana obrolan (Santai 🍵, Debat 🔥, Deep Talk 💬).</li>
+                        <li><b>Manajemen Pertanyaan:</b> Gunakan tombol panel <i class="fa-solid fa-list-check"></i> di header untuk mengedit, menambah, menghapus, atau meng-ekspor seluruh bank soal.</li>
                         <li><b>Sukai & Tandai:</b> Klik ikon ❤️ untuk menyimpan ke favorit, atau ikon ✅ jika pertanyaan sudah pernah dibahas.</li>
-                        <li><b>Tambah Manual:</b> Gunakan tombol <b>[+]</b> untuk menambahkan pertanyaan rahasia buatanmu sendiri secara instan.</li>
                     </ul>
                 </div>
 
@@ -483,7 +642,7 @@
                     <i class="fa-solid fa-plus"></i>
                 </div>
                 <div>
-                    <h2 class="text-base font-bold text-white">Tambah Topik Rahasia</h2>
+                    <h2 class="text-base font-bold text-white">Tambah Topik Pertanyaan Baru</h2>
                     <p class="text-xs text-slate-400">Masukkan pertanyaan buatanmu langsung ke dalam sistem</p>
                 </div>
             </div>
@@ -523,7 +682,7 @@
                 </div>
 
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition">
-                    Simpan Topik
+                    Simpan Pertanyaan
                 </button>
             </form>
         </div>
@@ -537,7 +696,7 @@
 
     <script>
         // Default curated Built-in Questions tailored specifically for their profiles
-        const DEFAULT_TOPICS = [
+        const INITIAL_DEFAULT_TOPICS = [
             // Sekolah (TU & Guru MI)
             { id: 1, kategori: "Sekolah", mode: "Debat", pertanyaan: "Menurutmu, gaya mengajar anak MI sekarang lebih efektif fokus ke hafalan visual atau praktik interaktif?", subtext: "Gimana dari sudut pandang kurikulum & administrasi sekolah?", dibahas: false },
             { id: 2, kategori: "Sekolah", mode: "Santai", pertanyaan: "Apa kejadian paling lucu atau bikin gemes dari murid-murid MI minggu ini?", subtext: "Dan gimana reaksimu saat itu di kelas?", dibahas: false },
@@ -618,7 +777,7 @@
         let recordSeconds = 0;
         let speechRecognition = null;
 
-        // Audio Click & Tick sound synthesizer using Web Audio API
+        // Audio Sound FX Synthesizers
         function playClickSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -669,28 +828,39 @@
                 if (sheetUrl) {
                     document.getElementById('sheetUrlInput').value = sheetUrl;
                 }
-                
-                const savedCustoms = localStorage.getItem('topik_customs');
-                if (savedCustoms) {
-                    const customs = JSON.parse(savedCustoms);
-                    DEFAULT_TOPICS.push(...customs);
-                }
             } catch(e) {
                 console.error("Local storage error", e);
             }
             updateFavBadge();
         }
 
-        // Initialize Topics list (From Sheet or Fallback)
+        // Initialize Topics list (From Local Storage, Sheet or Default)
         function initTopics() {
             if (sheetUrl) {
                 fetchFromGoogleSheet(sheetUrl);
             } else {
-                topics = [...DEFAULT_TOPICS];
-                updateSheetStatus(false, "Menggunakan Database Bawaan");
+                const savedTopics = localStorage.getItem('topik_all_db');
+                if (savedTopics) {
+                    try {
+                        topics = JSON.parse(savedTopics);
+                    } catch(e) {
+                        topics = [...INITIAL_DEFAULT_TOPICS];
+                    }
+                } else {
+                    topics = [...INITIAL_DEFAULT_TOPICS];
+                }
+                updateSheetStatus(false, "Menggunakan Database Lokal");
                 renderCard();
                 updateStats();
             }
+        }
+
+        // Save Topics to LocalStorage
+        function saveTopicsState() {
+            if (!sheetUrl) {
+                localStorage.setItem('topik_all_db', JSON.stringify(topics));
+            }
+            updateStats();
         }
 
         // Render Category Chips
@@ -806,12 +976,10 @@
             const totalDuration = 3800; // ~3.8 seconds animation
             const startTime = Date.now();
 
-            // Slot-machine deceleration effect over ~3.8 seconds
             function runShuffleStep() {
                 const elapsed = Date.now() - startTime;
                 playShuffleTick();
 
-                // Rapidly cycle random preview text
                 if (Math.random() > 0.35 && pool.length > 0) {
                     const randomSample = pool[Math.floor(Math.random() * pool.length)];
                     questionEl.textContent = randomSample.pertanyaan;
@@ -823,7 +991,6 @@
 
                 if (elapsed < totalDuration) {
                     const progress = elapsed / totalDuration;
-                    // Starts fast (~45ms) and decelerates gradually to (~260ms)
                     const nextDelay = 45 + Math.pow(progress, 2.5) * 215;
                     setTimeout(runShuffleStep, nextDelay);
                 } else {
@@ -835,7 +1002,6 @@
                         if (history.length > 30) history.pop();
                     }
 
-                    // Remove shuffle blur & trigger pop animation
                     cardEl.classList.remove('shuffle-blur');
                     cardEl.classList.remove('card-pop');
                     void cardEl.offsetWidth; // trigger reflow
@@ -911,6 +1077,221 @@
 
             resetRecordingState();
         }
+
+        // ================= MANAJEMEN PERTANYAAN LOGIC =================
+        function renderManageList() {
+            const container = document.getElementById('manageListContainer');
+            const searchKeyword = document.getElementById('manageSearchInput').value.toLowerCase().trim();
+            const selectedCat = document.getElementById('manageCategoryFilter').value;
+            const selectedMode = document.getElementById('manageModeFilter').value;
+
+            // Filter topics for management view
+            let manageFiltered = topics.filter(t => {
+                const matchesSearch = !searchKeyword || 
+                    t.pertanyaan.toLowerCase().includes(searchKeyword) || 
+                    (t.subtext && t.subtext.toLowerCase().includes(searchKeyword)) ||
+                    t.kategori.toLowerCase().includes(searchKeyword);
+                
+                const matchesCat = selectedCat === "Semua" || t.kategori === selectedCat;
+                const matchesMode = selectedMode === "Semua" || t.mode === selectedMode;
+
+                return matchesSearch && matchesCat && matchesMode;
+            });
+
+            document.getElementById('manageStatsText').textContent = `Menampilkan ${manageFiltered.length} dari total ${topics.length} pertanyaan`;
+
+            if (manageFiltered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-slate-500 text-xs">
+                        <i class="fa-solid fa-folder-open text-2xl mb-2 text-slate-600 block"></i>
+                        Tidak ada pertanyaan yang sesuai pencarian/filter.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = manageFiltered.map((t) => {
+                const catObj = CATEGORIES.find(c => c.id === t.kategori) || { label: t.kategori, icon: 'fa-comments' };
+                const isFav = favorites.some(f => f.id === t.id);
+
+                let sourceBadge = `<span class="bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded-full border border-slate-700">Bawaan</span>`;
+                if (String(t.id).startsWith('custom-')) {
+                    sourceBadge = `<span class="bg-indigo-950 text-indigo-300 text-[10px] px-2 py-0.5 rounded-full border border-indigo-800">Custom</span>`;
+                } else if (String(t.id).startsWith('sheet-')) {
+                    sourceBadge = `<span class="bg-emerald-950 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full border border-emerald-800">Sheets</span>`;
+                }
+
+                return `
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2 hover:border-slate-700 transition">
+                        <div class="flex items-center justify-between gap-2 flex-wrap text-xs">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-semibold text-indigo-300 flex items-center gap-1">
+                                    <i class="fa-solid ${catObj.icon} text-[10px]"></i> ${t.kategori}
+                                </span>
+                                <span class="text-slate-600">•</span>
+                                <span class="text-slate-400">${t.mode}</span>
+                                ${sourceBadge}
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-1">
+                                <button onclick="toggleFavFromManage('${t.id}')" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-pink-400 transition" title="Sukai">
+                                    <i class="${isFav ? 'fa-solid fa-heart text-pink-500' : 'fa-regular fa-heart'} text-xs"></i>
+                                </button>
+                                <button onclick="toggleDiscussedFromManage('${t.id}')" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-emerald-400 transition" title="Tandai Sudah Dibahas">
+                                    <i class="${t.dibahas ? 'fa-solid fa-circle-check text-emerald-400' : 'fa-regular fa-circle-check'} text-xs"></i>
+                                </button>
+                                <button onclick="openEditModal('${t.id}')" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-300 transition" title="Edit Pertanyaan">
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                </button>
+                                <button onclick="deleteTopic('${t.id}')" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-rose-400 transition" title="Hapus Pertanyaan">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-100 font-medium leading-relaxed">${t.pertanyaan}</p>
+                        ${t.subtext ? `<p class="text-[11px] text-indigo-300/80 italic">💡 Pemicu: ${t.subtext}</p>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle Favorite from Manage Panel
+        function toggleFavFromManage(id) {
+            const topic = topics.find(t => t.id == id);
+            if (!topic) return;
+
+            const idx = favorites.findIndex(f => f.id == id);
+            if (idx > -1) {
+                favorites.splice(idx, 1);
+                showToast("Dihapus dari favorit");
+            } else {
+                favorites.push(topic);
+                showToast("Ditambahkan ke favorit ❤️");
+            }
+            localStorage.setItem('topik_favorites', JSON.stringify(favorites));
+            updateFavBadge();
+            renderManageList();
+            renderCard();
+        }
+
+        // Toggle Discussed from Manage Panel
+        function toggleDiscussedFromManage(id) {
+            const topic = topics.find(t => t.id == id);
+            if (!topic) return;
+
+            topic.dibahas = !topic.dibahas;
+            saveTopicsState();
+            renderManageList();
+            renderCard();
+            showToast(topic.dibahas ? "Ditandai sudah dibahas" : "Ditandai belum dibahas");
+        }
+
+        // Open Edit Modal
+        function openEditModal(id) {
+            const topic = topics.find(t => t.id == id);
+            if (!topic) return;
+
+            document.getElementById('editTopicId').value = topic.id;
+            document.getElementById('editQuestionInput').value = topic.pertanyaan;
+            document.getElementById('editCategoryInput').value = topic.kategori || "Sekolah";
+            document.getElementById('editModeInput').value = topic.mode || "Santai";
+            document.getElementById('editSubtextInput').value = topic.subtext || "";
+
+            openModal('editModal');
+        }
+
+        // Save Edited Topic
+        function saveEditedTopic(e) {
+            e.preventDefault();
+            const id = document.getElementById('editTopicId').value;
+            const topic = topics.find(t => t.id == id);
+            if (!topic) return;
+
+            topic.pertanyaan = document.getElementById('editQuestionInput').value.trim();
+            topic.kategori = document.getElementById('editCategoryInput').value;
+            topic.mode = document.getElementById('editModeInput').value;
+            topic.subtext = document.getElementById('editSubtextInput').value.trim();
+
+            saveTopicsState();
+            closeModal('editModal');
+            renderManageList();
+            renderCard();
+            showToast("Perubahan pertanyaan berhasil disimpan!");
+        }
+
+        // Delete Topic
+        function deleteTopic(id) {
+            if (!confirm("Apakah Anda yakin ingin menghapus pertanyaan ini dari daftar?")) return;
+
+            topics = topics.filter(t => t.id != id);
+            favorites = favorites.filter(f => f.id != id);
+            localStorage.setItem('topik_favorites', JSON.stringify(favorites));
+            updateFavBadge();
+
+            saveTopicsState();
+            renderManageList();
+            renderCard();
+            showToast("Pertanyaan berhasil dihapus!");
+        }
+
+        // Export Questions JSON
+        function exportQuestionsJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(topics, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `ToKen_Database_Pertanyaan_${Date.now()}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast("Berhasil mengunduh ekspor JSON!");
+        }
+
+        // Import Questions JSON
+        function importQuestionsJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported) && imported.length > 0) {
+                        topics = imported.map((item, idx) => ({
+                            id: item.id || `custom-${Date.now()}-${idx}`,
+                            pertanyaan: item.pertanyaan || item.question || "Tanpa teks",
+                            kategori: item.kategori || item.category || "Sekolah",
+                            mode: item.mode || "Santai",
+                            subtext: item.subtext || "",
+                            dibahas: item.dibahas || false
+                        }));
+                        saveTopicsState();
+                        renderManageList();
+                        renderCard();
+                        showToast(`Berhasil mengimpor ${topics.length} pertanyaan! 🎉`);
+                    } else {
+                        showToast("Format JSON tidak valid atau kosong.");
+                    }
+                } catch(err) {
+                    console.error("Import error", err);
+                    showToast("Gagal membaca berkas JSON.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Reset to Default Questions
+        function confirmResetQuestions() {
+            if (confirm("Kembalikan database pertanyaan ke setelan awal default? Semua pertanyaan buatanmu yang belum di-ekspor akan direset.")) {
+                topics = [...INITIAL_DEFAULT_TOPICS];
+                saveTopicsState();
+                renderManageList();
+                renderCard();
+                showToast("Database dikembalikan ke setelan awal.");
+            }
+        }
+
 
         // Recording & Speech Recognition Functions
         async function startRecording() {
@@ -1097,6 +1478,7 @@
             if (!currentTopic) return;
 
             currentTopic.dibahas = !currentTopic.dibahas;
+            saveTopicsState();
             showToast(currentTopic.dibahas ? "Ditandai: Sudah Dibahas ✅" : "Ditandai: Belum Dibahas");
             renderCard();
             updateStats();
@@ -1109,7 +1491,6 @@
 
             const textToCopy = `"${currentTopic.pertanyaan}"\n(Pemicu: ${currentTopic.subtext || '-'})`;
             
-            // execCommand fallback for iFrame compatibility
             const textarea = document.createElement('textarea');
             textarea.value = textToCopy;
             document.body.appendChild(textarea);
@@ -1125,6 +1506,9 @@
             const discussedCount = topics.filter(t => t.dibahas).length;
             const summaryEl = document.getElementById('statsSummary');
             summaryEl.textContent = `Total: ${topics.length} topik • ${discussedCount} dibahas • ${favorites.length} favorit`;
+
+            const manageBadge = document.getElementById('manageCountBadge');
+            if (manageBadge) manageBadge.textContent = topics.length;
         }
 
         function updateFavBadge() {
@@ -1189,9 +1573,9 @@
             localStorage.removeItem('topik_sheet_url');
             sheetUrl = "";
             document.getElementById('sheetUrlInput').value = "";
-            topics = [...DEFAULT_TOPICS];
+            initTopics();
             updateSheetStatus(false, "Spreadsheet Off");
-            showToast("Kembali ke database topik bawaan");
+            showToast("Kembali ke database topik lokal");
             closeModal('sheetModal');
             renderCard();
             updateStats();
@@ -1228,20 +1612,13 @@
             };
 
             topics.unshift(newTopic);
-            
-            // Save local customs
-            let customs = [];
-            try {
-                customs = JSON.parse(localStorage.getItem('topik_customs') || '[]');
-            } catch(err){}
-            customs.unshift(newTopic);
-            localStorage.setItem('topik_customs', JSON.stringify(customs));
+            saveTopicsState();
 
             currentTopic = newTopic;
             renderCard();
-            updateStats();
+            renderManageList();
             closeModal('customModal');
-            showToast("Topik rahasia baru berhasil disimpan!");
+            showToast("Pertanyaan baru berhasil disimpan!");
             
             // Reset form
             document.getElementById('customQuestionInput').value = '';
@@ -1254,6 +1631,7 @@
             if (!modal) return;
             modal.classList.remove('hidden');
 
+            if (id === 'manageModal') renderManageList();
             if (id === 'favModal') renderFavoritesList();
             if (id === 'historyModal') renderHistoryList();
         }
