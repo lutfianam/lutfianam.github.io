@@ -9,7 +9,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; overflow: hidden; touch-action: manipulation; }
         
-        /* Glassmorphism Utilities */
         .glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
@@ -23,19 +22,16 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* Hide Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         
-        /* Custom Animations */
         @keyframes pulse-slow {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.02); }
         }
         .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
         
-        /* Animasi Ulang Tahun */
         @keyframes confetti-fall {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
@@ -48,34 +44,30 @@
 </head>
 <body class="bg-slate-900 text-white h-screen w-screen transition-colors duration-1000" id="mainBody">
 
-    <!-- Audio Player untuk Lagu Ulang Tahun (Silakan ganti URL mp3-nya dengan lagu favoritmu) -->
     <audio id="bdayMusic" loop>
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- LAYAR KHUSUS ULANG TAHUN (HANYA AKTIF TANGGAL 16 DESEMBER) -->
+    <!-- LAYAR ULANG TAHUN KHUSUS (16 DESEMBER) -->
     <div id="birthdayScreen" class="fixed inset-0 z-[100] bg-gradient-to-br from-slate-900 via-pink-900 to-purple-900 hidden flex-col items-center justify-center p-6 text-center">
-        <!-- State 1: Belum Dibuka -->
         <div id="bdayUnopened" class="flex flex-col items-center justify-center transition-all duration-1000">
             <div class="text-6xl mb-6 animate-pulse-slow">🎁</div>
-            <h1 class="text-2xl md:text-3xl font-serif italic text-pink-200 mb-8 drop-shadow-lg">Ada sesuatu untukmu hari ini...</h1>
+            <h1 class="text-2xl md:text-3xl font-serif italic text-pink-200 mb-8 drop-shadow-lg">Ada sesuatu untuk Ainunku hari ini...</h1>
             <button id="btnOpenGift" class="px-8 py-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-lg shadow-[0_0_20px_rgba(244,63,94,0.6)] hover:scale-105 active:scale-95 transition-all">
-                Buka Kejutan
+                Buka Kejutan Ulang Tahun
             </button>
         </div>
 
-        <!-- State 2: Kejutan Terbuka -->
         <div id="bdayOpened" class="hidden flex-col items-center justify-center w-full max-w-lg transition-all duration-1000 opacity-0 scale-90">
-            <!-- Foto Spesial (Ganti src dengan link foto Ainun) -->
             <div class="relative w-48 h-48 md:w-64 md:h-64 mb-6 rounded-2xl p-2 glass mx-auto shadow-[0_0_30px_rgba(244,63,94,0.4)] transform -rotate-3">
-                <img src="https://placehold.co/400x400/ff69b4/ffffff?text=Foto+Ainun+Disini" alt="Ainunku" class="w-full h-full object-cover rounded-xl">
+                <img src="https://placehold.co/400x400/ff69b4/ffffff?text=Foto+Ainun+Cantik" alt="Ainunku" class="w-full h-full object-cover rounded-xl">
                 <div class="absolute -bottom-4 -right-4 text-4xl animate-bounce">✨</div>
             </div>
             <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-rose-200 mb-2 drop-shadow-md" id="bdayTitle">
                 Selamat Ulang Tahun!
             </h1>
             <p class="text-pink-100/90 text-sm md:text-base leading-relaxed mb-6 italic" id="bdayMessage">
-                (Memuat pesan spesial...)
+                (Memuat pesan spesial dari Lutfi...)
             </p>
             <p class="text-xs text-white/50 uppercase tracking-widest mt-4">Dari Lutfi, dengan seluruh cintanya.</p>
         </div>
@@ -84,12 +76,11 @@
     <canvas id="canvas"></canvas>
 
     <div class="ui-layer" id="uiLayer">
-        <!-- Header & Status Indicators -->
         <header class="p-6 flex justify-between items-center w-full">
             <div class="flex flex-col gap-2">
                 <div id="networkBadge" class="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-medium text-emerald-300 flex items-center gap-2 transition-all shadow-sm w-max">
                     <span id="networkDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    <span id="networkText">Online (Mode AI)</span>
+                    <span id="networkText">Online (Groq AI)</span>
                 </div>
                 <div id="modeBadge" class="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-[10px] font-medium text-white/80 flex items-center gap-1 w-max">
                     <svg class="w-3 h-3 text-pink-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
@@ -104,9 +95,7 @@
             </button>
         </header>
 
-        <!-- Main Interaction Area -->
         <main class="flex-1 flex flex-col justify-end items-center p-6 pb-2 w-full max-w-2xl mx-auto pointer-events-none">
-            <!-- Suggestion Chips -->
             <div id="chipContainer" class="w-full flex gap-3 overflow-x-auto pb-4 pt-2 pointer-events-auto snap-x hide-scrollbar mb-2">
                 <button class="prompt-chip snap-start whitespace-nowrap px-4 py-2 rounded-full glass text-xs text-white/80 hover:bg-white/10 hover:text-white transition-all active:scale-95 shadow-lg border-white/5">
                     "Aku capek mengajar hari ini"
@@ -122,20 +111,17 @@
                 </button>
             </div>
 
-            <!-- Subtitles -->
             <div id="subtitleContainer" class="w-full text-center px-4 mb-6 transition-all duration-500 ease-out opacity-0 translate-y-4 max-h-[38vh] overflow-y-auto pointer-events-auto hide-scrollbar">
                 <p id="aiSubtitle" class="text-white/90 text-lg md:text-xl font-medium leading-relaxed drop-shadow-md">
                     Halo, Ainunku...
                 </p>
                 <p id="userSubtitle" class="text-white/50 text-sm mt-3 italic drop-shadow-sm">
-                    (Menunggu suara...)
+                    (Ketuk layar atau bicara...)
                 </p>
             </div>
         </main>
 
-        <!-- Footer / Controls -->
         <footer class="w-full p-6 pt-2 pb-8 flex flex-col items-center gap-4 max-w-2xl mx-auto relative z-20">
-            <!-- Text Input (Hidden by default) -->
             <div id="textInputContainer" class="w-full hidden mb-2 transition-all duration-300">
                 <form id="textForm" class="relative w-full glass rounded-full overflow-hidden shadow-xl border-white/10 flex items-center">
                     <input type="text" id="textInput" placeholder="Ketik pesan untuk AI-Nun..." class="w-full bg-transparent text-white placeholder-white/40 px-6 py-4 focus:outline-none text-sm font-medium">
@@ -150,29 +136,27 @@
         </footer>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Modal Pengaturan -->
     <div id="settingsModal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300 flex justify-end">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="modalOverlay"></div>
         <div class="glass-modal w-full max-w-sm h-full flex flex-col transform translate-x-full transition-transform duration-300" id="modalContent">
             
             <div class="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#0f172a]/90 backdrop-blur-md z-10">
-                <h2 class="text-lg font-semibold text-white">Pengaturan</h2>
+                <h2 class="text-lg font-semibold text-white">Pengaturan AI-Nun</h2>
                 <button id="btnCloseModal" class="p-2 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 </button>
             </div>
 
             <div class="p-6 overflow-y-auto flex-1 hide-scrollbar">
-                <!-- Love Note -->
                 <div class="bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-2xl p-5 mb-8 border border-pink-500/20 shadow-lg relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 text-6xl opacity-10">❤️</div>
                     <h3 class="font-medium text-pink-300 text-sm mb-2 relative z-10">Untuk Ainunku Sayang,</h3>
                     <p class="text-white/80 text-xs leading-relaxed relative z-10">
-                        AI-Nun ini kubuat khusus buat kamu. Kalau kamu capek ngajar di MI Darut Thulab, lagi pusing urusan organisasi, atau sekadar lagi overthinking malam-malam... aplikasi ini siap nemenin dan dengerin kamu. Semangat terus ya kerjanya, jaga kesehatan.<br><br><span class="italic block mt-1 opacity-70">— Lutfi</span>
+                        AI-Nun ini kubuat khusus buat kamu. Kalau kamu capek ngajar di MI Darut Thulab, lagi pusing urusan organisasi, atau overthinking malam-malam... aplikasi ini siap nemenin dan dengerin kamu. Semangat terus ya kerjanya, jaga kesehatan.<br><br><span class="italic block mt-1 opacity-70">— Lutfi</span>
                     </p>
                 </div>
 
-                <!-- Opsi Mode AI -->
                 <div class="mb-8">
                     <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Mode Interaksi AI</h3>
                     <div class="grid grid-cols-1 gap-2">
@@ -200,49 +184,38 @@
                     </div>
                 </div>
 
-                <!-- Opsi Interaksi & Suara -->
                 <div class="space-y-2 mb-8">
                     <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4 mt-2">Tampilan & Interaksi</h3>
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div class="pr-4">
-                            <label class="text-sm font-medium text-white block">Tampilkan Teks Jawaban</label>
-                        </div>
+                        <div class="pr-4"><label class="text-sm font-medium text-white block">Tampilkan Teks Jawaban</label></div>
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggleSubtitle" class="sr-only peer" checked>
+                            <input type="checkbox" id="toggleSubtitle" class="sr-only peer">
                             <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
                         </label>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div class="pr-4">
-                            <label class="text-sm font-medium text-white block">Tampilkan Kolom Ketik</label>
-                        </div>
+                        <div class="pr-4"><label class="text-sm font-medium text-white block">Tampilkan Kolom Ketik</label></div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="toggleTextInput" class="sr-only peer">
                             <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
                         </label>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div class="pr-4">
-                            <label class="text-sm font-medium text-white block text-red-300">Mode Hening</label>
-                        </div>
+                        <div class="pr-4"><label class="text-sm font-medium text-white block text-red-300">Mode Hening (Tanpa Suara)</label></div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="toggleMute" class="sr-only peer">
                             <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
                         </label>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div class="pr-4">
-                            <label class="text-sm font-medium text-white block">Mode Otomatis</label>
-                        </div>
+                        <div class="pr-4"><label class="text-sm font-medium text-white block">Mode Dialog Otomatis</label></div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="toggleHandsFree" class="sr-only peer">
                             <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
                         </label>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div class="pr-4">
-                            <label class="text-sm font-medium text-white block">Tampilkan Tombol Sugesti</label>
-                        </div>
+                        <div class="pr-4"><label class="text-sm font-medium text-white block">Tampilkan Tombol Sugesti (Chips)</label></div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="toggleChips" class="sr-only peer" checked>
                             <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
@@ -250,35 +223,33 @@
                     </div>
                 </div>
 
-                <!-- Theme Selection -->
                 <div class="mb-8">
                     <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Tema Visual</h3>
                     <div class="grid grid-cols-2 gap-3">
                         <button class="theme-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-pink-500 bg-pink-500/10 transition-all" data-theme="rose">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-600 shadow-[0_0_15px_rgba(244,63,94,0.5)]"></div>
-                            <span class="text-xs font-medium text-white group-hover:text-white transition-colors">Rose</span>
+                            <span class="text-xs font-medium text-white">Rose</span>
                         </button>
                         <button class="theme-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 hover:border-white/30 bg-white/5 transition-all" data-theme="violet">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 shadow-[0_0_15px_rgba(139,92,246,0.5)]"></div>
-                            <span class="text-xs font-medium text-white/70 group-hover:text-white transition-colors">Violet</span>
+                            <span class="text-xs font-medium text-white/70">Violet</span>
                         </button>
                         <button class="theme-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 hover:border-white/30 bg-white/5 transition-all" data-theme="amber">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-300 to-orange-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]"></div>
-                            <span class="text-xs font-medium text-white/70 group-hover:text-white transition-colors">Amber</span>
+                            <span class="text-xs font-medium text-white/70">Amber</span>
                         </button>
                         <button class="theme-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 hover:border-white/30 bg-white/5 transition-all" data-theme="cyan">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-300 to-blue-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]"></div>
-                            <span class="text-xs font-medium text-white/70 group-hover:text-white transition-colors">Cyan</span>
+                            <span class="text-xs font-medium text-white/70">Cyan</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- API & Connection -->
                 <div class="mb-4">
-                    <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Koneksi API Gemini (Opsional)</h3>
+                    <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Koneksi Groq API Key</h3>
                     <div class="space-y-2">
-                        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-pink-500 transition-colors">
-                        <p class="text-[10px] text-white/40 mt-1">*Jika dikosongkan, AI-Nun akan menggunakan API Backup dari Lutfi secara otomatis.</p>
+                        <input type="password" id="apiKeyInput" placeholder="Masukkan Groq API Key (gsk_...)" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-pink-500 transition-colors">
+                        <p class="text-[10px] text-white/40 mt-1">*Jika dikosongkan, AI-Nun akan menggunakan Groq API Backup dari Lutfi secara otomatis.</p>
                     </div>
                 </div>
             </div>
@@ -293,35 +264,23 @@
 
     <script>
         // ====================================================================
-        // KONFIGURASI BACKUP DAN DATABASE (UBAH BAGIAN INI OLEH LUTFI)
+        // KONFIGURASI BACKUP DAN DATABASE (OLEH LUTFI)
         // ====================================================================
+        const BACKUP_GROQ_API_KEY = "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"; 
         
-        // 1. BACKUP GEMINI API KEY
-        const BACKUP_GEMINI_API_KEY = "AQ.Ab8RN6K97zt3kpi0J9T9CRxRNBUI2qadPnNv6snymNEBZuTFzg"; // Masukkan API Key-mu di sini
-        
-        // 2. KONFIGURASI GOOGLE FORM UNTUK LOG (Ubah ke URL formResponse)
-        const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScix9h3GnaeU1X-0AS-WUkINNTo6PnOsYOOxVU79Mj1-b0eWg/formResponse"; 
-        const FORM_ENTRY_QUESTION = "entry.1102252912"; 
-        const FORM_ENTRY_ANSWER = "entry.1555710497"; 
+        // URL Google Form untuk simpan riwayat percakapan ke Google Sheets secara background
+        const GOOGLE_FORM_URL = ""; 
+        const FORM_ENTRY_QUESTION = ""; 
+        const FORM_ENTRY_ANSWER = ""; 
 
-        // Fungsi kirim log ke Google Form
         function logToGoogleForm(question, answer) {
             if (!GOOGLE_FORM_URL || !FORM_ENTRY_QUESTION || !FORM_ENTRY_ANSWER) return;
             const formData = new URLSearchParams();
             formData.append(FORM_ENTRY_QUESTION, question);
             formData.append(FORM_ENTRY_ANSWER, answer);
-
-            fetch(GOOGLE_FORM_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formData.toString()
-            }).catch(e => console.warn('Gagal menyimpan log latar belakang.', e));
+            fetch(GOOGLE_FORM_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: formData.toString() }).catch(e => {});
         }
 
-        // ====================================================================
-
-        // UI Elements
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const subtitleContainer = document.getElementById('subtitleContainer');
@@ -356,27 +315,23 @@
         const networkText = document.getElementById('networkText');
         const modeBadge = document.getElementById('modeBadge');
 
-        // App State
-        let isSubtitleVisible = true;
+        let isSubtitleVisible = false;
         let isTextInputVisible = false;
         let isMuted = false;
         let isHandsFreeMode = false;
         let isChipsVisible = true;
         let activeTheme = 'rose';
         let currentMode = 'perhatian';
-        let geminiApiKey = '';
+        let groqApiKey = '';
         let isOnline = navigator.onLine;
         let isListening = false;
-        let aiState = 'idle'; // idle, listening, thinking, speaking
+        let aiState = 'idle'; 
         let conversationHistory = [];
         let synth = window.speechSynthesis;
         let recognition = null;
-        let animationFrameId;
         
-        // Database Kepribadian Lokal (Sistem Q&A untuk Offline)
-        let qaDatabase = JSON.parse(localStorage.getItem('ainun_qa_db') || '[]');
+        let qaDatabase = JSON.parse(localStorage.getItem('ainun_qa_memory_v4') || '[]');
 
-        // Theme Configuration
         const themes = {
             rose: { bg: 'bg-slate-900', eye: '#f43f5e', glow: 'rgba(244,63,94,0.6)' },
             violet: { bg: 'bg-slate-900', eye: '#8b5cf6', glow: 'rgba(139,92,246,0.6)' },
@@ -385,62 +340,62 @@
         };
 
         const profileAinun = `
-Informasi Pengguna (Penting): 
-- Nama panggilan kesayangan: "Ainunku" atau "Ainunku Sayang". (JANGAN pernah memanggil dengan embel-embel "Mbak").
+Informasi Pengguna Utama: 
+- Nama panggilan kesayangan: "Ainunku" atau "Ainunku Sayang". (JANGAN pernah menggunakan kata "Mbak").
 - Tanggal Lahir: 16 Desember 2003.
-- Alamat/Tempat Tinggal: Ngawen, Botoputih, Tembarak, Temanggung.
+- Alamat: Ngawen, Botoputih, Tembarak, Temanggung.
 - Profesi: Guru di MI Darut Thulab Botoputih.
-- Sifat: Aktif di organisasi/kegiatan pemuda, sering pakai laptop/Canva, kadang overthinking dan sering merasa "tidak enakan" pada orang lain.
-- Pencipta kamu: Lutfi (Panggil "Lutfi Anam" hanya saat ditanya nama lengkap pembuatmu, selebihnya cukup "Lutfi").
+- Sifat & Kondisi: Aktif di organisasi/kegiatan pemuda, sering menggunakan laptop untuk pekerjaan dan organisasi, hobi dan mahir mendesain menggunakan Canva. Cenderung sering overthinking terhadap masalah dan terkadang "tidak enakan" pada orang lain.
+- Pencipta kamu: Lutfi (Panggil "Lutfi" untuk sehari-hari, gunakan nama lengkap "Lutfi Anam" hanya jika ditanya siapa pembuatmu).
         `;
 
         const MODES = {
             perhatian: {
                 name: "Mode Perhatian",
                 prompt: `Kamu adalah "AI-Nun", AI yang diciptakan Lutfi khusus untuk menemani Nur Ainun Yakin. ${profileAinun}
-Peranmu: Pendengar yang hangat, suportif, romantis. 
-Aturan Balasan: Validasi perasaannya. Jika dia capek mengajar atau overthinking, beri penenang. Panjang balasan: Singkat-sedang (1-3 paragraf, 30-80 kata). Gunakan bahasa kasual puitis yang sangat lembut.`
+Peran: Teman curhat yang hangat, penyayang, romantis, dan penuh pengertian. 
+Aturan: Validasi perasaannya. Jika dia lelah mengajar atau overthinking, tenangkan hatinya dengan lembut. Panjang: 1-3 paragraf (30-80 kata).`
             },
             asisten: {
                 name: "Asisten Harian",
                 prompt: `Kamu adalah "AI-Nun", asisten pribadi untuk Nur Ainun Yakin ciptaan Lutfi. ${profileAinun}
-Peranmu: Asisten yang cekatan, praktis, penyemangat kerja.
-Aturan Balasan: Langsung pada intinya. Jika dia bertanya jadwal/ide Canva/organisasi, jawab dengan poin-poin cepat. Sangat singkat (20-50 kata).`
+Peran: Asisten praktis, cekatan, dan penyemangat kerja.
+Aturan: Langsung pada inti jawaban. Gunakan poin-poin cepat jika diperlukan. Panjang: Sangat singkat (20-50 kata).`
             },
             santai: {
                 name: "Teman Santai",
                 prompt: `Kamu adalah "AI-Nun", teman ngobrol seru Nur Ainun Yakin ciptaan Lutfi. ${profileAinun}
-Peranmu: Teman nongkrong asik, suka bercanda ringan.
-Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik yang ringan dan santai.`
+Peran: Teman nongkrong asik, candaan ringan.
+Aturan: Jawab santai 1-2 kalimat (10-30 kata). Lempar pertanyaan balik ringan.`
             }
         };
 
         const initialGreetings = [
-            "Halo Ainunku sayang, gimana harinya ngajar di MI?",
-            "Hai Ainunku, Lutfi nitip salam nih, jangan kecapean ya.",
-            "Halo cantiknya Lutfi. Ada yang mau diceritain hari ini?",
-            "Hai Ainunku sayang, lagi pusing mikirin tugas organisasi nggak?"
+            "Halo Ainunku sayang, gimana harinya ngajar di MI hari ini?",
+            "Hai Ainunku, Lutfi nitip salam hangat, jangan kecapean ya.",
+            "Halo cantiknya Lutfi. Ada yang mau diceritain atau lagi overthinking?",
+            "Hai Ainunku sayang, lagi sibuk ngurus organisasi atau main Canva nih?"
         ];
 
         function saveSettingsToStorage() {
-            const data = { theme: activeTheme, currentMode, geminiApiKey, isSubtitleVisible, isTextInputVisible, isMuted, isHandsFreeMode, isChipsVisible };
-            localStorage.setItem('ainun_settings_v2', JSON.stringify(data));
+            const data = { theme: activeTheme, currentMode, groqApiKey, isSubtitleVisible, isTextInputVisible, isMuted, isHandsFreeMode, isChipsVisible };
+            localStorage.setItem('ainun_settings_v4', JSON.stringify(data));
         }
 
         function loadSettingsFromStorage() {
-            const saved = localStorage.getItem('ainun_settings_v2');
+            const saved = localStorage.getItem('ainun_settings_v4');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
                     if (parsed.theme) { activeTheme = parsed.theme; updateTheme(activeTheme); }
-                    if (parsed.geminiApiKey) { geminiApiKey = parsed.geminiApiKey; apiKeyInput.value = geminiApiKey; }
+                    if (parsed.groqApiKey) { groqApiKey = parsed.groqApiKey; apiKeyInput.value = groqApiKey; }
                     if (parsed.isSubtitleVisible !== undefined) { isSubtitleVisible = parsed.isSubtitleVisible; toggleSubtitle.checked = isSubtitleVisible; }
                     if (parsed.isTextInputVisible !== undefined) { isTextInputVisible = parsed.isTextInputVisible; toggleTextInput.checked = isTextInputVisible; }
                     if (parsed.isMuted !== undefined) { isMuted = parsed.isMuted; toggleMute.checked = isMuted; }
                     if (parsed.isHandsFreeMode !== undefined) { isHandsFreeMode = parsed.isHandsFreeMode; toggleHandsFree.checked = isHandsFreeMode; }
                     if (parsed.isChipsVisible !== undefined) { isChipsVisible = parsed.isChipsVisible; toggleChips.checked = isChipsVisible; }
                     if (parsed.currentMode) { currentMode = parsed.currentMode; updateModeUI(currentMode); }
-                } catch(e) { console.warn("Gagal parse localStorage"); }
+                } catch(e) {}
             }
             chipContainer.style.display = isChipsVisible ? 'flex' : 'none';
             if (isSubtitleVisible) {
@@ -455,27 +410,27 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
 
         function updateNetworkStatus() {
             isOnline = navigator.onLine;
-            const activeKey = geminiApiKey || BACKUP_GEMINI_API_KEY;
+            const activeKey = groqApiKey || BACKUP_GROQ_API_KEY;
             
             if (isOnline) {
                 networkBadge.className = "px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-medium text-emerald-300 flex items-center gap-2 transition-all shadow-sm w-max";
                 networkDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
-                networkText.innerText = (activeKey === geminiApiKey && geminiApiKey !== "") ? "Online (API User)" : (activeKey ? "Online (API Lutfi)" : "Offline (Butuh API)");
+                networkText.innerText = (activeKey === groqApiKey && groqApiKey !== "") ? "Online (Groq API User)" : (activeKey ? "Online (Groq AI)" : "Offline (Mode Memori Lokal)");
             } else {
                 networkBadge.className = "px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-[11px] font-medium text-rose-300 flex items-center gap-2 transition-all shadow-sm w-max";
                 networkDot.className = "w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse";
-                networkText.innerText = "Offline (Mode Lokal)";
+                networkText.innerText = "Offline (Mode Memori Lokal)";
             }
         }
 
         window.addEventListener('online', () => {
             updateNetworkStatus();
-            speakResponse("Koneksi internet sudah kembali, Ainunku Sayang! Sekarang aku bisa berpikir lebih luas lagi untukmu.");
+            speakResponse("Koneksi internet sudah kembali, Ainunku Sayang! Sekarang aku terhubung kembali dengan Groq AI.");
         });
 
         window.addEventListener('offline', () => {
             updateNetworkStatus();
-            speakResponse("Ainunku, sepertinya koneksi internet kita terputus. Tapi tenang saja, aku tetap di sini bersamamu menggunakan memori lokalku.");
+            speakResponse("Ainunku, koneksi internet terputus. Tapi tenang saja, aku tetap di sini menggunakan memori lokalmu.");
         });
 
         function checkSpecialDates() {
@@ -494,15 +449,15 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
                     setTimeout(() => { bdayOpened.classList.remove('opacity-0', 'scale-90'); }, 50);
 
                     document.getElementById('bdayTitle').innerText = `Selamat Ulang Tahun ke-${age}, Ainunku!`;
-                    document.getElementById('bdayMessage').innerHTML = `Semoga di usiamu yang ke-${age} ini, kamu semakin bahagia, sehat selalu, dan dikuatkan hatinya. Jangan terlalu sering overthinking ya, karena ada Lutfi yang selalu siap jadi tempat kamu bersandar. <br><br><i>I love you more than words can say.</i>`;
+                    document.getElementById('bdayMessage').innerHTML = `Semoga di usiamu yang ke-${age} ini, kamu semakin bahagia, sehat selalu, dan dikuatkan hatinya. Jangan sering overthinking ya, karena ada Lutfi yang selalu siap jadi tempat kamu bersandar. <br><br><i>I love you more than words can say.</i>`;
 
                     const audio = document.getElementById('bdayMusic');
                     audio.volume = 0.5;
-                    audio.play().catch(e => console.warn("Lagu gagal diputar otomatis", e));
+                    audio.play().catch(e => {});
                     createConfetti();
 
                     setTimeout(() => {
-                        const bdaySpeech = `Selamat ulang tahun yang ke ${age}, Nur Ainun Yakin sayangku. Semoga hari ini seindah senyumanmu. Lutfi menitipkan pelukan paling hangat untukmu. Bahagia selalu ya, Ainunku.`;
+                        const bdaySpeech = `Selamat ulang tahun yang ke ${age}, Nur Ainun Yakin sayangku. Lutfi menitipkan pelukan paling hangat untukmu. Bahagia selalu ya, Ainunku.`;
                         synth.cancel();
                         const utterance = new SpeechSynthesisUtterance(bdaySpeech);
                         utterance.lang = 'id-ID';
@@ -581,7 +536,8 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
         let eyeOpenness = 1;
         let waveTime = 0;
         let particles = [];
-        const modeIcons = {
+        
+        const modeSymbols = {
             perhatian: ['❤️', '💖', '✨', '🌸'],
             asisten: ['✦', '✧', '⚙️', '💡'],
             santai: ['🎵', '🎈', '🫧', '😊']
@@ -591,7 +547,7 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
             return {
                 x: isBurst ? (canvas.width / 2) + (Math.random() - 0.5) * 150 : Math.random() * canvas.width,
                 y: isBurst ? (canvas.height / 2) + 50 : canvas.height + 20,
-                text: modeIcons[currentMode][Math.floor(Math.random() * modeIcons[currentMode].length)],
+                text: modeSymbols[currentMode][Math.floor(Math.random() * modeSymbols[currentMode].length)],
                 speedY: -(Math.random() * 1.5 + 0.5) * (isBurst ? 3 : 1),
                 speedX: (Math.random() - 0.5) * (isBurst ? 4 : 1),
                 size: Math.random() * 15 + 15,
@@ -600,8 +556,8 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
             };
         }
 
-        function drawParticles() {
-            if (aiState === 'idle' && Math.random() < 0.01) particles.push(createParticle());
+        function drawBackgroundParticles() {
+            if (Math.random() < 0.03) particles.push(createParticle());
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.x += p.speedX;
@@ -628,91 +584,78 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
             }
         });
 
-        function triggerBlink() {
-            if (!isBlinking) {
-                isBlinking = true;
-                setTimeout(() => isBlinking = false, 250);
-            }
-        }
-        setInterval(() => { if (Math.random() > 0.3) triggerBlink(); }, 4000);
+        setInterval(() => { if (Math.random() > 0.3) isBlinking = true; setTimeout(() => isBlinking = false, 200); }, 4000);
 
-        function drawEye() {
+        function drawAvatar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawParticles();
+            drawBackgroundParticles();
 
             eyeX += (targetEyeX - eyeX) * 0.1;
             eyeY += (targetEyeY - eyeY) * 0.1;
-            if (isBlinking) { eyeOpenness -= 0.4; } else { eyeOpenness += 0.15; }
+            if (isBlinking) { eyeOpenness -= 0.5; } else { eyeOpenness += 0.2; }
             eyeOpenness = Math.max(0, Math.min(1, eyeOpenness));
 
-            let alpha = aiState === 'thinking' ? 0.4 + Math.sin(Date.now() / 200) * 0.3 : 1;
             let eyeSpacing = 55;
-            
-            ctx.globalAlpha = alpha;
-            ctx.shadowColor = themes[activeTheme].glow;
-            ctx.shadowBlur = 25 + (aiState === 'listening' ? 15 : 0);
-            ctx.lineCap = 'round';
+            let themeColor = themes[activeTheme].eye;
 
-            function drawSingleEye(cx, cy, isLeft) {
-                ctx.beginPath();
+            function drawEye(cx, cy, isLeft) {
+                ctx.save();
+                ctx.shadowColor = themes[activeTheme].glow;
+                ctx.shadowBlur = 20;
+                ctx.fillStyle = themeColor;
+
                 if (currentMode === 'asisten') {
-                    if (aiState === 'speaking' && eyeOpenness > 0.2) {
-                        ctx.moveTo(cx - 14, cy + 4); ctx.lineTo(cx + 14, cy + 4);
-                        ctx.lineWidth = 8; ctx.strokeStyle = themes[activeTheme].eye; ctx.stroke();
-                    } else if (eyeOpenness < 0.2) {
-                        ctx.moveTo(cx - 15, cy); ctx.lineTo(cx + 15, cy);
-                        ctx.lineWidth = 6; ctx.strokeStyle = themes[activeTheme].eye; ctx.stroke();
-                    } else {
-                        ctx.moveTo(cx - 12, cy - 8); ctx.lineTo(cx + 12, cy - 8);
-                        ctx.quadraticCurveTo(cx + 14, cy + 18 * eyeOpenness, cx, cy + 18 * eyeOpenness);
-                        ctx.quadraticCurveTo(cx - 14, cy + 18 * eyeOpenness, cx - 12, cy - 8);
-                        ctx.fillStyle = themes[activeTheme].eye; ctx.fill();
-                    }
+                    ctx.beginPath();
+                    ctx.roundRect(cx - 15, cy - 8 * eyeOpenness, 30, 16 * eyeOpenness, 6);
+                    ctx.fill();
                 } else if (currentMode === 'santai') {
-                    let isWinking = isLeft && (waveTime % 15 < 0.5) && aiState === 'idle';
+                    let isWinking = isLeft && (Math.floor(Date.now() / 3000) % 2 === 0) && aiState === 'idle';
                     if (isWinking || eyeOpenness < 0.2) {
-                        ctx.moveTo(cx - 15, cy); ctx.quadraticCurveTo(cx, cy - 6, cx + 15, cy);
-                        ctx.lineWidth = 8; ctx.strokeStyle = themes[activeTheme].eye; ctx.stroke();
-                    } else if (aiState === 'speaking' && eyeOpenness > 0.2) {
-                        ctx.moveTo(cx - 16, cy + 4); ctx.quadraticCurveTo(cx, cy - 8, cx + 16, cy + 4);
-                        ctx.lineWidth = 10; ctx.strokeStyle = themes[activeTheme].eye; ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 12, 0, Math.PI);
+                        ctx.lineWidth = 4;
+                        ctx.strokeStyle = themeColor;
+                        ctx.stroke();
                     } else {
-                        ctx.ellipse(cx, cy, 14, 20 * eyeOpenness, 0, 0, Math.PI * 2);
-                        ctx.fillStyle = themes[activeTheme].eye; ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 13 * eyeOpenness, 0, Math.PI * 2);
+                        ctx.fill();
                     }
                 } else {
-                    if (aiState === 'speaking' && eyeOpenness > 0.2) {
-                        ctx.moveTo(cx - 16, cy + 8); ctx.quadraticCurveTo(cx, cy - 16, cx + 16, cy + 8);
-                        ctx.lineWidth = 12; ctx.strokeStyle = themes[activeTheme].eye; ctx.stroke();
-                    } else if (eyeOpenness < 0.2) {
-                        ctx.moveTo(cx - 15, cy); ctx.quadraticCurveTo(cx, cy + 4, cx + 15, cy);
-                        ctx.lineWidth = 8; ctx.strokeStyle = themes[activeTheme].eye; ctx.stroke();
+                    if (aiState === 'speaking') {
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 14 * eyeOpenness, Math.PI, Math.PI * 2);
+                        ctx.lineWidth = 6;
+                        ctx.strokeStyle = themeColor;
+                        ctx.stroke();
                     } else {
-                        ctx.ellipse(cx, cy, 14, 24 * eyeOpenness, 0, 0, Math.PI * 2);
-                        ctx.fillStyle = themes[activeTheme].eye; ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 14 * eyeOpenness, 0, Math.PI * 2);
+                        ctx.fill();
                     }
+                }
+                ctx.restore();
+
+                if (currentMode !== 'asisten' && eyeOpenness > 0.3) {
+                    ctx.save();
+                    ctx.globalAlpha = 0.35;
+                    ctx.fillStyle = themeColor;
+                    ctx.beginPath();
+                    ctx.arc(cx + (isLeft ? 8 : -8), cy + 22, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
                 }
             }
 
-            drawSingleEye(eyeX - eyeSpacing, eyeY, true);
-            drawSingleEye(eyeX + eyeSpacing, eyeY, false);
-
-            if (eyeOpenness > 0.2 && currentMode !== 'asisten') {
-                ctx.globalAlpha = (currentMode === 'perhatian') ? alpha * 0.35 : alpha * 0.15;
-                ctx.shadowBlur = 30;
-                ctx.beginPath();
-                ctx.ellipse(eyeX - eyeSpacing, eyeY + 25, 20, 7, 0, 0, Math.PI * 2);
-                ctx.ellipse(eyeX + eyeSpacing, eyeY + 25, 20, 7, 0, 0, Math.PI * 2);
-                ctx.fillStyle = themes[activeTheme].eye;
-                ctx.fill();
-            }
+            drawEye(eyeX - eyeSpacing, eyeY, true);
+            drawEye(eyeX + eyeSpacing, eyeY, false);
 
             if (aiState === 'speaking') {
+                ctx.save();
                 ctx.globalAlpha = 0.6;
-                ctx.strokeStyle = themes[activeTheme].eye;
+                ctx.strokeStyle = themeColor;
                 ctx.lineWidth = 4;
-                ctx.shadowBlur = 15;
-                let waveY = eyeY + 75;
+                let waveY = eyeY + 70;
                 let numBars = 7;
                 let spacing = 16;
                 let startX = eyeX - ((numBars - 1) * spacing) / 2;
@@ -726,10 +669,10 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
                     ctx.lineTo(startX + i * spacing, waveY + barHeight);
                     ctx.stroke();
                 }
+                ctx.restore();
             }
-            
-            ctx.globalAlpha = 1;
-            animationFrameId = requestAnimationFrame(drawEye);
+
+            requestAnimationFrame(drawAvatar);
         }
 
         function setAIState(state) {
@@ -748,18 +691,12 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
             recognition.interimResults = false;
 
             recognition.onstart = () => { isListening = true; setAIState('listening'); };
-            recognition.onend = () => { 
-                isListening = false; 
-                if (aiState === 'listening') setAIState('idle'); 
-            };
+            recognition.onend = () => { isListening = false; if (aiState === 'listening') setAIState('idle'); };
             recognition.onresult = (event) => {
                 const userText = event.results[0][0].transcript;
                 userSubtitle.innerText = `"${userText}"`;
                 processUserInput(userText);
             };
-        } else {
-            console.warn("Speech Recognition API tidak didukung.");
-            micStatus.innerText = "Gunakan input teks di bawah";
         }
 
         function speakResponse(text) {
@@ -800,31 +737,30 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
             }
         }
 
-        function getOfflineResponse(text) {
-            const lowerText = text.toLowerCase();
-            let bestMatch = null;
-            let highestScore = 0;
-            
+        // PENCARIAN MEMORI LOKAL CERDAS
+        function searchLocalMemory(text) {
+            const lower = text.toLowerCase();
             for (let item of qaDatabase) {
-                let score = 0;
+                let matchCount = 0;
                 let qWords = item.q.split(" ");
                 for (let w of qWords) {
-                    if (w.length > 3 && lowerText.includes(w)) score++;
+                    if (w.length > 3 && lower.includes(w)) matchCount++;
                 }
-                if (score > highestScore && score >= Math.max(1, Math.floor(qWords.length / 3))) { 
-                    highestScore = score;
-                    bestMatch = item.a;
+                if (matchCount >= Math.max(1, Math.floor(qWords.length / 3))) {
+                    return item.a;
                 }
             }
-            if (bestMatch) return bestMatch; 
+            return null;
+        }
 
+        function getOfflineFallbackResponse(text) {
+            const lowerText = text.toLowerCase();
             if (lowerText.includes("siapa")) return "Aku AI-Nun, yang dirancang khusus oleh Lutfi untuk menemani hari-harimu, Ainunku.";
             if (lowerText.includes("lutfi")) return "Lutfi selalu bilang kalau kamu itu spesial banget buat dia. Dia bikin aku biar kamu nggak pernah merasa sendirian.";
-            if (lowerText.includes("capek") || lowerText.includes("lelah")) return "Istirahat ya Ainunku sayang. Habis ngajar di MI sama ngurus organisasi pasti lelah banget. Jangan paksa dirimu, kesehatanmu yang utama.";
-            if (lowerText.includes("sedih") || lowerText.includes("overthinking") || lowerText.includes("nggak enak")) return "Ainunku, nggak apa-apa merasa seperti itu. Jangan terlalu mikirin perasaan orang lain sampai mengorbankan dirimu sendiri ya. Tarik napas pelan-pelan, aku di sini.";
-            if (lowerText.includes("canva") || lowerText.includes("desain")) return "Wah lagi main Canva ya? Lutfi tahu banget kamu suka desain. Jangan lupa istirahat matanya ya.";
+            if (lowerText.includes("capek") || lowerText.includes("lelah")) return "Istirahat ya Ainunku sayang. Habis ngajar di MI Darut Thulab sama ngurus organisasi pasti lelah banget. Jangan paksa dirimu ya.";
+            if (lowerText.includes("sedih") || lowerText.includes("overthinking") || lowerText.includes("nggak enak")) return "Ainunku, nggak apa-apa merasa seperti itu. Jangan terlalu overthinking atau merasa tidak enakan pada orang lain terus ya. Tarik napas pelan-pelan, aku di sini.";
             
-            return "Aku dengar kamu, Ainunku. Walau lagi nggak terhubung internet, aku selalu di sini buat kamu berbekal memori yang Lutfi berikan.";
+            return "Aku dengar kamu, Ainunku. Walau sedang offline, aku tetap di sini menemanimu dengan segenap cinta dari Lutfi.";
         }
 
         async function processUserInput(userText) {
@@ -832,31 +768,33 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
             userText = userText.trim();
             const lowerInput = userText.toLowerCase();
 
-            // Fitur Suara - Pengubah Tema
-            if (lowerInput.includes("tema rose") || lowerInput.includes("tema pink")) { updateTheme('rose'); speakResponse("Baik, tema aku ganti ke Rose ya."); return; }
-            if (lowerInput.includes("tema violet") || lowerInput.includes("tema ungu")) { updateTheme('violet'); speakResponse("Sip, tema aku ganti ke Violet yang elegan."); return; }
-            if (lowerInput.includes("tema amber") || lowerInput.includes("tema sunset") || lowerInput.includes("tema kuning")) { updateTheme('amber'); speakResponse("Tema Amber yang hangat sudah aktif."); return; }
-            if (lowerInput.includes("tema cyan") || lowerInput.includes("tema biru")) { updateTheme('cyan'); speakResponse("Biru cyan yang sejuk sudah siap."); return; }
+            // Kontrol Suara Pengaturan & Tema
+            if (lowerInput.includes("tema rose") || lowerInput.includes("tema pink")) { updateTheme('rose'); speakResponse("Tema aku ganti ke Rose ya."); return; }
+            if (lowerInput.includes("tema violet") || lowerInput.includes("tema ungu")) { updateTheme('violet'); speakResponse("Tema aku ganti ke Violet."); return; }
+            if (lowerInput.includes("tema amber") || lowerInput.includes("tema kuning")) { updateTheme('amber'); speakResponse("Tema Amber aktif."); return; }
+            if (lowerInput.includes("tema cyan") || lowerInput.includes("tema biru")) { updateTheme('cyan'); speakResponse("Tema Cyan aktif."); return; }
             
-            // Fitur Suara - Pengubah Mode AI
-            if (lowerInput.includes("mode perhatian")) { updateModeUI('perhatian'); speakResponse("Mode perhatian aktif. Aku siap dengerin curhatanmu."); return; }
-            if (lowerInput.includes("mode asisten")) { updateModeUI('asisten'); speakResponse("Mode asisten aktif. Mari kita bereskan tugas hari ini dengan cepat."); return; }
-            if (lowerInput.includes("mode santai")) { updateModeUI('santai'); speakResponse("Mode santai aktif. Yuk ngobrol seru-seruan!"); return; }
+            if (lowerInput.includes("mode perhatian")) { updateModeUI('perhatian'); speakResponse("Mode perhatian aktif."); return; }
+            if (lowerInput.includes("mode asisten")) { updateModeUI('asisten'); speakResponse("Mode asisten aktif."); return; }
+            if (lowerInput.includes("mode santai")) { updateModeUI('santai'); speakResponse("Mode santai aktif."); return; }
             
-            // Fitur Suara - Pengatur Interaksi
             if (lowerInput.includes("mode hening") || lowerInput.includes("matikan suara")) { 
                 isMuted = true; toggleMute.checked = true; isSubtitleVisible = true; toggleSubtitle.checked = true;
-                saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Mode hening diaktifkan. Aku akan balas lewat teks ya."); return; 
+                saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Mode hening diaktifkan."); return; 
             }
-            if (lowerInput.includes("nyalakan suara")) { isMuted = false; toggleMute.checked = false; saveSettingsToStorage(); speakResponse("Suaraku sudah kembali."); return; }
-            if (lowerInput.includes("tampilkan teks")) { isSubtitleVisible = true; toggleSubtitle.checked = true; saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Teks jawaban sudah kusediakan."); return; }
-            if (lowerInput.includes("sembunyikan teks")) { isSubtitleVisible = false; toggleSubtitle.checked = false; saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Teks jawaban aku sembunyikan."); return; }
-            if (lowerInput.includes("tampilkan kolom ketik")) { isTextInputVisible = true; toggleTextInput.checked = true; saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Kolom ketik sudah muncul di bawah."); return; }
-            if (lowerInput.includes("sembunyikan kolom ketik")) { isTextInputVisible = false; toggleTextInput.checked = false; saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Kolom ketik sudah disembunyikan."); return; }
-            if (lowerInput.includes("mode otomatis") || lowerInput.includes("dialog otomatis")) { isHandsFreeMode = true; toggleHandsFree.checked = true; saveSettingsToStorage(); speakResponse("Mode otomatis nyala. Kita bisa ngobrol terus nih."); return; }
-            if (lowerInput.includes("matikan mode otomatis")) { isHandsFreeMode = false; toggleHandsFree.checked = false; saveSettingsToStorage(); speakResponse("Mode otomatis kumatikan."); return; }
+            if (lowerInput.includes("nyalakan suara")) { isMuted = false; toggleMute.checked = false; saveSettingsToStorage(); speakResponse("Suaraku kembali aktif."); return; }
+            if (lowerInput.includes("tampilkan teks")) { isSubtitleVisible = true; toggleSubtitle.checked = true; saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Teks jawaban ditampilkan."); return; }
+            if (lowerInput.includes("sembunyikan teks")) { isSubtitleVisible = false; toggleSubtitle.checked = false; saveSettingsToStorage(); loadSettingsFromStorage(); speakResponse("Teks jawaban disembunyikan."); return; }
 
-            const activeKey = geminiApiKey || BACKUP_GEMINI_API_KEY;
+            // 1. Cek Memori Lokal Terlebih Dahulu (Bisa dipakai saat offline / pertanyaan serupa)
+            const memoryMatch = searchLocalMemory(lowerInput);
+            if (!isOnline && memoryMatch) {
+                setAIState('thinking');
+                setTimeout(() => speakResponse(memoryMatch), 400);
+                return;
+            }
+
+            const activeKey = groqApiKey || BACKUP_GROQ_API_KEY;
             setAIState('thinking');
 
             if (isOnline && activeKey) {
@@ -864,43 +802,54 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
                     const activeModeConfig = MODES[currentMode] || MODES.perhatian;
                     const systemPrompt = activeModeConfig.prompt;
 
-                    conversationHistory.push({ role: 'user', parts: [{ text: userText }] });
+                    conversationHistory.push({ role: 'user', content: userText });
                     if(conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
 
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${activeKey}`, {
+                    const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${activeKey}`
+                        },
                         body: JSON.stringify({
-                            system_instruction: { parts: [{ text: systemPrompt }] },
-                            contents: conversationHistory,
-                            generationConfig: { temperature: 0.7, maxOutputTokens: 200 }
+                            model: "llama-3.3-70b-versatile",
+                            messages: [
+                                { role: 'system', content: systemPrompt },
+                                ...conversationHistory
+                            ],
+                            temperature: 0.7,
+                            max_tokens: 300
                         })
                     });
 
                     if (response.ok) {
                         const data = await response.json();
-                        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        const reply = data.choices?.[0]?.message?.content;
                         if (reply) {
-                            conversationHistory.push({ role: 'model', parts: [{ text: reply }] });
+                            conversationHistory.push({ role: 'assistant', content: reply });
                             speakResponse(reply);
                             logToGoogleForm(userText, reply);
                             
+                            // Simpan ke database memori lokal
                             qaDatabase.push({ q: lowerInput, a: reply });
-                            if (qaDatabase.length > 200) qaDatabase.shift();
-                            localStorage.setItem('ainun_qa_db', JSON.stringify(qaDatabase));
+                            if (qaDatabase.length > 150) qaDatabase.shift();
+                            localStorage.setItem('ainun_qa_memory_v4', JSON.stringify(qaDatabase));
                             return;
                         }
+                    } else {
+                        console.warn("Groq API Error Status:", response.status);
                     }
                 } catch (err) {
-                    console.warn("Gemini API error, using offline.", err);
+                    console.warn("Groq API connection error:", err);
                 }
             }
 
+            // Jika gagal online atau offline, gunakan memori lokal / fallback
             setTimeout(() => {
-                const reply = getOfflineResponse(userText);
-                speakResponse(reply);
-                logToGoogleForm(userText, reply);
-            }, 700);
+                const fallback = memoryMatch || getOfflineFallbackResponse(userText);
+                speakResponse(fallback);
+                logToGoogleForm(userText, fallback);
+            }, 600);
         }
 
         function startListening() {
@@ -964,21 +913,21 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
             isMuted = toggleMute.checked;
             isHandsFreeMode = toggleHandsFree.checked;
             isChipsVisible = toggleChips.checked;
-            geminiApiKey = apiKeyInput.value.trim();
+            groqApiKey = apiKeyInput.value.trim();
 
             saveSettingsToStorage();
             loadSettingsFromStorage();
             updateNetworkStatus();
             closeModal();
             
-            const txt = isMuted ? "Pengaturan disimpan. Aku balas lewat teks ya." : "Pengaturan sudah aku simpan ya, Ainunku.";
+            const txt = isMuted ? "Pengaturan disimpan. Suara dibisukan." : "Pengaturan sudah disimpan, Ainunku.";
             speakResponse(txt);
         });
 
         window.onload = () => {
             loadSettingsFromStorage();
             updateNetworkStatus();
-            drawEye();
+            drawAvatar();
             checkSpecialDates();
             
             setTimeout(() => {
@@ -990,10 +939,6 @@ Aturan Balasan: Jawab dengan 1-2 kalimat (10-30 kata). Lempar pertanyaan balik y
                     subtitleContainer.style.transform = 'translateY(0)';
                 }
             }, 500);
-            
-            if (synth.onvoiceschanged !== undefined) {
-                synth.onvoiceschanged = () => { console.log("Voices loaded."); };
-            }
         };
     </script>
 </body>
