@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FGD Ambalan HUD</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    colors: {
+                        scout: {
+                            dark: '#0f172a',
+                            panel: '#1e293b',
+                            primary: '#10b981', // Emerald
+                            accent: '#f59e0b',  // Amber
+                            danger: '#ef4444',
+                        }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 15px rgba(16, 185, 129, 0.5)',
+                        'glow-accent': '0 0 20px rgba(245, 158, 11, 0.6)',
+                        'slot': 'inset 0 10px 20px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'bounce-in': 'bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        bounceIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.8) translateY(20px)' },
+                            '60%': { opacity: '1', transform: 'scale(1.05) translateY(-5px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body {
+            background-color: #020617; /* Slate 950 */
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+        
+        /* Hide scrollbar */
+        ::-webkit-scrollbar { display: none; }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item.active {
+            color: #10b981;
+            transform: translateY(-5px);
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        /* Slot Machine Arcade Design */
+        .arcade-cabinet {
+            background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+            border-radius: 2rem;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.1);
+            border: 4px solid #334155;
+        }
+        .arcade-top-light {
+            background: linear-gradient(to bottom, #ef4444, #991b1b);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), inset 0 2px 4px rgba(255,255,255,0.4);
+        }
+        .slot-screen {
+            background: #020617;
+            box-shadow: inset 0 15px 30px rgba(0,0,0,0.9), 0 0 15px rgba(16, 185, 129, 0.2);
+            overflow: hidden;
+            position: relative;
+            border: 3px solid #10b981;
+        }
+        .slot-screen::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 30px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            z-index: 10;
+            pointer-events: none;
+        }
+        .slot-screen::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 30px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes spinReel {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .spinning .reel-content {
+            animation: spinReel 0.12s linear infinite;
+            filter: blur(2px);
+        }
+
+        /* Card flip */
+        .case-card {
+            transform-style: preserve-3d;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .case-card.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-active .accordion-content {
+            max-height: 2000px;
+        }
+        .accordion-active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        #toast {
+            transition: all 0.3s ease-in-out;
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="flex justify-center h-screen w-full overflow-hidden">
+
+    <div class="w-full max-w-md h-full flex flex-col relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        
+        <!-- Top Header -->
+        <header class="pt-5 pb-3 px-5 z-20 flex justify-between items-center bg-gradient-to-b from-black/90 to-transparent flex-shrink-0">
+            <div>
+                <h1 class="font-black text-xl text-white tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-scout-primary"></i> FGD Ambalan HUD
+                </h1>
+                <p class="text-[11px] text-slate-300 font-medium">SMA Islam Sudirman Tembarak</p>
+            </div>
+            <div class="w-9 h-9 rounded-full glass-panel border border-scout-primary/50 flex items-center justify-center text-scout-primary shadow-glow">
+                <i class="fa-solid fa-fire-flame-curved text-sm"></i>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Area with Extra Bottom Padding so Sticky Nav doesn't overlap content -->
+        <main class="flex-1 overflow-y-auto px-4 pb-36 z-10 scroll-smooth" id="main-scroll">
+            
+            <!-- VIEW: TANTANGAN (SLOT MACHINE - DEFAULT LANDING) -->
+            <div id="view-tantangan" class="flex flex-col pt-3 pb-8 animate-fade-in">
+                
+                <!-- Arcade Machine Housing -->
+                <div class="arcade-cabinet p-5 mb-6">
+                    <!-- Arcade Marquee Top Light -->
+                    <div class="arcade-top-light rounded-xl py-2 px-4 mb-4 text-center border border-red-400/40">
+                        <span class="font-mono font-black text-white text-xs tracking-widest uppercase drop-shadow">🎰 CASINO SLOT KASUS & DEBAT 🎰</span>
+                    </div>
+                    
+                    <!-- Slot Screen Display Window -->
+                    <div class="slot-screen rounded-2xl h-36 flex items-center justify-center relative mb-5">
+                        <!-- Neon laser center guide -->
+                        <div class="absolute w-full h-0.5 bg-scout-primary/40 top-1/2 -translate-y-1/2 z-20 shadow-[0_0_8px_#10b981]"></div>
+                        
+                        <div id="slot-reel" class="w-full text-center px-4 relative z-10 flex flex-col items-center justify-center h-full">
+                            <span class="font-mono text-lg font-bold text-slate-300 uppercase tracking-widest">
+                                <i class="fa-solid fa-gamepad text-scout-primary mb-1 text-2xl"></i><br>
+                                TARIK TUAS / SPIN
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Arcade Spin Button -->
+                    <button id="btn-spin" onclick="spinSlot()" class="w-full bg-gradient-to-b from-scout-accent via-amber-600 to-amber-800 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#78350f,0_15px_20px_rgba(0,0,0,0.6)] active:shadow-[0_0px_0_#78350f,0_5px_10px_rgba(0,0,0,0.5)] active:translate-y-[6px] transition-all uppercase tracking-widest border border-amber-300/60 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-rotate text-lg"></i> PULL & SPIN <i class="fa-solid fa-bolt"></i>
+                    </button>
+                </div>
+
+                <!-- Result Case Card (Fully visible above bottom nav) -->
+                <div id="case-display" class="case-card hidden w-full mb-6">
+                    <div class="glass-panel p-5 rounded-2xl relative overflow-hidden border-l-4 border-scout-primary shadow-2xl">
+                        <div class="absolute -top-4 -right-4 text-white/5 text-8xl pointer-events-none">
+                            <i class="fa-solid fa-quote-right"></i>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <span id="case-tag" class="bg-scout-primary/20 text-scout-primary border border-scout-primary/50 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Topik Debat</span>
+                            <button onclick="markCurrentCaseAsDone()" id="btn-done-case" class="text-xs bg-scout-primary/20 hover:bg-scout-primary text-scout-primary hover:text-slate-900 border border-scout-primary/50 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-check-circle"></i> Selesai
+                            </button>
+                        </div>
+                        
+                        <h3 id="case-title" class="text-lg font-bold text-white mb-2 relative z-10 leading-snug">Judul Permasalahan</h3>
+                        
+                        <div class="bg-slate-900/70 p-3.5 rounded-xl mb-3 text-slate-300 text-xs leading-relaxed relative z-10 border border-slate-800">
+                            <p id="case-text">Skenario diskusi akan muncul di sini.</p>
+                        </div>
+                        
+                        <div class="relative z-10 bg-slate-950/40 p-3 rounded-xl border border-scout-accent/30">
+                            <p class="text-[11px] font-bold text-scout-accent mb-1 uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid fa-circle-question"></i> Bahan Perdebatan / FGD:
+                            </p>
+                            <p id="case-question" class="text-xs font-medium text-white italic">Bagaimana sikap kelompok Anda?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: PANDUAN & MATERI KOMPREHENSIF -->
+            <div id="view-panduan" class="hidden space-y-4 pt-3 pb-6">
+                <div class="glass-panel p-5 rounded-2xl">
+                    <h2 class="text-lg font-bold text-scout-accent mb-2">Panduan Komprehensif FGD LDK</h2>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Modul panduan dan materi pokok kepemimpinan, teknik FGD, problem solving, serta manajemen konflik untuk Dewan Ambalan Kelas 11.
+                    </p>
+                </div>
+
+                <!-- 0. Konsep Dasar FGD & Debat -->
+                <div class="glass-panel rounded-xl overflow-hidden accordion accordion-active">
+                    <button class="w-full px-5 py-4 flex justify-between items-center text-left focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-bold text-sm flex items-center gap-2 text-scout-primary"><i class="fa-solid fa-circle-info"></i> 0. Konsep Dasar FGD & Debat</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform accordion-icon text-xs"></i>
+                    </button>
+                    <div class="accordion-content bg-slate-800/50">
+                        <div class="p-4 text-xs text-slate-300 space-y-3 border-t border-slate-700">
+                            <div>
+                                <strong class="text-white block mb-1">Mengapa Harus Menggunakan FGD?</strong>
+                                <p class="text-slate-400">Forum Group Discussion melatih investigasi kolektif, kerja sama tim, dan kepemimpinan setara (*peer leadership*). Setiap anggota regu wajib menyumbangkan sudut pandang nyata dalam memecahkan dilema organisasi.</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-3 rounded-lg border-l-2 border-amber-400">
+                                <strong class="text-white block mb-1">FGD vs Debat: Beda Orientasi</strong>
+                                <ul class="list-disc pl-4 text-slate-300 space-y-1">
+                                    <li><strong class="text-amber-300">Debat:</strong> Mencari benar-salah, kemenangan argumen individual, membela kubu tertentu (Win-Lose).</li>
+                                    <li><strong class="text-amber-300">FGD:</strong> Mencari mufakat, titik temu, dan solusi terbaik atas dilema bersama (Win-Win).</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong class="text-white block mb-1">Persiapan Pelaksanaan FGD</strong>
+                                <p class="text-slate-400">1. Pastikan suasana melingkar tanpa sekat.<br>2. Tunjuk satu orang pencatat/notulen dan pemantik waktu.<br>3. Fokus pada substansi masalah, bukan menyerang pribadi individu.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1. Problem Solving & Manajemen Konflik -->
+                <div class="glass-panel rounded-xl overflow-hidden accordion mt-3">
+                    <button class="w-full px-5 py-4 flex justify-between items-center text-left focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-bold text-sm flex items-center gap-2 text-scout-accent"><i class="fa-solid fa-brain"></i> 1. Problem Solving & Manajemen Konflik</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform accordion-icon text-xs"></i>
+                    </button>
+                    <div class="accordion-content bg-slate-800/50">
+                        <div class="p-4 text-xs text-slate-300 space-y-3 border-t border-slate-700">
+                            <div class="bg-slate-900 p-3 rounded-lg border-l-2 border-scout-accent">
+                                <strong class="text-white block mb-1">Teknik Pemecahan Masalah (Problem Solving)</strong>
+                                <ol class="list-decimal pl-4 space-y-1 text-slate-300">
+                                    <li><strong>Definisikan Masalah:</strong> Pisahkan fakta objektif dari asumsi emosional.</li>
+                                    <li><strong>Brainstorming Alternatif:</strong> Kumpulkan minimal 3 opsi solusi tanpa langsung menghakimi.</li>
+                                    <li><strong>Analisis Risiko:</strong> Timbang dampak jangka pendek dan panjang dari opsi terpilih.</li>
+                                    <li><strong>Eksekusi & Evaluasi:</strong> Tetapkan penanggung jawab dan tenggat waktu pelaksanaan.</li>
+                                </ol>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded-lg border-l-2 border-red-400">
+                                <strong class="text-white block mb-1">Manajemen Resolusi Konflik Lapangan</strong>
+                                <ul class="list-disc pl-4 space-y-1 text-slate-300">
+                                    <li><strong>Isolasi Emosi:</strong> Hindari menegur atau melerai anggota di tengah keramaian umum. Ajak ke ruang privat.</li>
+                                    <li><strong>Model Gunung Es:</strong> Masalah permukaan (amarah/teriakan) biasanya dipicu rasa tidak dihargai atau kelelahan fisik. Cari akar tersebut.</li>
+                                    <li><strong>Orientasi Solusi:</strong> Fokuskan dialog pada "Bagaimana kita memperbaikinya sekarang?" bukan "Siapa yang kemarin berbuat salah?".</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Nilai Ki Hajar Dewantara & SK Trimurti -->
+                <div class="glass-panel rounded-xl overflow-hidden accordion mt-3 mb-4">
+                    <button class="w-full px-5 py-4 flex justify-between items-center text-left focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-bold text-sm flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-medal"></i> 2. Teladan KHD & SK Trimurti</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform accordion-icon text-xs"></i>
+                    </button>
+                    <div class="accordion-content bg-slate-800/50">
+                        <div class="p-4 text-xs text-slate-300 space-y-3 border-t border-slate-700">
+                            <div>
+                                <strong class="text-white block mb-1">Tri Semboyan Ki Hajar Dewantara</strong>
+                                <p class="text-slate-400 mb-1">Ing Ngarso Sung Tulodo (Teladan di depan), Ing Madya Mangun Karso (Semangat di tengah), Tut Wuri Handayani (Dorongan di belakang).</p>
+                            </div>
+                            <div>
+                                <strong class="text-white block mb-1">Kritis & Berani ala SK Trimurti</strong>
+                                <p class="text-slate-400">Mengedepankan literasi fakta (Tabayyun) sebelum bertindak serta berani menyuarakan kebenaran secara konstruktif dan beretika organisasi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: PESERTA -->
+            <div id="view-peserta" class="hidden animate-fade-in pt-3 pb-6">
+                <div class="glass-panel p-5 rounded-2xl mb-5">
+                    <h2 class="text-base font-bold text-white mb-1">Manajemen Peserta</h2>
+                    <p class="text-xs text-slate-400 mb-4">Tambahkan audiens untuk mengacak giliran bicara secara adil.</p>
+
+                    <div class="flex gap-2 mb-4">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-user text-xs"></i>
+                            </div>
+                            <input type="text" id="input-name" placeholder="Nama Peserta / Regu..." class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-xl focus:outline-none focus:border-scout-primary pl-9 p-3" onkeypress="if(event.key==='Enter') addParticipant()">
+                        </div>
+                        <button onclick="addParticipant()" class="bg-scout-primary text-slate-900 font-bold px-4 rounded-xl shadow-glow hover:bg-emerald-400 transition active:scale-95 text-xs">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-xl p-4 border border-slate-700 text-center">
+                        <p class="text-[11px] text-slate-400 uppercase tracking-wider font-bold mb-1">Giliran Bicara Terpilih</p>
+                        <div id="picked-name" class="text-xl font-black text-slate-500 h-9 flex items-center justify-center transition-all duration-300 mb-3">
+                            ?
+                        </div>
+                        <button id="btn-pick" onclick="pickParticipant()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-scout-primary font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95 text-xs">
+                            <i class="fa-solid fa-dice text-sm"></i> Acak Pembicara Berikutnya
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4 rounded-2xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold text-white">Daftar (<span id="count-belum" class="text-scout-accent">0</span> blm bicara)</span>
+                        <button onclick="clearParticipants()" class="text-[11px] text-scout-danger hover:text-red-400 bg-red-500/10 px-2.5 py-1 rounded-lg transition"><i class="fa-solid fa-trash-can mr-1"></i> Hapus Semua</button>
+                    </div>
+                    <ul id="participant-list" class="space-y-2 max-h-52 overflow-y-auto pr-1">
+                        <!-- JS injected -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- VIEW: TIMER -->
+            <div id="view-timer" class="hidden flex-col items-center justify-center pt-6 pb-6">
+                <div class="glass-panel rounded-full w-64 h-64 flex flex-col items-center justify-center relative border-8 border-slate-800 shadow-[inset_0_0_40px_rgba(0,0,0,0.6)]">
+                    <span id="timer-display" class="font-mono text-6xl font-black text-white tracking-tighter">05:00</span>
+                    <span id="timer-status" class="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-widest bg-slate-900 px-3 py-1 rounded-full border border-slate-700">SIAP</span>
+                </div>
+
+                <!-- Presets -->
+                <div class="flex justify-center gap-2 mt-6 w-full px-2">
+                    <button onclick="setTimer(1)" class="flex-1 py-2 bg-slate-800 border border-slate-600 text-white rounded-xl text-xs font-bold hover:border-scout-primary transition">1 Mnt</button>
+                    <button onclick="setTimer(3)" class="flex-1 py-2 bg-slate-800 border border-slate-600 text-white rounded-xl text-xs font-bold hover:border-scout-primary transition">3 Mnt</button>
+                    <button onclick="setTimer(5)" class="flex-1 py-2 bg-scout-primary text-slate-900 rounded-xl text-xs font-bold shadow-glow transition">5 Mnt</button>
+                </div>
+                
+                <!-- Custom Time Input -->
+                <div class="flex justify-center gap-2 mt-3 w-full px-2 items-center bg-slate-900/50 p-2.5 rounded-xl border border-slate-800">
+                    <span class="text-[11px] text-slate-400 font-bold mr-1 uppercase">Custom:</span>
+                    <input type="number" id="custom-min" min="0" max="99" placeholder="Mnt" class="w-14 bg-slate-800 border border-slate-600 text-white text-center text-xs rounded-lg py-1.5 focus:outline-none focus:border-scout-primary font-mono">
+                    <span class="text-white font-bold">:</span>
+                    <input type="number" id="custom-sec" min="0" max="59" placeholder="Dtk" class="w-14 bg-slate-800 border border-slate-600 text-white text-center text-xs rounded-lg py-1.5 focus:outline-none focus:border-scout-primary font-mono">
+                    <button onclick="setCustomTimer()" class="bg-slate-700 hover:bg-scout-accent hover:text-slate-900 text-white font-bold px-3 py-1.5 rounded-lg transition text-xs shadow-md ml-1">
+                        Set
+                    </button>
+                </div>
+
+                <!-- Start / Pause / Reset -->
+                <div class="flex justify-center gap-3 mt-4 w-full px-2">
+                    <button id="btn-start" onclick="startTimer()" class="flex-1 bg-white text-slate-900 font-black py-3 rounded-xl shadow-lg active:scale-95 transition text-sm flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-play"></i> START
+                    </button>
+                    <button id="btn-pause" onclick="pauseTimer()" class="hidden flex-1 bg-scout-accent text-slate-900 font-black py-3 rounded-xl shadow-glow-accent active:scale-95 transition text-sm justify-center items-center gap-2">
+                        <i class="fa-solid fa-pause"></i> PAUSE
+                    </button>
+                    <button onclick="resetTimer()" class="w-14 bg-slate-800 border border-slate-600 text-slate-300 font-bold py-3 rounded-xl active:scale-95 transition flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW: KELOLA (CRUD) -->
+            <div id="view-kelola" class="hidden pt-3 pb-6">
+                <!-- Form Kasus -->
+                <div class="glass-panel p-4 rounded-2xl mb-5 border-t-2 border-scout-accent">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-white text-xs" id="form-header"><i class="fa-solid fa-pen-to-square text-scout-accent mr-1"></i> Editor Permasalahan & Debat</h3>
+                        <button onclick="cancelEdit()" id="btn-cancel-edit" class="hidden text-[10px] bg-slate-700 text-white px-2.5 py-1 rounded-lg">Batal</button>
+                    </div>
+                    
+                    <div class="space-y-2.5 text-xs">
+                        <input type="text" id="form-title" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-scout-accent" placeholder="Judul Topik / Masalah...">
+                        
+                        <input type="text" id="form-tag" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-scout-accent" placeholder="Kategori Topik (ex: Etika, Survival, Kepemimpinan)">
+                        
+                        <textarea id="form-text" rows="2.5" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-scout-accent" placeholder="Deskripsi/skenario perdebatan..."></textarea>
+                        
+                        <input type="text" id="form-question" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:border-scout-accent" placeholder="Pertanyaan untuk bahan debat / diskusi...">
+                        
+                        <button onclick="saveCase()" id="btn-save-case" class="w-full bg-scout-accent text-slate-900 font-bold py-2.5 rounded-xl shadow-glow-accent active:scale-95 transition mt-1">
+                            Simpan Topik Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Database List -->
+                <div class="glass-panel p-4 rounded-2xl">
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-700 text-xs">
+                        <span class="font-bold text-white">Database Topik (<span id="count-cases">0</span>)</span>
+                        <div class="flex gap-1.5">
+                            <button onclick="resetAllCaseStatus()" class="text-[10px] bg-slate-800 border border-slate-600 px-2 py-1 rounded text-slate-300" title="Reset centang selesai">
+                                <i class="fa-solid fa-rotate-right mr-0.5"></i> Reset
+                            </button>
+                            <button onclick="resetDefaultCases()" class="text-[10px] bg-slate-800 border border-slate-600 px-2 py-1 rounded text-slate-300">
+                                Default
+                            </button>
+                        </div>
+                    </div>
+                    <ul id="case-list-manage" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                        <!-- Loaded by JS -->
+                    </ul>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation Sticky -->
+        <nav class="fixed bottom-0 w-full max-w-md bg-slate-900/95 backdrop-blur-md border-t border-slate-800 z-50 px-2 pb-5 pt-2 flex justify-between">
+            <button onclick="switchTab('panduan')" id="nav-panduan" class="nav-item flex-1 flex flex-col items-center justify-center text-slate-400 gap-1 text-[10px] font-bold relative">
+                <i class="fa-solid fa-book text-base mb-0.5"></i> Panduan
+            </button>
+            <button onclick="switchTab('peserta')" id="nav-peserta" class="nav-item flex-1 flex flex-col items-center justify-center text-slate-400 gap-1 text-[10px] font-bold relative">
+                <i class="fa-solid fa-users text-base mb-0.5"></i> Peserta
+            </button>
+            
+            <!-- Central Slot Button -->
+            <button onclick="switchTab('tantangan')" id="nav-tantangan" class="nav-item active flex flex-col items-center justify-center text-slate-400 relative -mt-5">
+                <div class="w-13 h-13 bg-gradient-to-tr from-scout-accent to-amber-400 rounded-full flex items-center justify-center shadow-glow-accent text-white border-4 border-slate-900">
+                    <i class="fa-solid fa-slot-machine text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-1 text-slate-300">Slot</span>
+            </button>
+
+            <button onclick="switchTab('timer')" id="nav-timer" class="nav-item flex-1 flex flex-col items-center justify-center text-slate-400 gap-1 text-[10px] font-bold relative">
+                <i class="fa-solid fa-stopwatch text-base mb-0.5"></i> Timer
+            </button>
+            <button onclick="switchTab('kelola')" id="nav-kelola" class="nav-item flex-1 flex flex-col items-center justify-center text-slate-400 gap-1 text-[10px] font-bold relative">
+                <i class="fa-solid fa-folder-open text-base mb-0.5"></i> Kelola
+            </button>
+        </nav>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-scout-primary text-slate-900 px-4 py-2 rounded-lg font-bold text-xs shadow-glow z-50 pointer-events-none">
+            Berhasil!
+        </div>
+    </div>
+
+    <script>
+        // --- AUDIO SYSTEM (TONE.JS) ---
+        let audioInit = false;
+        let synth;
+        
+        async function initAudio() {
+            if (audioInit) return;
+            await Tone.start();
+            synth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "square" },
+                envelope: { attack: 0.005, decay: 0.08, sustain: 0.05, release: 0.2 }
+            }).toDestination();
+            Tone.Destination.volume.value = -3;
+            audioInit = true;
+        }
+
+        ['click', 'touchstart'].forEach(evt => 
+            document.body.addEventListener(evt, initAudio, { once: true })
+        );
+
+        function playClick() {
+            if (!audioInit) return;
+            synth.triggerAttackRelease("C6", "32n", Tone.now(), 0.1);
+        }
+
+        function playWin() {
+            if (!audioInit) return;
+            const now = Tone.now();
+            synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", now, 0.4);
+            synth.triggerAttackRelease(["E4", "G4", "C5", "E5"], "4n", now + 0.15, 0.5);
+            synth.triggerAttackRelease(["G4", "C5", "E5", "G5"], "2n", now + 0.35, 0.6);
+        }
+
+        function playAlarm() {
+            if (!audioInit) return;
+            const now = Tone.now();
+            synth.triggerAttackRelease("C5", "8n", now, 0.5);
+            synth.triggerAttackRelease("C5", "8n", now + 0.3, 0.5);
+            synth.triggerAttackRelease("C5", "8n", now + 0.6, 0.5);
+            synth.triggerAttackRelease("E5", "2n", now + 0.9, 0.6);
+        }
+
+        let spinIntervalSound;
+        function startSpinSound() {
+            if (!audioInit) return;
+            let noteIdx = 0;
+            const arcadeNotes = ["C3", "G3", "E4", "B3", "F3", "A3"];
+            spinIntervalSound = setInterval(() => {
+                synth.triggerAttackRelease(arcadeNotes[noteIdx % arcadeNotes.length], "16n", Tone.now(), 0.25);
+                noteIdx++;
+            }, 65); // Realistic arcade slot rolling mechanical sound
+        }
+        
+        function stopSpinSound() {
+            if (spinIntervalSound) clearInterval(spinIntervalSound);
+        }
+
+        // --- DATA & STATE ---
+        const defaultCaseStudies = [
+            { 
+                title: "Tradisi Senioritas vs Peraturan Sekolah", 
+                tag: "Etika & Regulasi", 
+                text: "Senior/alumni ambalan memaksa memberlakukan hukuman fisik lapangan dengan alasan 'menjaga tradisi turun-temurun', padahal pihak sekolah melarang tegas segala bentuk kekerasan fisik.", 
+                question: "Apakah tradisi senioritas harus dilestarikan jika bertentangan dengan aturan modern? Bagaimana jalan tengahnya?", 
+                done: false 
+            },
+            { 
+                title: "Dilema Panitia: Antara Loyalitas dan Akademik", 
+                tag: "Prioritas Organisasi", 
+                text: "Menjelang perkemahan besar, pengurus inti ambalan dihadapkan pada ujian sekolah yang sangat padat. Sebagian ingin fokus belajar, sebagian mendesak persiapan kemah dilanjutkan.", 
+                question: "Mana yang harus diprioritaskan: menyelamatkan nilai akademik individu atau menjaga kesiapan acara organisasi?", 
+                done: false 
+            },
+            { 
+                title: "Krisis Logistik: Makanan Basi & Kas Menipis", 
+                tag: "Survival & Krisis", 
+                text: "Jatah konsumsi makan malam peserta perkemahan luar ternyata basi dan tidak layak konsumsi. Kas ambalan hanya cukup untuk 30% dari total kebutuhan darurat.", 
+                question: "Langkah taktis darurat apa yang harus diambil dewan ambalan dalam 30 menit ke depan tanpa menimbulkan kepanikan?", 
+                done: false 
+            },
+            { 
+                title: "Anggota Pasif & 'Free Rider' dalam Regu", 
+                tag: "Dinamika Anggota", 
+                text: "Dalam proyek pembuatan pionering, dari 10 anggota regu, hanya 3 orang yang bekerja keras sementara sisanya asyik mengobrol dan bermain ponsel.", 
+                question: "Bagaimana cara pemimpin regu menegur tanpa memicu pertengkaran atau membuat anggota tersebut ngambek?", 
+                done: false 
+            },
+            { 
+                title: "Konten Medsos vs Kesakralan Acara", 
+                tag: "Etika Digital", 
+                text: "Saat upacara pelantikan/renungan malam yang sakral, beberapa peserta kedapatan merekam video secara sembunyi-sembunyi demi konten TikTok/Reels.", 
+                question: "Apakah kebebasan berekspresi di media sosial boleh mengorbankan kekhidmatan tradisi? Di mana batasannya?", 
+                done: false 
+            },
+            { 
+                title: "Pro Kontra Inovasi Pramuka Modern", 
+                tag: "Transformasi", 
+                text: "Sebagian pengurus ingin mengubah total format latihan pramuka menjadi games petualangan modern ala outbound kekinian, sementara senior lama menuntut tetap pertahankan format lama.", 
+                question: "Bagaimana cara menyatukan visi tanpa dicap 'melupakan akar sejarah ambalan'?", 
+                done: false 
+            },
+            { 
+                title: "Cinta Lokasi (Cinlok) Pengurus Inti", 
+                tag: "Profesionalisme", 
+                text: "Dua pimpinan teras ambalan yang sedang berpacaran mengalami konflik pribadi, mengakibatkan komunikasi organisasi macet dan rapat pleno terganggu.", 
+                question: "Bagaimana standar profesionalisme organisasi menghadapi masalah personal pengurus?", 
+                done: false 
+            },
+            { 
+                title: "Ancaman Cuaca Ekstrem saat Kegiatan Alam", 
+                tag: "Manajemen Risiko", 
+                text: "Tenda perkemahan luar ruang mulai diterjang angin kencang dan hujan lebat. Pihak pembina menyerahkan keputusan mutlak pada dewan ambalan: lanjut atau batalkan?", 
+                question: "Apa dasar rasional dan indikator utama dalam mengambil keputusan evakuasi darurat?", 
+                done: false 
+            },
+            { 
+                title: "Miskomunikasi Lintas Angkatan (Kelas 10 & 11)", 
+                tag: "Kaderisasi", 
+                text: "Adik kelas 10 merasa mendapat instruksi yang saling bertentangan dari dua pengurus kelas 11 yang berbeda bidang, sehingga terjadi kebingungan eksekusi tugas.", 
+                question: "Bagaimana memperbaiki koordinasi internal dewan pengurus agar tidak membingungkan anggota di bawah?", 
+                done: false 
+            },
+            { 
+                title: "Baku Hantam Ego Ego Sektoral Antar Regu", 
+                tag: "Solidaritas", 
+                text: "Terjadi perdebatan sengit berujung nyaris fisik antar regu karena memperebutkan fasilitas tenda dan kayu bakar terbaik saat pos tracking.", 
+                question: "Bagaimana mendamaikan tensi kompetisi yang berlebihan agar kembali menjadi sportivitas pramuka?", 
+                done: false 
+            }
+        ];
+
+        let caseStudies = JSON.parse(localStorage.getItem('pramukaCasesSlot6')) || [...defaultCaseStudies];
+        let participants = JSON.parse(localStorage.getItem('pramukaParticipantsSlot6')) || [];
+        let editIndex = -1;
+        let currentActiveCaseIndex = -1;
+
+        function syncDB() {
+            localStorage.setItem('pramukaCasesSlot6', JSON.stringify(caseStudies));
+            localStorage.setItem('pramukaParticipantsSlot6', JSON.stringify(participants));
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.className = `fixed bottom-24 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg font-bold text-xs shadow-glow z-50 pointer-events-none transition-all duration-300 ${isError ? 'bg-scout-danger text-white' : 'bg-scout-primary text-slate-900'}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // --- NAVIGATION ---
+        function switchTab(tab) {
+            playClick();
+            ['panduan', 'tantangan', 'peserta', 'timer', 'kelola'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`view-${t}`).classList.remove('flex', 'animate-fade-in');
+                
+                const nav = document.getElementById(`nav-${t}`);
+                if(nav) {
+                    nav.classList.remove('active');
+                    if(t === 'tantangan') nav.querySelector('div').classList.replace('from-scout-accent', 'from-scout-primary');
+                }
+            });
+
+            const targetView = document.getElementById(`view-${tab}`);
+            targetView.classList.remove('hidden');
+            targetView.classList.add('animate-fade-in');
+            if(tab === 'tantangan' || tab === 'timer') targetView.classList.add('flex');
+
+            const targetNav = document.getElementById(`nav-${tab}`);
+            if(targetNav) {
+                targetNav.classList.add('active');
+                if(tab === 'tantangan') targetNav.querySelector('div').classList.replace('from-scout-primary', 'from-scout-accent');
+            }
+
+            if(tab === 'kelola') renderManageList();
+            if(tab === 'peserta') renderParticipants();
+            
+            document.getElementById('main-scroll').scrollTop = 0;
+        }
+
+        // --- ACCORDION ---
+        function toggleAccordion(btn) {
+            const container = btn.parentElement;
+            document.querySelectorAll('.accordion').forEach(acc => {
+                if(acc !== container) acc.classList.remove('accordion-active');
+            });
+            container.classList.toggle('accordion-active');
+        }
+
+        // --- SLOT MACHINE LOGIC (5 SECONDS REALISTIC SPIN) ---
+        let isSpinning = false;
+        function spinSlot() {
+            if (isSpinning) return;
+
+            let availableCases = caseStudies.map((c, idx) => ({ ...c, originalIndex: idx })).filter(c => !c.done);
+
+            if (availableCases.length === 0) {
+                showToast("Semua topik sudah selesai didiskusikan! Reset status di tab Kelola.", true);
+                return;
+            }
+
+            isSpinning = true;
+            playClick();
+            startSpinSound();
+
+            const reel = document.getElementById('slot-reel');
+            const btn = document.getElementById('btn-spin');
+            const card = document.getElementById('case-display');
+
+            card.classList.remove('show');
+            setTimeout(() => card.classList.add('hidden'), 300);
+            
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            reel.classList.add('spinning');
+
+            const fakeTags = ["DEBAT Kritis", "DILEMA Organisasi", "SURVIVAL", "ETIKA", "KRISIS Lapangan", "STRATEGI"];
+            let ticks = 0;
+            const duration = 5000; // Exactly 5 seconds spinning duration
+            const intervalTime = 100;
+            
+            const spinInterval = setInterval(() => {
+                const randomTag = fakeTags[Math.floor(Math.random() * fakeTags.length)];
+                reel.innerHTML = `<span class="font-mono text-xl font-black text-scout-primary drop-shadow-[0_0_10px_#10b981]">${randomTag}</span>`;
+                ticks += intervalTime;
+
+                if (ticks >= duration) {
+                    clearInterval(spinInterval);
+                    finishSpin(reel, btn, card, availableCases);
+                }
+            }, intervalTime);
+        }
+
+        function finishSpin(reel, btn, card, availableCases) {
+            reel.classList.remove('spinning');
+            stopSpinSound();
+            playWin();
+            
+            const selected = availableCases[Math.floor(Math.random() * availableCases.length)];
+            currentActiveCaseIndex = selected.originalIndex;
+
+            reel.innerHTML = `<span class="font-mono text-sm font-black text-scout-accent drop-shadow-[0_0_12px_#f59e0b] scale-105 transition-transform uppercase">🔥 ${selected.tag} 🔥</span>`;
+
+            document.getElementById('case-title').innerText = selected.title;
+            document.getElementById('case-tag').innerText = selected.tag;
+            document.getElementById('case-text').innerText = selected.text;
+            document.getElementById('case-question').innerText = selected.question;
+
+            const doneBtn = document.getElementById('btn-done-case');
+            doneBtn.innerHTML = `<i class="fa-solid fa-check-circle"></i> Selesai`;
+            doneBtn.classList.remove('bg-scout-primary', 'text-slate-900');
+            doneBtn.classList.add('bg-scout-primary/20', 'text-scout-primary');
+
+            setTimeout(() => {
+                card.classList.remove('hidden');
+                void card.offsetWidth;
+                card.classList.add('show', 'animate-bounce-in');
+                
+                isSpinning = false;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                
+                // Scroll down smoothly to reveal card fully above bottom nav
+                document.getElementById('main-scroll').scrollTo({ top: 300, behavior: 'smooth' });
+            }, 600);
+        }
+
+        function markCurrentCaseAsDone() {
+            if (currentActiveCaseIndex === -1) return;
+            caseStudies[currentActiveCaseIndex].done = true;
+            syncDB();
+
+            const doneBtn = document.getElementById('btn-done-case');
+            doneBtn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai (Tersimpan)`;
+            doneBtn.classList.remove('bg-scout-primary/20', 'text-scout-primary');
+            doneBtn.classList.add('bg-scout-primary', 'text-slate-900');
+
+            showToast("Topik ditandai selesai & tidak akan muncul lagi di spin!");
+        }
+
+        // --- PARTICIPANTS ---
+        function addParticipant() {
+            const input = document.getElementById('input-name');
+            const name = input.value.trim();
+            if(name) {
+                participants.push({ id: Date.now(), name: name, spoken: false });
+                input.value = '';
+                syncDB();
+                renderParticipants();
+            }
+        }
+
+        function toggleSpoken(id) {
+            const p = participants.find(x => x.id === id);
+            if(p) {
+                p.spoken = !p.spoken;
+                syncDB();
+                renderParticipants();
+            }
+        }
+
+        function removeParticipant(id) {
+            participants = participants.filter(x => x.id !== id);
+            syncDB();
+            renderParticipants();
+        }
+
+        function clearParticipants() {
+            participants = [];
+            syncDB();
+            renderParticipants();
+            document.getElementById('picked-name').innerText = "?";
+        }
+
+        function renderParticipants() {
+            const list = document.getElementById('participant-list');
+            const count = document.getElementById('count-belum');
+            list.innerHTML = '';
+            
+            let belum = 0;
+            if (participants.length === 0) {
+                list.innerHTML = '<li class="text-xs text-slate-500 text-center py-4 border border-dashed border-slate-700 rounded-lg">Belum ada peserta</li>';
+            } else {
+                participants.forEach(p => {
+                    if(!p.spoken) belum++;
+                    list.innerHTML += `
+                        <li class="flex items-center justify-between bg-slate-800 p-2.5 rounded-xl border border-slate-700 ${p.spoken ? 'opacity-50 bg-slate-900' : ''}">
+                            <div class="flex items-center gap-2.5">
+                                <button onclick="toggleSpoken(${p.id})" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${p.spoken ? 'bg-scout-primary border-scout-primary text-slate-900' : 'border-slate-500 text-transparent hover:border-scout-primary'}">
+                                    <i class="fa-solid fa-check text-[10px]"></i>
+                                </button>
+                                <span class="text-xs font-bold ${p.spoken ? 'line-through text-slate-500' : 'text-white'}">${p.name}</span>
+                            </div>
+                            <button onclick="removeParticipant(${p.id})" class="text-slate-500 hover:text-scout-danger px-2 py-1"><i class="fa-solid fa-xmark text-xs"></i></button>
+                        </li>
+                    `;
+                });
+            }
+            count.innerText = belum;
+        }
+
+        function pickParticipant() {
+            const available = participants.filter(p => !p.spoken);
+            if(available.length === 0) {
+                showToast("Semua peserta sudah bicara / Kosong!", true);
+                return;
+            }
+
+            playClick();
+            const btn = document.getElementById('btn-pick');
+            const display = document.getElementById('picked-name');
+            btn.disabled = true;
+            
+            display.className = "text-xl font-black text-slate-400 h-9 flex items-center justify-center transition-all duration-300 mb-3";
+
+            let ticks = 0;
+            if (audioInit) startSpinSound();
+            
+            const spinner = setInterval(() => {
+                display.innerText = available[Math.floor(Math.random() * available.length)].name;
+                ticks++;
+                if(ticks > 12) {
+                    clearInterval(spinner);
+                    stopSpinSound();
+                    playWin();
+                    const winner = available[Math.floor(Math.random() * available.length)];
+                    display.innerHTML = `<span class="animate-pulse text-scout-primary font-black">🔥 ${winner.name} 🔥</span>`;
+                    btn.disabled = false;
+                }
+            }, 80);
+        }
+
+        // --- CASE MANAGEMENT (CRUD) ---
+        function renderManageList() {
+            const list = document.getElementById('case-list-manage');
+            document.getElementById('count-cases').innerText = caseStudies.length;
+            list.innerHTML = '';
+
+            if (caseStudies.length === 0) {
+                list.innerHTML = '<li class="text-xs text-slate-500 text-center py-4 border border-dashed border-slate-700 rounded-lg">Database kosong.</li>';
+                return;
+            }
+
+            caseStudies.forEach((c, index) => {
+                list.innerHTML += `
+                    <li class="bg-slate-800 p-2.5 rounded-xl border border-slate-700 flex flex-col gap-1.5 ${c.done ? 'opacity-60 bg-slate-900/80' : ''}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" ${c.done ? 'checked' : ''} onclick="toggleCaseDone(${index})" class="w-4 h-4 rounded text-scout-primary focus:ring-0 cursor-pointer">
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <h4 class="font-bold text-xs text-white ${c.done ? 'line-through text-slate-400' : ''}">${c.title}</h4>
+                                    </div>
+                                    <span class="text-[9px] bg-slate-700 text-slate-300 px-1.5 py-0.2 rounded uppercase">${c.tag}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="prepareEdit(${index})" class="text-slate-400 hover:text-scout-accent p-1"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="deleteCase(${index})" class="text-slate-400 hover:text-scout-danger p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            });
+        }
+
+        function toggleCaseDone(index) {
+            caseStudies[index].done = !caseStudies[index].done;
+            syncDB();
+            renderManageList();
+        }
+
+        function resetAllCaseStatus() {
+            caseStudies.forEach(c => c.done = false);
+            syncDB();
+            renderManageList();
+            showToast("Semua status topik direset!");
+        }
+
+        function prepareEdit(index) {
+            editIndex = index;
+            const c = caseStudies[index];
+            
+            document.getElementById('form-title').value = c.title;
+            document.getElementById('form-tag').value = c.tag;
+            document.getElementById('form-text').value = c.text;
+            document.getElementById('form-question').value = c.question;
+            
+            document.getElementById('form-header').innerHTML = `<i class="fa-solid fa-pen-to-square text-scout-accent mr-1"></i> Edit Topik Debat`;
+            document.getElementById('btn-save-case').innerText = "Update Topik";
+            document.getElementById('btn-save-case').className = "w-full bg-scout-primary text-slate-900 font-bold py-2.5 rounded-xl shadow-glow active:scale-95 transition mt-1 text-xs";
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            
+            document.getElementById('main-scroll').scrollTop = 0;
+        }
+
+        function cancelEdit() {
+            editIndex = -1;
+            document.getElementById('form-title').value = '';
+            document.getElementById('form-tag').value = '';
+            document.getElementById('form-text').value = '';
+            document.getElementById('form-question').value = '';
+            
+            document.getElementById('form-header').innerHTML = `<i class="fa-solid fa-pen-to-square text-scout-accent mr-1"></i> Editor Permasalahan & Debat`;
+            document.getElementById('btn-save-case').innerText = "Simpan Topik Baru";
+            document.getElementById('btn-save-case').className = "w-full bg-scout-accent text-slate-900 font-bold py-2.5 rounded-xl shadow-glow-accent active:scale-95 transition mt-1 text-xs";
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+        }
+
+        function saveCase() {
+            const title = document.getElementById('form-title').value.trim();
+            const tag = document.getElementById('form-tag').value.trim() || 'UMUM';
+            const text = document.getElementById('form-text').value.trim();
+            const question = document.getElementById('form-question').value.trim();
+
+            if (!title || !text || !question) {
+                showToast("Lengkapi form dengan benar!", true);
+                return;
+            }
+
+            const newData = { title, tag, text, question, done: false };
+
+            if (editIndex === -1) {
+                caseStudies.push(newData);
+                showToast("Topik Debat Baru Ditambahkan!");
+            } else {
+                newData.done = caseStudies[editIndex].done;
+                caseStudies[editIndex] = newData;
+                showToast("Topik Berhasil Diperbarui!");
+            }
+
+            syncDB();
+            cancelEdit();
+            renderManageList();
+        }
+
+        function deleteCase(index) {
+            caseStudies.splice(index, 1);
+            syncDB();
+            renderManageList();
+            if(editIndex === index) cancelEdit();
+            showToast("Topik Dihapus!", true);
+        }
+
+        function resetDefaultCases() {
+            caseStudies = [...defaultCaseStudies];
+            syncDB();
+            renderManageList();
+            cancelEdit();
+            showToast("Database direstore ke default!");
+        }
+
+        // --- TIMER ---
+        let timerInterval;
+        let timeLeft = 300; 
+        let isRunning = false;
+        let initialTime = 300;
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            const el = document.getElementById('timer-display');
+            
+            el.innerText = `${m}:${s}`;
+            
+            if (timeLeft <= 60 && timeLeft > 0) {
+                el.classList.add('text-scout-danger', 'animate-pulse');
+                el.classList.remove('text-white');
+            } else {
+                el.classList.remove('text-scout-danger', 'animate-pulse');
+                el.classList.add('text-white');
+            }
+
+            if(timeLeft === 0) {
+                document.getElementById('timer-status').innerText = "WAKTU HABIS";
+                document.getElementById('timer-status').className = "text-[10px] text-white mt-2 font-bold uppercase tracking-widest bg-scout-danger px-3 py-1 rounded-full animate-bounce";
+                playAlarm();
+            }
+        }
+
+        function setTimer(minutes) {
+            playClick();
+            pauseTimer();
+            initialTime = minutes * 60;
+            timeLeft = initialTime;
+            document.getElementById('timer-status').innerText = "SIAP";
+            document.getElementById('timer-status').className = "text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-widest bg-slate-900 px-3 py-1 rounded-full border border-slate-700";
+            updateTimerDisplay();
+            
+            document.getElementById('custom-min').value = '';
+            document.getElementById('custom-sec').value = '';
+        }
+
+        function setCustomTimer() {
+            let m = parseInt(document.getElementById('custom-min').value) || 0;
+            let s = parseInt(document.getElementById('custom-sec').value) || 0;
+            
+            if (m === 0 && s === 0) {
+                showToast("Masukkan durasi waktu yang valid!", true);
+                return;
+            }
+
+            playClick();
+            pauseTimer();
+            initialTime = (m * 60) + s;
+            timeLeft = initialTime;
+            document.getElementById('timer-status').innerText = "SIAP";
+            document.getElementById('timer-status').className = "text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-widest bg-slate-900 px-3 py-1 rounded-full border border-slate-700";
+            updateTimerDisplay();
+        }
+
+        function startTimer() {
+            if (isRunning || timeLeft === 0) return;
+            isRunning = true;
+            playClick();
+            document.getElementById('timer-status').innerText = "BERJALAN";
+            
+            document.getElementById('btn-start').classList.add('hidden');
+            document.getElementById('btn-pause').classList.remove('hidden');
+            document.getElementById('btn-pause').classList.add('flex');
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    pauseTimer();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (isRunning) playClick();
+            clearInterval(timerInterval);
+            isRunning = false;
+            
+            if(timeLeft > 0) document.getElementById('timer-status').innerText = "JEDA";
+            
+            document.getElementById('btn-pause').classList.add('hidden');
+            document.getElementById('btn-pause').classList.remove('flex');
+            document.getElementById('btn-start').classList.remove('hidden');
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timeLeft = initialTime;
+            document.getElementById('timer-status').innerText = "SIAP";
+            document.getElementById('timer-status').className = "text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-widest bg-slate-900 px-3 py-1 rounded-full border border-slate-700";
+            updateTimerDisplay();
+        }
+
+        // --- INIT ---
+        renderParticipants();
+        updateTimerDisplay();
+        switchTab('tantangan');
+    </script>
+</body>
+</html>
